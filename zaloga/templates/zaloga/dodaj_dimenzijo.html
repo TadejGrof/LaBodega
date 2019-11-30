@@ -1,0 +1,80 @@
+{% extends 'program/base.html' %}
+
+
+{% load zaloga_exstras %}
+
+{% block content %}
+    <style>
+        div.okno{
+            position:absolute;
+            width:50%;
+            height:60%;
+            left:25%;
+            top:25%;
+            font-size:4vh;
+            text-align:center
+        }
+        div.title{
+            font-size:6vh;
+            text-align:center;
+            margin-top:3%;
+        }
+        div.tabela{
+            display:block;
+            width:30%;
+            position:relative;
+            left:35%;
+            margin-top:4%;
+            text-align:center
+        }
+    </style>
+    <div class="title">
+        {{slovar|keyvalue:'Nova dimenzija'|keyvalue:jezik}}
+    </div>
+    <div class="tabela">
+        <table style="font-size:4vh;width:100%">
+            <tr>
+                <td>{{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:</td>
+                <td><input form="nova_dimenzija" name="dimenzija" type="text" required autocomplete="off"></td>
+            </tr>
+            <tr>
+                <td>Radius:</td>
+                <td><input form="nova_dimenzija" name="radius" type="text" pattern="R[1-2]{1}[0-9]{1}" required autocomplete="off"></td>
+            </tr>
+            <tr>
+                <td>Height:</td>
+                <td><input form="nova_dimenzija" name="height" type="text" pattern="[1-3]{1}[0-9]{1}(0|5)" required autocomplete="off"></td>
+            </tr>
+            <tr>
+                <td>Width:</td>
+                <td><input form="nova_dimenzija" name="width" type="text" pattern="([1-9]{1}(0|5)C?|R)" required autocomplete="off"></td>
+            </tr>
+            <tr>
+                <td>Special:</td>
+                <td>
+                    <select form="nova_dimenzija" name="special">
+                        <option value="false" selected> None </option>
+                        <option value="true"> C </option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <form id="nova_dimenzija" action="{% url 'nova_dimenzija' %}" method="POST">
+            {% csrf_token %}
+            <input style="margin-top:2%;display:inline-block;width:30%;height:10%;"type="submit" value="{{slovar|keyvalue:'Dodaj'|keyvalue:jezik}}">
+        </form>
+    </div>
+
+    {%if perms.admin.view_logentry %}
+        <div style="margin-top:5%;text-align:center;font-size:4vh">
+            Dodaj iz datoteke:
+            <form enctype='multipart/form-data' action="{% url 'sestavine_iz_datoteke' %}" method="POST">
+                {% csrf_token %}
+                <input type="file" name="datoteka" value="brskaj">
+                <input type="submit" value="potrdi">
+            </form>
+        </div>
+    {% endif %}
+
+    </div>
+{% endblock %}

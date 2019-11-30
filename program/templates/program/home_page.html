@@ -1,0 +1,166 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+    <style>
+        div.tip:hover {
+            background-color:red;
+        }
+        div.title{
+            height:10%;
+            text-align:center;
+            font-size:4vh;
+            margin-top:1%;
+        }
+        div.cetrt{
+            height:70%;
+            width:49%;
+            margin:0%;
+            padding:0%;
+            display:inline-block;
+            overflow:auto;
+            border:1px solid black
+        }
+        a:hover{
+            background-color: red;
+        }
+    </style>
+
+    <div style="height:2%"></div>
+    {% if perms.admin.view_logentry %}
+    <form action="{% url 'ponastavi_zalogo' %}" method="POST">
+        {% csrf_token %}	
+        <input type="submit" value="ponastavi_zalogo">
+    </form>
+    {% endif %}
+
+    {% if perms.zaloga.view_zaloga %}
+        <div class="cetrt pogoste_dimenzije">
+            <div class="title">
+                Radius:
+                <select name="radius" form="top10">
+                    <option value="all"> All </option>
+                    {% for radius in zaloga.vrni_razlicne_radiuse %}
+                        <option value="{{radius}}"> {{radius}} </option>
+                    {% endfor %}
+                </select>
+                Tip:
+                <select name="tip" form="top10">
+                    {% for tip in zaloga.vrni_tipe %}
+                        <option value="{{tip.0}}"> {{tip.1}} </option>
+                    {% endfor %}
+                </select>
+                <form style="display:inline-block" id="top10" action="{% url 'home_page' %}" method="GET">
+                    <input type="submit" value="Filtriraj">
+                </form>
+            </div>
+            <table class="tabela_vnosov">
+                <tr>
+                    <th> Dimenzija:</th>
+                    <th> Tip: </th>
+                    <th> Zaloga: </th>
+                </tr>
+                {% for sestavina in sestavine %}
+                    <tr>
+                        <td> {{sestavina.dimenzija}} </td>
+                        <td> {{tip}} </td>
+                        <td> {{sestavina|stringvalue:tip}} </td>
+                    <tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+    {% if perms.prodaja.view_stranka %}
+    <div class="cetrt stranke">
+        <div class="title"> {{slovar|keyvalue:'Stranke'|keyvalue:jezik}}: </div>
+        <table class="tabela_vnosov">
+            <tr class="header">
+                <th> {{slovar|keyvalue:'Ime'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Telefon'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'E-mail'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}} </th>
+            </tr>
+            {% for stranka in stranke %}
+                <tr>
+                    <td> {{stranka.naziv}} </td>
+                    <td> {{stranka.telefon}} </td>
+                    <td> {{stranka.mail}} </td>
+                    <td> 
+                        <form action="{% url 'nova_dnevna_prodaja' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="stranka" value="{{stranka.pk}}">
+                            <input type="date" hidden="hidden" name="datum" value="{{danes}}">
+                            <input type="submit" value="nova prodaja">
+                        </form>
+                    </tr>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    {% if perms.zaloga.view_dnevna_prodaja %}
+    <div class="cetrt dnevna_prodaja">
+        {% if dnevna_prodaja == None %}
+            <div style="font-size:6vh;margin-top:5%" class="title">
+                {{zaloga.danes}}
+            </div>
+            <div class="ustvari_prodajo" style="margin-top:5%">
+                <form style="width:90%;height:50%;display:inline-block" action="{% url 'nova_dnevna_prodaja' %}" method="POST">
+                    {% csrf_token %}
+                    <input style="width:60%;height:70%;font-size:5vh" type="submit" value="Nova dnevna prodaja">
+                </form>
+            </div>
+        {% else %}
+            <div class="title"> {{dnevna_prodaja.title}} Prodane: </div>
+            <table class="tabela_vnosov">
+                <tr>
+                    <th> Dimenzija:</th>
+                    <th> Tip: </th>
+                    <th> Stevilo: </th>
+                </tr>
+                {% with dnevna_prodaja.prodane as prodane %}
+                {% for prodana in prodane %}
+                    <tr>
+                        <td> {{prodane|keyvalue:prodana|keyvalue:'dimenzija'}} </td>
+                        <td> {{prodane|keyvalue:prodana|keyvalue:'tip'}} </td>
+                        <td> {{prodane|keyvalue:prodana|keyvalue:'stevilo'}} </td>
+                    </tr>
+                {% endfor %}
+                {% endwith %}
+                <tr>
+                    <td colspan="2"> Skupno stevilo:</td>
+                    <td> {{dnevna_prodaja.skupno_stevilo}} </td>
+                </tr>
+                <tr>
+                    <td colspan="2"> Skupna cena:</td>
+                    <td> {{dnevna_prodaja.skupna_cena}} $ </td>
+                </tr>
+            </table>
+
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="cetrt info">
+        <div class="sestavina_finder">
+        </div>
+
+        <div class="cena_finder">
+        </div>
+    </div>
+    
+
+    <script>
+        function pokazi_pogoste_dimenzije(tip){
+            if (tip == "yellow"){
+                toggle('tabela_yellow', 'block')
+                toggle('tabela_white', 'none')
+            } else if (tip == "white"){
+                toggle('tabela_yellow', 'none')
+                toggle('tabela_white', 'block')
+            }
+        }
+    </script>
+{% endblock %}

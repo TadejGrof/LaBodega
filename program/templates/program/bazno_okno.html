@@ -1,0 +1,91 @@
+{% load zaloga_exstras %}
+
+<style>
+    table.okno{
+        padding:1%;
+        display:inline-block;
+        width:70%;
+        border:1px solid black;
+        margin-top:2%; 
+    }
+</style>
+{% if baza.tip == "prevzem" %}
+    <table id="tabela_podatkov" class="tabela_podatkov okno">
+        <tr class="header">
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki baze'|keyvalue:jezik}}:</th>
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki kontejnerja'|keyvalue:jezik}}: </th>
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Ostali podatki'|keyvalue:jezik}}: </th>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{slovar|keyvalue:baza.tip|keyvalue:jezik}} </td>
+            <td class="info"> {{slovar|keyvalue:'Stevilka'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.kontejner.stevilka}} </td>
+            <td class="info"> User: </td>
+            <td class="podatek"> {{baza.author.username}} </td>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.title}} </td>
+            <td class="info"> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.kontejner.posiljatelj}} </td>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.datum}} </td>
+            <td class="info"> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.kontejner.drzava}} </td>
+        </tr>
+    </table>
+{% elif baza.tip == "vele_prodaja" %}
+    <table  id="tabela_podatkov" class="tabela_podatkov okno">
+        <tr class="header">
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki prodaje'|keyvalue:jezik}}:</th>
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki stranke'|keyvalue:jezik}}: </th>
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki prodajalca'|keyvalue:jezik}}: </th>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.tip}} </td>
+            <td class="info"> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.stranka.ime}} </td>
+            <td class="info"> {{slovar|keyvalue:'Prodajalec'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.author.username}} </td>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Faktura'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.title}} </td>
+            <td class="info"> {{slovar|keyvalue:'Telefon'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.stranka.telefon}} </td>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.datum}} </td>
+            <td class="info"> {{slovar|keyvalue:'E-mail'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.stranka.mail}} </td>
+        </tr>
+    </table>
+{% else %}
+    <table  id="tabela_podatkov" class="tabela_podatkov okno">
+        <tr class="header">
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki baze'|keyvalue:jezik}}:</th>
+            <th width=33% colspan="2"> {{slovar|keyvalue:'Ostali podatki'|keyvalue:jezik}}: </th>
+            <th width=33% colspan="2"></th>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{slovar|keyvalue:baza.tip|keyvalue:jezik}} </td>
+            <td class="info"> User: </td>
+            <td class="podatek"> {{baza.author.username}} </td>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.title}} </td>
+        </tr>
+        <tr>
+            <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+            <td class="podatek"> {{baza.datum}} </td>
+        </tr>
+    </table>
+{% endif %}
+    

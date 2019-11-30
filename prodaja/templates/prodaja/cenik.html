@@ -1,0 +1,142 @@
+{% extends 'program/base.html' %}
+
+{% block content %}
+
+<style>
+    div.besedilo{
+        display:block;
+        position:relative;
+        text-align:center;
+        font-size:5vh;
+        margin-top:2%
+    }
+    div.table{
+        position:relative;
+        left:15%;
+        width:70%;
+        margin-top:2%
+    }
+    div.filter{
+            display:block;
+            margin-top:2%;
+            width:100%;
+            text-align:center;
+            height:15%;
+        }
+    select{
+        width:10%;
+    }
+</style>
+
+<div class="besedilo">
+    Cenik
+    {% if tip == "vele_prodaja" %}
+        vele prodaje
+    {% elif tip == "dnevna_prodaja" %}
+        dnevne prodaje
+    {% endif %}
+</div>
+
+<div class="filter">
+    <div style="font-size:3.5vh;display:block">
+        <form action="{% url 'cenik_prodaje' tip %}" method="GET">
+            {% include "program/dinamic_select.html" %} 
+            <input type="submit" value="filtriraj">
+        
+        </form>
+    </div>
+    <div style="display:block;margin-top:1%">
+        {% for tip in zaloga.vrni_tipe %}
+            <button id="{{tip.0}}_button" onclick="Tip_button('{{tip.0}}')"> {{tip.1}} </button>
+        {% endfor %}
+        <form style="display:inline-block" action="{% url 'cenik_pdf' tip %}" method="GET">
+            {% csrf_token %}
+            <input type="submit" value="PDF">
+        </form>
+        <button onclick="Spremeni_vse()" class="spremeni"> Spremeni vse </button>
+        <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="spremeni_vse">
+    </div>
+</div>
+
+<div class="table">
+    <table class="tabela_vnosov" >
+        <tr class="header">
+            <th width="30%">
+                Dimenzija
+            </th>
+            <th width="25%">
+                Tip:
+            </th>
+            <th width="25%">
+                Cena:
+            </th>
+            <th width="20%">
+                Spremeni:
+            </th>  
+        </tr>
+            {% for sestavina in sestavine %}
+                <tr class="vrstica vrstica_{{sestavina.cena__tip}}">
+                    <td> {{sestavina.dimenzija__dimenzija}}</td>
+                    <td> {{sestavina.cena__tip}}</td>
+                    <td> 
+                        <div class="spremeni spremeni_{{sestavina.cena}}">{{sestavina.cena__cena}}$</div>
+                        <div hidden="hidden" class="potrdi_{{sestavina.cena}}">
+                            <input form="spremeni_{{sestavina.cena}}_form" name="cena" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value="" required> $ 
+                        </div>
+                        <div hidden="hidden" class="potrdi">
+                            <input form="spremeni_vse_form" name="cena_{{sestavina.cena}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $ 
+                        </div>
+                    </td>
+                    <td> 
+                        <button onclick="Spremeni_ceno('{{sestavina.cena}}')" class="spremeni spremeni_{{sestavina.cena}}"> Spremeni </button>
+                        <input type="submit" form="spremeni_{{sestavina.cena}}_form" value="potrdi" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden">
+                        <button onclick="Preklici_spremembo_cene('{{sestavina.cena}}')" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden"> Preklici </button>
+                    </td>
+                    <form id="spremeni_{{sestavina.cena}}_form" hidden="hidden" action="{% url 'spremeni_ceno' tip %}" method="POST">
+                        {% csrf_token %}
+                        <input id="form_pk" type="hidden" hidden="hidden" name="pk" value="{{sestavina.cena}}">
+                    </form>
+                </tr>
+            {% endfor %}
+            <form hidden="hidden" id="spremeni_vse_form" action="{% url 'spremeni_cene' tip %}" method="POST">
+                {% csrf_token %}
+            </form>
+    </table>
+</div>
+
+<script>
+    function Preklici_spremembo_cene(pk){
+        toggle('spremeni_' + pk, 'inline-block')
+        toggle('potrdi_' + pk, 'none')
+    };
+    function Spremeni_ceno(pk){
+        toggle('spremeni_' + pk, 'none')
+        toggle('potrdi_' + pk, 'inline-block')
+    };
+    function Potrdi_spremembo(pk){
+        cena = document.getElementById('cena_' + pk).value
+        if (je_veljavna_cena(cena)){
+            alert(cena)
+            document.getElementById('form_cena').value = cena
+            document.getElementById('form_pk').value = pk
+            document.getElementById('form_button').click()
+        } else{
+            alert('vnesi veljavno ceno')
+        }
+    }
+    function Spremeni_vse(){
+        toggle('spremeni','none');
+        toggle('potrdi','inline-block')
+    };
+    function Potrdi_vse(){
+        var cena;
+        {% for sestavina in sestavine %}
+            cena = document.getElementById("cena_{{sestavina.cena}}").value;
+            if ( je_veljavna_cena(cena) ){
+                document.getElementById("all_cena_{{sestavina.cena}}").value = cena;
+            }
+        {% endfor %}
+        document.getElementById('all_form_button').click();
+    };
+</script>
+{% endblock %}

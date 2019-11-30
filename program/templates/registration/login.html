@@ -1,0 +1,47 @@
+{% load staticfiles %}
+
+<html>
+    <head>
+        <title> Login </title>
+        <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+        <link rel="stylesheet" href="{% static 'css/tabele.css' %}">
+    </head>
+
+    <script src="{% static 'js/poskus.js' %}"></script>
+    <script src="{% static 'js/funkcije.js' %}"></script>
+    
+    <body>
+        <style>
+            body{
+                background: black
+            }
+            div.login{
+                background: white;
+                display:block;
+                position:absolute;
+                left:35%;
+                width:30%;
+                height:45%;
+                top:25%;
+                text-align:center;
+                font-size:4vh
+            }
+            input{
+                width:50%;
+                height:12%;
+            }
+            button{
+                width:30%;
+                height:16%;
+            }
+        </style>
+        <div class="login">
+        <h2>Login</h2>
+        <form class="login" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+        </div>
+    </body>
+</html>

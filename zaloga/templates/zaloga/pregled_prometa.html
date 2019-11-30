@@ -1,0 +1,66 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<style>
+    div.okno{
+        display:block;
+        position:relative;
+        text-align:center;
+        font-size:5vh;
+        margin-top:2%
+    }
+    div.table{
+        position:relative;
+        left:15%;
+        width:70%;
+        margin-top:2%;
+    }
+</style>
+
+<div class="okno">
+    {{slovar|keyvalue:'Pregled prometa za'|keyvalue:jezik}}
+     {{sestavina.dimenzija.dimenzija}}
+     {{slovar|keyvalue:'tipa'|keyvalue:jezik}}
+     {{tip}}
+</div>
+
+<div class="table">
+    <table class="tabela_vnosov">
+        <tr>    
+            <td colspan="5">
+            {{slovar|keyvalue:'Trenutno stanje'|keyvalue:jezik}}: {{sestavina|stringvalue:tip}}
+            </td>
+        </tr>
+        <tr>
+            <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}} </th>
+            <th> {{slovar|keyvalue:'Tip'|keyvalue:jezik}} </th>
+            <th> {{slovar|keyvalue:'Title'|keyvalue:jezik}} </th>
+            <th> {{slovar|keyvalue:'Sprememba'|keyvalue:jezik}} </th>
+            <th> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}} </th>
+        </tr>
+        {% for sprememba in spremembe %}
+            <tr>
+                <td> {{sprememba.baza.datum}} </td>
+                {% if sprememba.baza.tip == 'racun' %}
+                <td> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}} </td>
+                <td> {{sprememba.baza.datum}} </td>
+                {% else %}
+                <td> {{sprememba.baza.tip}} </td>
+                <td> {{sprememba.baza.title}} </td>
+                {% endif %}
+                <td> {{sprememba.str_stevilo}} </td>
+                <td> {{zaporedna_stanja|index:forloop.counter0}} </td>
+            </tr>
+        {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="5">
+            {{slovar|keyvalue:'Zacetno stanje'|keyvalue:jezik}}: {{zaporedna_stanja|zadnji}}
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

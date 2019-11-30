@@ -1,0 +1,117 @@
+{% load staticfiles %}
+
+{% load zaloga_exstras %}
+
+<html>
+    <head>
+        <title> Home </title>
+        <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+        <link rel="stylesheet" href="{% static 'css/tabele.css' %}">
+        <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+    </head>
+
+    <script src="{% static 'js/filter.js' %}"></script>
+    <script src="{% static 'js/poskus.js' %}"></script>
+    <script src="{% static 'js/funkcije.js' %}"></script>
+    
+    <body>
+        <div class="navbar">
+            <a style="width:7%" href="/">Home</a>
+                {% if perms.zaloga.view_zaloga %}
+                <div style="width:11%" class="dropdown" id="zaloga">
+                    <button class="dropbtn"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="myDropdown">
+                        <a href="{% url 'pregled_zaloge' %}" >{{slovar|keyvalue:'Pregled zaloge'|keyvalue:jezik}}</a>
+                        {% if perms.zaloga.add_dimenzija %}
+                        <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
+                        {% endif %}
+                        {% if perms.zaloga.add_inventura %}
+                        <a href="{% url 'baze' 'inventura' %}">{{slovar|keyvalue:'Inventura'|keyvalue:jezik}}</a>
+                        {% endif %}
+                        {% if perms.zaloga.view_inventura %}
+                        <a href="{% url 'arhiv_baz' 'inventura' %}">{{slovar|keyvalue:'Arhiv inventur'|keyvalue:jezik}}</a>
+                        {% endif %}
+                    </div>
+                </div> 
+                {% endif %}
+                {% if perms.zaloga.view_odpis %}
+                <div style="width:10%" class="dropdown" id="odpis">
+                    <button class="dropbtn">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
+                    <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="odpis_dropdown">
+                    {% if perms.zaloga.add_odpis %}
+                    <a href="{% url 'baze' 'odpis' %}">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}</a>
+                    {% endif %}
+                    <a href="{% url 'arhiv_baz' 'odpis'%}">{{slovar|keyvalue:'Arhiv odpisov'|keyvalue:jezik}}</a>
+                    </div>
+                </div> 
+                {% endif %}
+                {% if perms.zaloga.view_prevzem %}
+                <div style="width:13%" class="dropdown" id="prevzem">
+                    <button class="dropbtn">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}
+                    <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="prevzem">
+                    {% if perms.zaloga.add_prevzem %}
+                    <a href="{% url 'baze' 'prevzem' %}">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}</a>
+                    {% endif %}
+                    <a href="{% url 'arhiv_baz' 'prevzem' %}">{{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}</a>
+                    </div>
+                </div> 
+                {% endif %}
+                {% if perms.prodaja.view_prodaja %}
+                <div style="width:12%;overflow:hidden" class="dropdown" id="prodaja">
+                    <button class="dropbtn" >{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
+                    <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="dnevna_prodaja">
+                    {% if perms.prodaja.add_vele_prodaja %}
+                    <a href="{% url 'baze' 'vele_prodaja' %}">{{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}</a>
+                    {% endif %}
+                    {% if perms.prodaja.view_stranka %}
+                    <a href="{% url 'pregled_strank' %}">{{slovar|keyvalue:'Pregled strank'|keyvalue:jezik}}</a>
+                    {% endif %}
+                    {% if perms.prodaja.view_vele_prodaja %}
+                    <a href="{% url 'arhiv_baz' 'vele_prodaja' %}">{{slovar|keyvalue:'Arhiv vele prodaj'|keyvalue:jezik}}</a>
+                    {% endif %}
+                    <a href="{% url 'cenik_prodaje' 'vele_prodaja' %}">{{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}</a>
+                    <a href="{% url 'cenik_prodaje' 'dnevna_prodaja' %}">{{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}</a>
+                    {% if perms.prodaja.view_dnevna_prodaja %}
+                    <a href="{% url 'arhiv_baz' 'dnevna_prodaja' %}">{{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}</a>
+                    {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if perms.prodaja.add_dnevna_prodaja %}
+                <a style="width:22%" href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
+                {% endif %}
+                <div style="width:15%" class="dropdown" id="racun">
+                    <button class="dropbtn" >{{ user.get_username }}
+                    <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="profil">
+                        {% if perms.admin.view_logentry %}
+                        <a href="{% url 'admin:index' %}"> Admin </a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
+                    </div>
+                </div>
+            </div> 
+        <div style="width:100%;height:82%;vertical-align:top;text-align:center;overflow:auto">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div class="footer">
+            {% for jezik in program.vrni_jezike %}
+                <form style="display:inline-block" action="{% url 'spremeni_jezik' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="jezik" value="{{jezik.0}}">
+                    <input type="submit" value="{{jezik.0}}">
+                </form>
+            {% endfor %}
+        </div>
+    </body>
+</html>

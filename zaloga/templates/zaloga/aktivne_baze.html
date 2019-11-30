@@ -1,0 +1,188 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+{% block content %}
+
+<style>
+    div.title{
+        font-size:6vh;
+        text-align:center;
+        margin-top:1.5%;
+    }
+    div.okno{
+        margin-top:2%;
+        position:relative;
+        display:block;
+        width:90%;
+        left:5%;
+        font-size:5vh;
+    }
+    div.okno form input[type=submit]{
+        display:block;
+        width:20%;
+        height:10%;
+        position:relative;
+        left:40%;
+        margin-top:2%;
+    }
+</style>
+
+<div class="title">
+{% if tip == "prevzem" %}
+    {{slovar|keyvalue:'Nov prevzem'|keyvalue:jezik}}
+{% elif tip == "odpis" %}
+    {{slovar|keyvalue:'Nov odpis'|keyvalue:jezik}}
+{% elif tip == "inventura" %}
+    {{slovar|keyvalue:'Nova inventura'|keyvalue:jezik}}
+{% elif tip == "vele_prodaja" %}
+    {{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}
+{% endif %}
+</div>
+<div class="okno">
+    {% if tip == "prevzem" %}
+        <table style="padding:1%;display:inline-block;border:1px solid black"class="tabela_podatkov">
+            <tr>
+                <th width="33%" colspan="2"> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}:</th>
+                <th width="42%" colspan="2">{{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}:</th>
+                <th width="25%" colspan="2"> User: </th>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </td>
+                <td> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}} </td>
+                <td> {{slovar|keyvalue:'Stevilka'|keyvalue:jezik}} </td>
+                <td> <input form="nova_baza" name="stevilka" type="text" required autocomplete="off"> </td>
+                <td> User: </td>
+                <td> {{user.username}} </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
+                <td> {{program.naslednji_prevzem}} </td>
+                <td> {{slovar|keyvalue:'Izvor'|keyvalue:jezik}}: </td> 
+                <td> <input form="nova_baza" name="drzava" type="text" required> </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+                <td> {{zaloga.danes}} </td>
+                <td> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
+                <td> <input form="nova_baza" name="posiljatelj" type="text" required> </td>
+            </tr>
+        </table>
+    {% elif tip == "vele_prodaja" %}
+        <table style="padding:1%;display:inline-block;border:1px solid black"class="tabela_podatkov">
+            <tr>
+                <th width="50%" colspan="2">
+                    {{slovar|keyvalue:'Baza'|keyvalue:jezik}}:
+                </th>
+                <th width="50%" colspan="2">User:</th>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
+                <td> 
+                    <select name="stranka" form="nova_baza">
+                        {% for stranka in stranke %}
+                            <option value="{{stranka.pk}}"> {{stranka.naziv}} </option>
+                        {% endfor %}
+                    </select>  
+                </td>
+                <td> User: </td>
+                <td> {{user.username}} </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Faktura'|keyvalue:jezik}}: </td>
+                <td> {{program.naslednja_faktura}} </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+                <td> {{zaloga.danes}} </td>
+            </tr>
+        </table>
+    {% else %}
+        <table style="padding:1%;display:inline-block;border:1px solid black"class="tabela_podatkov">
+            <tr>
+                <th width="50%" colspan="2">
+                    {{slovar|keyvalue:'Baza'|keyvalue:jezik}}:
+                </th>
+                <th width="50%" colspan="2">User:</th>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </td>
+                <td> 
+                {% if tip == "odpis" %}
+                    {{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
+                {% elif tip == "inventura" %}
+                    {{slovar|keyvalue:'Inventura'|keyvalue:jezik}}
+                {% endif %}
+                </td>
+                <td> User: </td>
+                <td> {{user.username}} </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
+                <td>
+                {% if tip == "odpis" %}
+                    {{program.naslednji_odpis}}
+                {% elif tip == "inventura" %}
+                    {{program.naslednja_inventura}}
+                {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+                <td> {{zaloga.danes}} </td>
+            </tr>
+        </table>
+    {% endif %}
+    <form id="nova_baza" action="{% url 'nova_baza' tip %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="{{slovar|keyvalue:'Nova baza'|keyvalue:jezik}}"> 
+    </form>
+</div>
+
+<div class="title" style="margin-top:4%">
+    Aktivno:
+</div>
+
+{% if baze.count == 0 %}
+    <div class="title" style="margin-top:2%">
+        Brez aktivnih baz
+    </div>
+{% else %}
+    <div class="table" style="margin-top:2%">
+        <table class="tabela_vnosov" style="width:70%;display:inline-block">
+            <tr class="header">
+                <th> Title: </th>
+                {% if tip == "vele_prodaja" %}
+                <th> Stranka: </th>
+                {% elif tip == "prevzem" %}
+                <th> Kontejner: </th>
+                {% endif %}
+                <th> Datum: </th>
+                <th> Ogled: </th>
+                <th> Izbris: </th>
+            </tr>
+            {% for baza in baze %}
+            <tr>
+                <td> {{baza.title}} </td>
+                {% if tip == "vele_prodaja" %}
+                <td> {{baza.stranka}} </td>
+                {% elif tip == "prevzem" %}
+                <td> {{baza.kontejner.stevilka}} </td>
+                {% endif %}
+                <td> {{baza.datum}} </td>
+                <td class="ogled"> 
+                    <form action="{% url 'baza' tip baza.pk %}" method="GET">
+                        <input type="submit" value="ogled">
+                    </form>
+                </td>
+                <td class="izbris">
+                    <form action="{% url 'izbris_baze' baza.tip baza.pk %}" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" value="izbris">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

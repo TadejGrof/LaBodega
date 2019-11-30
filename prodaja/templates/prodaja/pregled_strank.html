@@ -1,0 +1,72 @@
+{% extends 'program/base.html' %}
+
+{% block content %}
+    {% if perms.prodaja.add_stranka %}
+    <div class="title" style="margin-top:2%;font-size:5vh">
+        Nova stranka:
+    </div>
+    <div style="display:block;text-align:center;margin-top:2%">
+        <table style="padding:1%;display:inline-block;width:70%;border:1px solid black" class="tabela_podatkov">
+            <tr>
+                <th width="33%" colspan="2"> Osebni podatki: </th>
+                <th width="42%" colspan="2">Naslov: </th>
+                <th width="25%" colspan="2"> Kontakt: </th>
+            </tr>
+            <tr>
+                <td> Naziv: </td>
+                <td> <input form="nova_stranka" name="naziv" type="text" required autocomplete="off"> </td>
+                <td> Drzava: </td>
+                <td> <input form="nova_stranka" name="drzava" type="text" required autocomplete="off"> </td>
+                <td> Telefon: </td>
+                <td> <input form="nova_stranka" name="telefon" type="text" autocomplete="off"> </td>
+            </tr>
+            <tr>
+                <td> Ime: </td>
+                <td> <input form="nova_stranka" name="ime" type="text" required autocomplete="off"> </td>
+                <td> Mesto: </td> 
+                <td> <input form="nova_stranka" name="mesto" type="text" required autocomplete="off"> </td>
+                <td> E-mail: </td>
+                <td> <input form="nova_stranka" name="mail" type="text" autocomplete="off"> </td>
+            </tr>
+            <tr>
+                <td> Davcna: </td>
+                <td> <input form="nova_stranka" name="davcna" type="text" autocomplete="off"> </td>
+                <td> Naslov: </td>
+                <td> <input form="nova_stranka" name="naslov" type="text" required autocomplete="off"> </td>
+            </tr>
+        </table>
+        <form id="nova_stranka" action="{% url 'nova_stranka' %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="POTRDI">
+        </form>
+    </div>
+    {% endif %}
+    <div class="title" style="font-size:5vh;margin:2%;">
+        Obsotječe stranke:
+    </div>
+    <div style="display:block;text-align:center">
+        <table class="tabela_vnosov" style="width:70%;table-layout:fixed;">
+            <tr>
+                <th width="15%"> Naziv: </th>
+                <th width="23%"> Ime: </th>
+                <th width="20%"> Telefon: </th>
+                <th width="30%"> E-mail: </th>
+                <th width="12%"> Pregled: </th>
+            </tr>
+            {% for stranka in stranke %}
+                <tr>
+                    <td> {{stranka.naziv}} </td>
+                    <td> {{stranka.ime}} </td>
+                    <td> {{stranka.telefon}} </td>
+                    <td style="overflow:hidden"> {{stranka.mail}}dsdsdsadsdsa </td>
+                    <td>
+                        <button> Pregled </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+  
+
+
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<style>
+    div.title{
+        display:block;
+        height:10%;
+        margin-top:3%;
+        text-align:center;
+        font-size:6vh
+    }
+    div.sub_title{
+        display:block;
+        height:10%;
+        margin-top:2%;
+        text-align:center;
+        font-size:4vh
+    }
+    div.racuni{
+        display:inline-block;
+        width:40%;
+        height:60%;
+        margin-top:3%;
+        vertical-align:top;
+        margin-left:3%;
+        border: 1px solid black
+    }
+    div.racun{
+        display:inline-block;
+        width:50%;
+        height:60%;
+        margin-top:3%;
+        vertical-align:top;
+        margin-left:3%;
+        border: 1px solid black
+    }
+</style>
+
+<div class="title">
+    Ogled dnevne prodaje na dan {{prodaja.title}}
+</div>
+
+<div class="racuni">
+    <div class="sub_title">
+        Racuni:
+    </div>
+    <div style="display:inline-block;width:90%;margin-top:4%;height:60%;overflow:auto" >
+        <table style="width:100%" class="tabela_vnosov">
+            <tr class="header">
+                <th> St.: </th>
+                <th> Status: </th>
+                <th> Cas: </th>
+                <th> Cena: </th>
+                <th> Vpogled: </th>
+            </tr>
+            {% for racun in racuni %}
+            <tr>
+                <td> {{racun.title}} </td>
+                <td> {{racun.status}} </td>
+                <td> {{racun.cas}} </td>
+                <td> {{racun.koncna_cena}}$ </td>
+                <td> 
+                    <form action="{% url 'ogled_dnevne_prodaje' prodaja.pk %}" method="GET">
+                        <input type="number" hidden="hidden" name="pk" value={{prodaja.pk}}>
+                        <input type="number" hidden="hidden" name="racun_pk" value={{racun.pk}}>
+                        <input type="submit" value="vpogled">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div>
+        <table style="width:90%" class="tabela_vnosov">
+            <tr>
+                <td> Skupno prodanih: </td>
+                <td> {{prodaja.skupno_stevilo}} </td>
+                <td> Skupna cena: </td>
+                <td> {{prodaja.skupna_cena}}$ </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="racun">
+    <div class="sub_title">
+        Racun {{racun.title}}
+    </div>
+    <div style="display:inline-block;width:80%;height:45.7%;margin-top:3.5%;overflow:auto">
+        <table style="width:100%" class="tabela_vnosov">
+            <tr class="header">
+                <th> Dimenzija: </th>
+                <th> Tip: </th>
+                <th> St.: </th>
+                <th> Cena: </th>
+                <th> Skup: </th>
+            </tr>
+            {% for vnos in racun.vrni_vnose %}
+            <tr>
+                <td> {{vnos.dimenzija}} </td>
+                <td> {{vnos.tip}} </td>
+                <td> {{vnos.stevilo}} </td>
+                <td> {{vnos.cena}}$ </td>
+                <td> {{vnos.skupna_cena}}$ </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td> Skupno: </td>
+                <td> Stevilo:</td>
+                <td> {{racun.skupno_stevilo}} </td>
+                <td> Cena: </td>
+                <td> {{racun.skupna_cena }}$ </td>
+            </tr>
+        </table>
+    </div>
+    <div style="height:10%">
+        <table style="width:80%" class="tabela_vnosov">
+            <tr>
+                <td> Popust: </td>
+                <td> {{racun.popust}}% </td>
+                <td> Cena popusta: </td>
+                <td> {{racun.cena_popusta}}$ </td>
+                <td> Skupna cena: </td>
+                <td> {{racun.koncna_cena}}$ </td>
+            </tr>
+        </table>
+    </div>
+    {% if racun.status == "veljavno" %}
+        <div style="margin-top:4%">
+            <form action="{% url 'storniraj_racun' prodaja.pk racun.pk %}" method="GET">
+                <input type="submit" value="STORNIRAJ">
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+<div class="sestavine">
+    <div class="sub_title">
+        Prodane:
+    </div>
+    <div style="margin-bottom:3%">
+        <table style="width:80%" class="tabela_vnosov">
+            <tr class="header">
+                <th>Dimenzija:</th>
+                <th>Tip:</th>
+                <th>Stevilo:</th>
+            </tr>
+            {% with prodaja.prodane as prodane %}
+                {% for prodana in prodane %}
+                    <tr>
+                        <td> {{prodane|keyvalue:prodana|keyvalue:'dimenzija'}} </td>
+                        <td> {{prodane|keyvalue:prodana|keyvalue:'tip'}} </td>
+                        <td> {{prodane|keyvalue:prodana|keyvalue:'stevilo'}} </td>
+                    </tr>
+                {% endfor %}
+            {% endwith %}
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

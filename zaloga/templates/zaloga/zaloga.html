@@ -1,0 +1,82 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+    <style>
+        select{
+            width:15%;
+        }
+        div.filter{
+            display:block;
+            margin-top:3%;
+            width:100%;
+            text-align:center;
+            height:15%;
+        }
+        div.table{
+            display:block;
+            position:relative;
+            width:60%;
+            left:20%
+        }
+    </style>
+
+    <div class="filter">
+        <div style="display:block">
+            <form action="{% url 'pregled_zaloge' %}" method="GET">
+                {% include "program/dinamic_select.html" %} 
+                <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
+            </form>
+        </div>
+        <div style="display:block;margin-top:1%">
+            {% for tip in zaloga.vrni_tipe %}
+                <button id="{{tip.0}}_button" onclick="Tip_button('{{tip.0}}')"> {{tip.1}} </button>
+            {% endfor %}
+            <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" value="all" name="radius">
+                <input style="width:100%"type="submit" value="pdf">
+            </form>
+        </div>
+    </div>
+
+    <div class="table">
+        <table class="tabela_vnosov" >
+            <tr class="header">
+                <th width="30%">
+                    {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:
+                </th>
+                <th width="25%" class="tip">
+                    {{slovar|keyvalue:'Tip'|keyvalue:jezik}}:
+                </th>
+                <th width="25% class="total">
+                    {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
+                </th>
+                {% if perms.zaloga.view_sprememba %}
+                <th width="20%" class="vpogled">
+                    {{slovar|keyvalue:'Vpogled'|keyvalue:jezik}}
+                </th>  
+                {% endif %}
+            </tr>
+                {% for sestavina in sestavine %}
+                    {% for tip in zaloga.vrni_tipe %}
+                        <tr class="vrstica vrstica_{{tip.0}}">
+                            <td> {{sestavina.dimenzija__dimenzija}} </td>
+                            <td> {{ tip.1 }} </td>
+                            <td> {{sestavina|keyvalue:tip.0}} </td>
+                            <td>
+                                <form action="{% url 'pregled_prometa' %}" method="GET">
+                                    <input type="hidden" name="tip" value="{{tip.0}}">
+                                    <input type="hidden" name="pk" value="{{sestavina.pk}}">
+                                    <input type="submit" value="{{slovar|keyvalue:'Pregled prometa'|keyvalue:jezik}}">
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}
+    

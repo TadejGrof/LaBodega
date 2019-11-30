@@ -1,0 +1,129 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<style>
+    div.table{
+        display:inline-block;
+        margin-top:2%;
+        width:80%;
+        overflow: auto
+    }
+    div.besedilo{
+        height:8%;
+        font-size:6vh;
+        display:block;
+        text-align:center;
+        margin-top:2%
+    }
+</style>
+
+<div class="besedilo">
+{% if tip == 'prevzem' %}
+    {{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}
+{% elif tip == 'odpis' %}
+    {{slovar|keyvalue:'Arhiv odpisov'|keyvalue:jezik}}
+{% elif tip == 'inventura' %}
+    {{slovar|keyvalue:'Arhiv inventur'|keyvalue:jezik}}
+{% elif tip == 'vele_prodaja' %}
+    {{slovar|keyvalue:'Arhiv vele prodaj'|keyvalue:jezik}}
+{% elif tip == 'dnevna_prodaja' %}
+    {{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}
+{% endif %}
+</div>
+
+<div class="filter" style="margin-top:3%">
+    <form action="{% url 'arhiv_baz' tip %}" method="GET">
+        {% if tip == "prevzem" %}
+        {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}:
+        <select name="drzava">
+        </select>
+        {% endif %}
+        <input style="width:10%" type="submit" value="filtriraj">
+    </form>
+</div>
+
+<div class="table">
+    {% if tip == "vele_prodaja" %}
+    <table style="display:inline-block;width:100%" class="tabela_vnosov">
+        <tr class="header">
+            <th width="15%">Faktura:</th>
+            <th width="15%">Stranka:</th>
+            <th width="35%">Datum:</th>
+            <th width="25%">Skupna cena:</th>
+            <th width="15%">Vpogled</th>
+        </tr>
+        {% for baza in baze %}
+            <tr>
+                <td> {{baza.title}} </td>
+                <td> {{baza.stranka.ime}} </td>
+                <td> {{baza.datum}} </td>
+                <td> {{baza.skupna_cena}} $</td>
+                <td>
+                    <form action="{% url 'baza' 'vele_prodaja' baza.pk %}" method="GET">
+                        <input type="submit" value="Vpogled">
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% elif tip == "dnevna_prodaja" %}
+    <table style="display:inline-block;width:100%" class="tabela_vnosov">
+        <tr>
+            <th width="35%">Datum:</th>
+            <th width="25%">Stevilo prodanih:</th>
+            <th width="25%">Skupna cena:</th>
+            <th width="15%">Vpogled</th>
+        </tr>
+        {% for prodaja in baze %}
+            <tr>
+                <td> {{prodaja.title}} </td>
+                <td> {{prodaja.skupno_stevilo}} </td>
+                <td> {{prodaja.skupna_cena}} $ </td>
+                <td> 
+                    <form action="{% url 'ogled_dnevne_prodaje' prodaja.pk %}" method="GET">
+                        <input type="submit" value="vpogled">
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <table class="tabela_vnosov" style="display:inline-block;width:100%">
+        <tr class="header">
+            <th width="8%"> N. </th>
+            <th width="22%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
+            <th width="22%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+            {% if tip != 'inventura' %}
+            {% for tip in zaloga.vrni_tipe %}
+            <th width="9%"> {{tip.0}} </th>
+            {% endfor %}
+            <th width="9%"> T </th>  
+            {% endif %}
+            <th width="13%"> {{slovar|keyvalue:'Vpogled'|keyvalue:jezik}}: </th>  
+        </tr>
+        {% for baza in baze %}
+        <tr>
+            <td> {{forloop.counter}}. </td>
+            <td> {{baza.title}} </td>
+            <td> {{baza.datum}} </td>
+            {% if tip != 'inventura' %}
+            {% for tip in zaloga.vrni_tipe %}
+            <td> {{baza|skupno:tip.0}} </td> 
+            {% endfor %}
+            <td> {{baza|skupno:'all'}} </td>
+            {% endif %}
+            <td>
+                <form action="{% url 'baza' tip baza.pk %}" method="GET">
+                    <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                </form>
+            </td>  
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,472 @@
+{
+        "Arhiv inventur": {
+            "slo": "Arhiv inventur",
+            "ang": "Stocktaking archive",
+            "spa": "Archivo de inventarios"
+        },
+        "Podatki kontejnerja": {
+            "slo": "Podatki kontejnerja",
+            "ang": "Container info",
+            "spa": "Contenedor info"
+        },
+        "Arhiv odpisov": {
+            "slo": "Arhiv odpisov",
+            "ang": "Write-off archive",
+            "spa": "Archivo de cancelaciones"
+        },
+        "Arhiv prevzemov": {
+            "slo": "Arhiv prevzemov",
+            "ang": "Takein archive",
+            "spa": "Archivo de containers"
+        },
+        "Arhiv vele prodaj": {
+            "slo": "Arhiv vele prodaj",
+            "ang": "Wholesale archive",
+            "spa": "Archivo de venta por mayor"
+        },
+        "Arhiv dnevnih prodaj": {
+            "slo": "Arhiv dnevnih prodaj",
+            "ang": "Daysale archive",
+            "spa": "Archive de venta diaria"
+        },
+        "Cenik vele prodaje": {
+            "slo": "Cenik vele prodaje",
+            "ang": "Wholesale prices",
+            "spa": "Precios por mayor"
+        },
+        "Cenik dnevne prodaje": {
+            "slo": "Cenik dnevne prodaje",
+            "ang": "Daysale prices",
+            "spa": "Precios por menor"
+        },
+        "Skupaj": {
+            "slo": "Skupaj",
+            "ang": "Combined",
+            "spa": "Junto"
+        },
+        "Prodaja": {
+            "slo": "Prodaja",
+            "ang": "Sale",
+            "spa": "Venta"
+        },
+        "odpis": {
+            "slo": "Odpis",
+            "ang": "Write-off",
+            "spa": "Cancelacion"
+        },
+        "prevzem":{
+            "slo": "Prevzem",
+            "ang": "Takein",
+            "spa": "Container"
+        },
+        "inventura": {
+            "slo": "Inventura",
+            "ang": "Stocktaking",
+            "spa": "Inventario"
+        },
+        "Odpis": {
+            "slo": "Odpis",
+            "ang": "Write-off",
+            "spa": "Cancelacion"
+        },
+        "Prevzem":{
+            "slo": "Prevzem",
+            "ang": "Takein",
+            "spa": "Container"
+        },
+        "Inventura": {
+            "slo": "Inventura",
+            "ang": "Stocktaking",
+            "spa": "Inventario"
+        },
+        "Vele prodaja": {
+            "slo": "Vele prodaja",
+            "ang": "Wholesale",
+            "spa": "Venta por mayor"
+        },
+        "Dnevna prodaja": {
+            "slo": "Dnevna prodaja",
+            "ang": "Daily sale",
+            "spa": "Venta diaria"
+        },
+        "Podatki prodaje": {
+            "slo": "Podatki prodaje",
+            "ang": "Sale info",
+            "spa": "Info de venta"
+        },
+        "Podatki stranke": {
+            "slo": "Podatki stranke",
+            "ang": "Cliente's info",
+            "spa": "Info de cliente"
+        },
+        "Stranka": {
+            "slo": "Stranka",
+            "ang": "Client",
+            "spa": "Cliente"
+        },
+        "Prodajalec": {
+            "slo": "Prodajalec",
+            "ang": "Seller",
+            "spa": "Vendedor"
+        },
+        "Faktura": {
+            "slo": "Faktura",
+            "ang": "Faktura",
+            "spa": "Factura"
+        },
+        "Podatki prodajalca": {
+            "slo": "Podatki prodajalca",
+            "ang": "Seller's info",
+            "spa": "Info de vendedor"
+        },
+        "Pregled zaloge": {
+            "slo": "Pregled zaloge",
+            "ang": "Stock",
+            "spa": "Inventario"
+        },
+        "Dodaj dimenzijo": {
+            "slo": "Dodaj dimenzijo",
+            "ang": "Add dimension",
+            "spa": "Nueva dimension"
+        },
+        "Nova vele prodaja": {
+            "slo": "Nova vele prodaja",
+            "ang": "New sale",
+            "spa": "Nueva venta"
+        },
+        "Nova prodaja": {
+            "slo": "Nova vele prodaja",
+            "ang": "New sale",
+            "spa": "Nueva venta"
+        },
+        "Pregled strank": {
+            "slo": "Pregled strank",
+            "ang": "Clients",
+            "spa": "Cliente"
+        },
+        "Stranke": {
+            "slo": "Stranke",
+            "ang": "Clients",
+            "spa": "Cliente"
+        },
+        "Odjava": {
+            "slo": "Odjava",
+            "ang": "Logout",
+            "spa": "Logout"
+        },
+        "Filtriraj": {
+            "slo": "Filtriraj",
+            "ang": "Filter",
+            "spa": "Filtre"
+        },
+        "Pregled prometa": {
+            "slo": "Pregled prometa",
+            "ang": "Changes",
+            "spa": ""
+        },
+        "Dodaj iz datoteke": {
+            "slo": "Dodaj iz datoteke",
+            "ang": "Add from file",
+            "spa": "Agregga de file"
+        },
+        "Nova dimenzija": {
+            "slo": "Nova dimenzija",
+            "ang": "New dimension",
+            "spa": "Nueva dimension"
+        },
+        "Dodaj": {
+            "slo": "Dodaj",
+            "ang": "Add",
+            "spa": "Agrega"
+        },
+        "Tip": {
+            "slo": "Tip",
+            "ang": "Tipe",
+            "spa": "Tipo"
+        },
+        "Ime": {
+            "slo": "Ime",
+            "ang": "Name",
+            "spa": "Nombre"
+        },
+        "Stevilo": {
+            "slo": "Stevilo",
+            "ang": "Amount",
+            "spa": "Numero"
+        },
+        "Skupno stevilo": {
+            "slo": "Skupno stevilo",
+            "ang": "Total amount",
+            "spa": "Total"
+        },
+        "Uredi": {
+            "slo": "Uredi",
+            "ang": "Edit",
+            "spa": "Ordena"
+        },
+        "Pokazi vse": {
+            "slo": "Pokazi vse",
+            "ang": "Show all",
+            "spa": "Todos"
+        },
+        "Podatki baze": {
+            "slo": "Podatki baze",
+            "ang": "Base info",
+            "spa": "Base info"
+        },
+        "Ime baze": {
+            "slo": "Ime baze",
+            "ang": "Base title",
+            "spa": "Titolo"
+        },
+        "Tip baze": {
+            "slo": "Tip baze",
+            "ang": "Base type",
+            "spa": "Tipo"
+        },
+        "Ostali podatki": {
+            "slo": "Ostali podatki",
+            "ang": "Other info",
+            "spa": "Otro"
+        },
+        "Preklici urejanje": {
+            "slo": "Preklici urejanje",
+            "ang": "Cancel editing",
+            "spa": "Cancela ordanar"
+        },
+        "Vec vnosov": {
+            "slo": "Vec vnosov",
+            "ang": "Multiple entries",
+            "spa": "Multiple entradas"
+        },
+        "Vnos": {
+            "slo": "Vnos",
+            "ang": "Entry",
+            "spa": "Entrada"
+        },
+        "Razlika": {
+            "slo": "Razlika",
+            "ang": "Difference",
+            "spa": "Diferencia"
+        },
+        "Uveljavi": {
+            "slo": "Uveljavi",
+            "ang": "Confirm",
+            "spa": "Uveljavi"
+        },
+        "Shrani vse": {
+            "slo": "Shrani vse",
+            "ang": "Save all",
+            "spa": "Guarda todo"
+        },
+        "Preklici veckratni vnos": {
+            "slo": "Preklici veckratni vnos",
+            "ang": "Cancel multiple enktries",
+            "spa": "Cancela mulitple entradas"
+        },
+        "Pocisti": {
+            "slo": "Pocisti",
+            "ang": "Clean",
+            "spa": "Limpia"
+        },
+        "Nov vnos": {
+            "slo": "Nov vnos",
+            "ang": "New entry",
+            "spa": "Nueva entrada"
+        },
+        "Drzava": {
+            "slo": "Drzava",
+            "ang": "Country",
+            "spa": "Pais"
+        },
+        "Title": {
+            "slo":"Title",
+            "ang": "Title",
+            "spa": "Titolo"
+        },
+        "Datum": {
+            "slo": "Datum",
+            "ang": "Date",
+            "spa": "Fetcha"
+        },
+        "Nova baza": {
+            "slo": "Nova baza",
+            "ang": "New base",
+            "spa": "Nueva base"
+        },
+        "Nova inventura": {
+            "slo": "Nova inventura",
+            "ang": "New stockhold",
+            "spa": "Nuevo inventario"
+        },
+        "Nov prevzem": {
+            "slo": "Nov prevzem",
+            "ang": "New takein",
+            "spa": "New contenedor"
+        },
+        "Nov odpis": {
+            "slo": "Nov odpis",
+            "ang": "New write-off",
+            "spa": "Nueva cancelacion"
+        },
+        "Vpogled": {
+            "slo": "Vpogled",
+            "ang": "Lookin",
+            "spa": "Lookin"
+        },
+        "Ogled": {
+            "slo": "Ogled",
+            "ang": "Look",
+            "spa": "Look"
+        },
+        "Ime stranke": {
+            "slo": "Ime stranke",
+            "ang": "Name",
+            "spa": "Nombre"
+        },
+        "Telefon": {
+            "slo": "Telefon",
+            "ang": "Phone",
+            "spa": "Telefono"
+        },
+        "E-mail": {
+            "slo": "E-mail",
+            "ang": "E-mail",
+            "spa": "E-mail"
+        },
+        "Spremeni": {
+            "slo": "Spremeni",
+            "ang": "Change",
+            "spa": "Cambia"
+        },
+        "Izbrisi": {
+            "slo": "Izbrisi",
+            "ang": "Delete",
+            "spa": "Borra"
+        },
+        "Nova stranka": {
+            "slo": "Nova stranka",
+            "ang": "New client",
+            "spa": "Nuevo cliente"
+        },
+        "Dodaj stranko": {
+            "slo": "Dodaj stranko",
+            "ang": "Add client",
+            "spa": "Agrega cliente"
+        },
+        "Dimenzija": {
+            "slo": "Dimenzija",
+            "ang": "Dimension",
+            "spa": "Dimension"
+        },
+        "Cena": {
+            "slo": "Cena",
+            "ang": "Price",
+            "spa": "Precio"
+        },
+        "Spremeni vse": {
+            "slo": "Spremeni vse",
+            "ang": "Change all",
+            "spa": "Cambia todo"
+        },
+        "Potrdi": {
+            "slo": "Potrdi",
+            "ang": "Confirm",
+            "spa": "OK"
+        },
+        "Preklici": {
+            "slo": "Preklici",
+            "ang": "Cancel",
+            "spa": "Cancel"
+        },
+        "Sprememba": {
+            "slo": "Sprememba",
+            "ang": "Change",
+            "spa": "Cambio"
+        },
+        "Zaloga": {
+            "slo": "Zaloga",
+            "ang": "Stock",
+            "spa": "Inventario"
+        },
+        "Trenutno stanje": {
+            "slo": "Trenutno stanje",
+            "ang": "Current stock",
+            "spa": ""
+        },
+        "Zacetno stanje": {
+            "slo": "Zacetno stanje",
+            "ang": "Beginning stock",
+            "spa": ""
+        },
+        "Pregled prometa za": {
+            "slo": "Pregled prometa za",
+            "ang": "Changes for",
+            "spa": ""
+        },
+        "tipa": {
+            "slo": "tipa",
+            "ang": "of tipe",
+            "spa": "de tipo "
+        },
+        "Stevilka": {
+            "slo": "Stevilka",
+            "ang": "Number",
+            "spa": "Numero"
+        },
+        "Izvor": {
+            "slo": "Izvor",
+            "ang": "Country",
+            "spa": "Pais"
+        },
+        "Posiljatelj": {
+            "slo": "Posiljatelj",
+            "ang": "Sender",
+            "spa": "Mandador"
+        },
+        "Kontejner": {
+            "slo": "Kontejner",
+            "ang": "Container",
+            "spa": "Contenedor"
+        },
+        "Baza": {
+            "slo": "Baza",
+            "ang": "Base",
+            "spa": "Base"
+        },
+        "Aktivne vele prodaje": {
+            "slo": "Aktivne vele prodaje",
+            "ang": "Active wholesales",
+            "spa": "Ventas activas"
+        },
+        "Dodaj vele prodajo": {
+            "slo": "Dodaj vele prodajo",
+            "ang": "Add wholesale",
+            "spa": "Agregga venta"
+        },
+        "Stevilo prodanih": {
+            "slo": "Stevilo prodanih",
+            "ang": "Amount of sold tires",
+            "spa": "Numero de llantas"
+        },
+        "Skupna cena": {
+            "slo": "Skupna cena",
+            "ang": "Summed precio",
+            "spa": "Precio total"
+        },
+        "Koncna cena": {
+            "slo": "Koncna cena",
+            "and": "Final price",
+            "spa": "Precio final"
+        },
+        "Popust": {
+            "slo": "Popust",
+            "ang": "Discount",
+            "spa": "Discuento"
+        },
+        "Cena popusta": {
+            "slo": "Cena popusta",
+            "ang": "Discount price",
+            "spa": "Precio de discuento"
+        }  
+    }

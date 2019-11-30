@@ -4,8 +4,6 @@ from .models import Baza, Zaloga
 from django.shortcuts import redirect
 from prodaja.models import Prodaja, Stranka
 import io
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
 import datetime
 from django.contrib.auth.decorators import login_required
 import json 

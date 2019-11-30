@@ -5,12 +5,12 @@ from django.shortcuts import redirect
 import zaloga.pdf as pdf
 import io
 from django.http import FileResponse
-from reportlab.pdfgen import canvas
+#from reportlab.pdfgen import canvas
 import datetime
-from reportlab.platypus import Table, TableStyle
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+#from reportlab.platypus import Table, TableStyle
+#from reportlab.lib import colors
+#from reportlab.lib.pagesizes import letter
+#from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
  
  
 zaloga = Zaloga.objects.first()

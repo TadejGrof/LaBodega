@@ -1,6 +1,4 @@
 import io
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
 from datetime import datetime
 import json 
 import os

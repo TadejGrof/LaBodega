@@ -1,8 +1,8 @@
-from reportlab.platypus import Table, TableStyle
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from reportlab.pdfgen import canvas
+#from reportlab.platypus import Table, TableStyle
+#from reportlab.lib import colors
+#from reportlab.lib.pagesizes import letter
+#from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+#from reportlab.pdfgen import canvas
 import datetime
 
 ZGORNJA_MEJA = 830

@@ -6,7 +6,6 @@
     <head>
         <title> Home </title>
         <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
-        <link rel="stylesheet" href="{% static 'css/tabele.css' %}">
         <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     </head>
 
@@ -15,6 +14,8 @@
     <script src="{% static 'js/funkcije.js' %}"></script>
     
     <body>
+        {% include "css/tabele.html" %}
+        
         <div class="navbar">
             <a style="width:7%" href="/">Home</a>
                 {% if perms.zaloga.view_zaloga %}

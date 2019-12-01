@@ -27,6 +27,8 @@
         }
     </style>
 
+    {% include "css/tabele.html" %}
+
     <div style="height:2%"></div>
     {% if perms.admin.view_logentry %}
     <form action="{% url 'ponastavi_zalogo' %}" method="POST">
@@ -55,11 +57,11 @@
                     <input type="submit" value="Filtriraj">
                 </form>
             </div>
-            <table class="tabela_vnosov">
+            <table style="table-layout: fixed; width: 100% " class="tabela_vnosov">
                 <tr>
-                    <th> Dimenzija:</th>
-                    <th> Tip: </th>
-                    <th> Zaloga: </th>
+                    <th width="50%"> Dimenzija:</th>
+                    <th width="25%"> Tip: </th>
+                    <th width="25%"> Zaloga: </th>
                 </tr>
                 {% for sestavina in sestavine %}
                     <tr>

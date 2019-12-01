@@ -201,7 +201,7 @@
     </div>
 {% endif %}
 
-<div class="table">
+<div style="display:inline-block;width:80%;margin-top:2%">
     {% if status == "aktivno" %}
             <table class="inventurni_vnosi pre_vnosi tabela_vnosov">
                 <tr class="header">
@@ -256,7 +256,7 @@
                 {% endfor %}
             </table>
             {% if tip != "inventura" %}
-            <table style="display:inline-block;width:80%" class="bazni_vnosi tabela_vnosov vnosi">
+            <table class="bazni_vnosi tabela_vnosov vnosi">
                 <tr class="header">
                     <th width="8%"> N. </th>
                     <th width="20%"> Dimenzija: </th>
@@ -354,7 +354,7 @@
             </table>
             {% endif %}
     {% elif status == "veljavno" %}
-        <table style="width:60%;display:inline-block" class="tabela_vnosov">
+        <table class="tabela_vnosov">
             <tr class="header">
                 <th width="10%"> N. </th>
                 <th width="30%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}} </th>

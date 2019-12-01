@@ -11,11 +11,10 @@
     }
     div.okno{
         margin-top:2%;
-        position:relative;
-        display:block;
-        width:90%;
-        left:5%;
+        display:inline-block;
+        width:70%;
         font-size:5vh;
+        text-align:center;
     }
     div.okno form input[type=submit]{
         display:block;
@@ -40,7 +39,7 @@
 </div>
 <div class="okno">
     {% if tip == "prevzem" %}
-        <table style="padding:1%;display:inline-block;border:1px solid black"class="tabela_podatkov">
+        <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
             <tr>
                 <th width="33%" colspan="2"> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}:</th>
                 <th width="42%" colspan="2">{{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}:</th>
@@ -68,12 +67,13 @@
             </tr>
         </table>
     {% elif tip == "vele_prodaja" %}
-        <table style="padding:1%;display:inline-block;border:1px solid black"class="tabela_podatkov">
+        <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
             <tr>
-                <th width="50%" colspan="2">
+                <th width="33%" colspan="2">
                     {{slovar|keyvalue:'Baza'|keyvalue:jezik}}:
                 </th>
-                <th width="50%" colspan="2">User:</th>
+                <th width="33%" colspan="2">User:</th>
+                <th></th>
             </tr>
             <tr>
                 <td> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
@@ -97,12 +97,13 @@
             </tr>
         </table>
     {% else %}
-        <table style="padding:1%;display:inline-block;border:1px solid black"class="tabela_podatkov">
+        <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
             <tr>
-                <th width="50%" colspan="2">
+                <th width="33%" colspan="2">
                     {{slovar|keyvalue:'Baza'|keyvalue:jezik}}:
                 </th>
-                <th width="50%" colspan="2">User:</th>
+                <th width="33%" colspan="2">User:</th>
+                <th></th>
             </tr>
             <tr>
                 <td> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </td>
@@ -147,8 +148,8 @@
         Brez aktivnih baz
     </div>
 {% else %}
-    <div class="table" style="margin-top:2%">
-        <table class="tabela_vnosov" style="width:70%;display:inline-block">
+    <div style="width:70%;display:inline-block;margin-top:2%" >
+        <table class="tabela_vnosov">
             <tr class="header">
                 <th> Title: </th>
                 {% if tip == "vele_prodaja" %}

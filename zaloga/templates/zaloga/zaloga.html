@@ -24,14 +24,18 @@
 
     <div class="filter">
         <div style="display:block">
-            <form action="{% url 'pregled_zaloge' %}" method="GET">
+            <form id="filter" action="{% url 'pregled_zaloge' %}" method="GET">
                 {% include "program/dinamic_select.html" %} 
                 <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
             </form>
         </div>
         <div style="display:block;margin-top:1%">
             {% for tip in zaloga.vrni_tipe %}
-                <button id="{{tip.0}}_button" onclick="Tip_button('{{tip.0}}')"> {{tip.1}} </button>
+                {{tip.0}}:
+                <select style="width:5%" form="filter" name="{{tip.0}}">
+                    <option value="true" selected> Yes </option>
+                    <option value="false"> No </option>
+                </select>
             {% endfor %}
             <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' %}" method="POST">
                 {% csrf_token %}
@@ -60,7 +64,7 @@
                 {% endif %}
             </tr>
                 {% for sestavina in sestavine %}
-                    {% for tip in zaloga.vrni_tipe %}
+                    {% for tip in tipi %}
                         <tr class="vrstica vrstica_{{tip.0}}">
                             <td> {{sestavina.dimenzija__dimenzija}} </td>
                             <td> {{ tip.1 }} </td>

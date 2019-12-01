@@ -32,6 +32,10 @@ def pregled_zaloge(request):
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = True)
             else:
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = False)
+        tipi = []
+        for tip in zaloga.vrni_tipe:
+            if request.GET.get(tip[0],"true") == "true":
+                tipi.append(tip)
         sestavine = sestavine.values(
             'dimenzija__dimenzija',
             'pk',
@@ -41,7 +45,7 @@ def pregled_zaloge(request):
             'JP50',
             'JP70',
         )
-        return pokazi_stran(request, 'zaloga/zaloga.html', {'sestavine':sestavine})
+        return pokazi_stran(request, 'zaloga/zaloga.html', {'sestavine':sestavine,'tipi':tipi})
 
 @login_required
 def pregled_prometa(request):

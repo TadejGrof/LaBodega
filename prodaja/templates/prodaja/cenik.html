@@ -1,5 +1,7 @@
 {% extends 'program/base.html' %}
 
+{% load zaloga_exstras %}
+
 {% block content %}
 
 <style>
@@ -29,11 +31,10 @@
 </style>
 
 <div class="besedilo">
-    Cenik
     {% if tip == "vele_prodaja" %}
-        vele prodaje
+        {{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}
     {% elif tip == "dnevna_prodaja" %}
-        dnevne prodaje
+        {{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}
     {% endif %}
 </div>
 
@@ -41,7 +42,7 @@
     <div style="font-size:3.5vh;display:block">
         <form action="{% url 'cenik_prodaje' tip %}" method="GET">
             {% include "program/dinamic_select.html" %} 
-            <input type="submit" value="filtriraj">
+            <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
         
         </form>
     </div>
@@ -53,8 +54,8 @@
             {% csrf_token %}
             <input type="submit" value="PDF">
         </form>
-        <button onclick="Spremeni_vse()" class="spremeni"> Spremeni vse </button>
-        <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="spremeni_vse">
+        <button onclick="Spremeni_vse()" class="spremeni"> {{slovar|keyvalue:'Spremeni vse'|keyvalue:jezik}} </button>
+        <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="">
     </div>
 </div>
 
@@ -62,16 +63,16 @@
     <table class="tabela_vnosov" >
         <tr class="header">
             <th width="30%">
-                Dimenzija
+                {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:
             </th>
             <th width="25%">
-                Tip:
+                {{slovar|keyvalue:'Tip'|keyvalue:jezik}}:
             </th>
             <th width="25%">
-                Cena:
+                {{slovar|keyvalue:'Cena'|keyvalue:jezik}}:
             </th>
             <th width="20%">
-                Spremeni:
+                {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}:
             </th>  
         </tr>
             {% for sestavina in sestavine %}
@@ -88,9 +89,9 @@
                         </div>
                     </td>
                     <td> 
-                        <button onclick="Spremeni_ceno('{{sestavina.cena}}')" class="spremeni spremeni_{{sestavina.cena}}"> Spremeni </button>
+                        <button onclick="Spremeni_ceno('{{sestavina.cena}}')" class="spremeni spremeni_{{sestavina.cena}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
                         <input type="submit" form="spremeni_{{sestavina.cena}}_form" value="potrdi" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden">
-                        <button onclick="Preklici_spremembo_cene('{{sestavina.cena}}')" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden"> Preklici </button>
+                        <button onclick="Preklici_spremembo_cene('{{sestavina.cena}}')" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
                     </td>
                     <form id="spremeni_{{sestavina.cena}}_form" hidden="hidden" action="{% url 'spremeni_ceno' tip %}" method="POST">
                         {% csrf_token %}

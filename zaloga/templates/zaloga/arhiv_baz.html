@@ -41,7 +41,7 @@
         <select name="drzava">
         </select>
         {% endif %}
-        <input style="width:10%" type="submit" value="filtriraj">
+        <input style="width:10%" type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
     </form>
 </div>
 
@@ -49,11 +49,11 @@
     {% if tip == "vele_prodaja" %}
     <table class="tabela_vnosov">
         <tr class="header">
-            <th width="15%">Faktura:</th>
-            <th width="15%">Stranka:</th>
-            <th width="35%">Datum:</th>
-            <th width="25%">Skupna cena:</th>
-            <th width="15%">Vpogled</th>
+            <th width="15%">{{slovar|keyvalue:'Faktura'|keyvalue:jezik}}:</th>
+            <th width="15%">{{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:</th>
+            <th width="35%">{{slovar|keyvalue:'Datum'|keyvalue:jezik}}:</th>
+            <th width="25%">{{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:</th>
+            <th width="15%">{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}</th>
         </tr>
         {% for baza in baze %}
             <tr>
@@ -63,7 +63,7 @@
                 <td> {{baza.skupna_cena}} $</td>
                 <td>
                     <form action="{% url 'baza' 'vele_prodaja' baza.pk %}" method="GET">
-                        <input type="submit" value="Vpogled">
+                        <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>
             </tr>
@@ -72,10 +72,10 @@
     {% elif tip == "dnevna_prodaja" %}
     <table class="tabela_vnosov">
         <tr>
-            <th width="35%">Datum:</th>
-            <th width="25%">Stevilo prodanih:</th>
-            <th width="25%">Skupna cena:</th>
-            <th width="15%">Vpogled</th>
+            <th width="35%">{{slovar|keyvalue:'Datum'|keyvalue:jezik}}:</th>
+            <th width="25%">{{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}:</th>
+            <th width="25%">{{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:</th>
+            <th width="15%">{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}</th>
         </tr>
         {% for prodaja in baze %}
             <tr>
@@ -84,7 +84,7 @@
                 <td> {{prodaja.skupna_cena}} $ </td>
                 <td> 
                     <form action="{% url 'ogled_dnevne_prodaje' prodaja.pk %}" method="GET">
-                        <input type="submit" value="vpogled">
+                        <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>
             </tr>

@@ -171,20 +171,20 @@
 {% else %}
     <div class="prodaja">
         <div class="title" style="font-size:6vh">
-            {{prodaja.title}} PRODAJA
+            {{prodaja.title}} {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
         </div>
 
         <div class="racuni">
-            <div class="title"> Računi </div>
+            <div class="title"> {{slovar|keyvalue:'Racuni'|keyvalue:jezik}} </div>
             {% if prodaja.stevilo_veljavnih_racunov == 0 %}
-                <div class="sredinsko_besedilo"> Brez zgodovine </div>
+                <div class="sredinsko_besedilo"> {{slovar|keyvalue:'Brez zgodovine'|keyvalue:jezik}} </div>
             {% else %}
                 <div class="tabela">
                     <table class="tabela_vnosov">
                         <tr>
-                            <th> St.</th>
-                            <th> Cas </th>
-                            <th> Cena </th>
+                            <th> N.</th>
+                            <th> {{slovar|keyvalue:'Cas'|keyvalue:jezik}} </th>
+                            <th> {{slovar|keyvalue:'Cena'|keyvalue:jezik}} </th>
                             <th> E </th>
                         </tr>
                         {% for racun in prodaja.racuni %}
@@ -206,9 +206,9 @@
                 <div class="tabela">
                     <table class="tabela_vnosov">
                         <tr>
-                            <td> Stevilo: </td>
+                            <td> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </td>
                             <td> {{prodaja.skupno_stevilo}}</td>
-                            <td> Cena </td>
+                            <td> {{slovar|keyvalue:'Cena'|keyvalue:jezik}} </td>
                             <td> {{prodaja.skupna_cena}} $</td>
                         </tr>
                     </table>
@@ -218,19 +218,19 @@
 
         <div class="okno">
             <div class="table">
-                <table style="margin-top:3%;width:90%" class="tabela_vnosov">
+                <table style="margin-top:3%;width:100%" class="tabela_vnosov">
                     <tr>
-                        <th width="25%"> Dimenzija: </th>
-                        <th width="15%"> Tip: </th>
-                        <th width="10%"> St.: </th>
-                        <th width="15%"> Cena: </th>
-                        <th width="15%"> Skup: </th>
+                        <th width="25%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+                        <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                        <th width="10%"> N.: </th>
+                        <th width="15%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                        <th width="15%"> Total: </th>
                         <th hidden="hidden" width="20%" class="uredi"> Edit: </th>
                     </tr>
                 {% if aktivni_racun.stevilo_vnosov == 0 %}
                     </table>
                     <div class="sredinsko_besedilo">
-                        Brez vnosov
+                        {{slovar|keyvalue:'Brez vnosov'|keyvalue:jezik}}
                     </div>
                 {% else %}
                     {% for vnos in aktivni_racun.vrni_vnose %}
@@ -283,9 +283,9 @@
                         </tr>
                     {% endfor %}
                     <tr>
-                        <td colspan = "2"> Skupno stevilo: </td>         
+                        <td colspan = "2"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>         
                         <td> {{aktivni_racun.skupno_stevilo}} </td>
-                        <td> Cena: </td>
+                        <td> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </td>
                         <td colspan = "2"> {{aktivni_racun.skupna_cena}}$ </td>
                     </tr>
                 </table>
@@ -319,9 +319,9 @@
             <div class="cena">
                 <div class="cena_inline">
                     <div class="spremeni_popust" style="margin-top:2%;margin-bottom:1%">
-                        Popust: {{aktivni_racun.popust}}%
+                        {{slovar|keyvalue:'Popust'|keyvalue:jezik}}: {{aktivni_racun.popust}}%
                     </div>
-                    <button class="spremeni_popust" id="spremeni_popust_button" onclick="Spremeni_popust()"> Spremeni popust </button>
+                    <button class="spremeni_popust" id="spremeni_popust_button" onclick="Spremeni_popust()"> {{slovar|keyvalue:'Spremeni popust'|keyvalue:jezik}} </button>
                     
                     <input style="width:20%;height:60%;text-align:center;margin-top:6%" hidden="hidden" form="spremeni_popust" class="potrdi_popust" placeholder="{{aktivni_racun.popust}}" type="number" name="popust" required>
                     <div hidden="hidden" class="potrdi_popust">%</div>
@@ -334,7 +334,7 @@
                 </div>
                 <div class="cena_inline cena_text">
                     <div class="cena_polovica">
-                        Cena popusta: 
+                        {{slovar|keyvalue:'Cena popusta'|keyvalue:jezik}}: 
                     </div>
                     <div class="cena_polovica">
                         {{aktivni_racun.cena_popusta}}$
@@ -342,20 +342,20 @@
                 </div>
                 <div class="cena_inline">
                     <div class="cena_polovica">
-                        Skupna cena: 
+                        {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}: 
                     </div>
                     <div class="cena_polovica">
                         {{aktivni_racun.koncna_cena}}$
                     </div>
                 </div>
                 <div class="cena_inline">
-                    <button class="uredi_gumb"  style="width:100%;height:100%" onclick="Uredi()"> Uredi </button>
-                    <button class="uredi" style="width:100%;height:100%" hidden="hidden" onclick="Preklici_urejanje()"> Preklici urejanje </button>
+                    <button class="uredi_gumb"  style="width:100%;height:100%" onclick="Uredi()"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}} </button>
+                    <button class="uredi" style="width:100%;height:100%" hidden="hidden" onclick="Preklici_urejanje()"> {{slovar|keyvalue:'Preklici urejanje'|keyvalue:jezik}} </button>
                 </div>
                 <div class="cena_inline">
                     <form style="width:100%;height:100%" action="{% url 'uveljavi_racun' aktivni_racun.pk %}" method="POST" onsubmit="return Uveljavi()">
                     {% csrf_token %}
-                    <input style="width:100%;height:100%" type="submit" value="uveljavi">
+                    <input style="width:100%;height:100%" type="submit" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
                     </form>
                 </div>
             </div>

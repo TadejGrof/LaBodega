@@ -140,26 +140,26 @@
 </div>
 
 <div class="title" style="margin-top:4%">
-    Aktivno:
+    {{slovar|keyvalue:'Aktivno'|keyvalue:jezik}}:
 </div>
 
 {% if baze.count == 0 %}
     <div class="title" style="margin-top:2%">
-        Brez aktivnih baz
+        {{slovar|keyvalue:'Ni aktivnih baz'|keyvalue:jezik}}
     </div>
 {% else %}
     <div style="width:70%;display:inline-block;margin-top:2%" >
         <table class="tabela_vnosov">
             <tr class="header">
-                <th> Title: </th>
+                <th> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
                 {% if tip == "vele_prodaja" %}
-                <th> Stranka: </th>
+                <th> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </th>
                 {% elif tip == "prevzem" %}
-                <th> Kontejner: </th>
+                <th> {{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}: </th>
                 {% endif %}
-                <th> Datum: </th>
-                <th> Ogled: </th>
-                <th> Izbris: </th>
+                <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Izbris'|keyvalue:jezik}}: </th>
             </tr>
             {% for baza in baze %}
             <tr>
@@ -172,13 +172,13 @@
                 <td> {{baza.datum}} </td>
                 <td class="ogled"> 
                     <form action="{% url 'baza' tip baza.pk %}" method="GET">
-                        <input type="submit" value="ogled">
+                        <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>
                 <td class="izbris">
                     <form action="{% url 'izbris_baze' baza.tip baza.pk %}" method="POST">
                         {% csrf_token %}
-                        <input type="submit" value="izbris">
+                        <input type="submit" value="{{slovar|keyvalue:'Izbris'|keyvalue:jezik}}">
                     </form>
                 </td>
             </tr>

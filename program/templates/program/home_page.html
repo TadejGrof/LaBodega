@@ -54,14 +54,14 @@
                     {% endfor %}
                 </select>
                 <form style="display:inline-block" id="top10" action="{% url 'home_page' %}" method="GET">
-                    <input type="submit" value="Filtriraj">
+                    <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
                 </form>
             </div>
             <table style="table-layout: fixed; width: 100% " class="tabela_vnosov">
                 <tr>
-                    <th width="50%"> Dimenzija:</th>
-                    <th width="25%"> Tip: </th>
-                    <th width="25%"> Zaloga: </th>
+                    <th width="50%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:</th>
+                    <th width="25%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                    <th width="25%"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
                 </tr>
                 {% for sestavina in sestavine %}
                     <tr>
@@ -81,7 +81,7 @@
                 <th> {{slovar|keyvalue:'Ime'|keyvalue:jezik}}: </th>
                 <th> {{slovar|keyvalue:'Telefon'|keyvalue:jezik}}: </th>
                 <th> {{slovar|keyvalue:'E-mail'|keyvalue:jezik}}: </th>
-                <th> {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}} </th>
+                <th> {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}: </th>
             </tr>
             {% for stranka in stranke %}
                 <tr>
@@ -93,7 +93,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="stranka" value="{{stranka.pk}}">
                             <input type="date" hidden="hidden" name="datum" value="{{danes}}">
-                            <input type="submit" value="nova prodaja">
+                            <input type="submit" value="{{slovar|keyvalue:'Nova prodaja'|keyvalue:jezik}}">
                         </form>
                     </tr>
                 </tr>
@@ -115,12 +115,12 @@
                 </form>
             </div>
         {% else %}
-            <div class="title"> {{dnevna_prodaja.title}} Prodane: </div>
+            <div class="title"> {{dnevna_prodaja.title}} {{slovar|keyvalue:'Prodane'|keyvalue:jezik}}: </div>
             <table class="tabela_vnosov">
                 <tr>
-                    <th> Dimenzija:</th>
-                    <th> Tip: </th>
-                    <th> Stevilo: </th>
+                    <th> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:</th>
+                    <th> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                    <th> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
                 </tr>
                 {% with dnevna_prodaja.prodane as prodane %}
                 {% for prodana in prodane %}
@@ -132,11 +132,11 @@
                 {% endfor %}
                 {% endwith %}
                 <tr>
-                    <td colspan="2"> Skupno stevilo:</td>
+                    <td colspan="2"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}:</td>
                     <td> {{dnevna_prodaja.skupno_stevilo}} </td>
                 </tr>
                 <tr>
-                    <td colspan="2"> Skupna cena:</td>
+                    <td colspan="2"> {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:</td>
                     <td> {{dnevna_prodaja.skupna_cena}} $ </td>
                 </tr>
             </table>

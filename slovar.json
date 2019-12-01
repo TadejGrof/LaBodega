@@ -9,6 +9,21 @@
             "ang": "Container info",
             "spa": "Contenedor info"
         },
+        "Izbris": {
+            "slo": "Izbris",
+            "ang": "Delete",
+            "spa": "Eliminar"
+        },
+        "Aktivno": {
+            "slo": "Aktivno",
+            "ang": "Active",
+            "spa": "Activo"
+        },
+        "Prodane": {
+            "slo": "Prodane",
+            "ang": "Sold",
+            "spa": "Vendido"
+        },
         "Arhiv odpisov": {
             "slo": "Arhiv odpisov",
             "ang": "Write-off archive",
@@ -287,12 +302,77 @@
         "Datum": {
             "slo": "Datum",
             "ang": "Date",
-            "spa": "Fetcha"
+            "spa": "Fecha"
+        },
+        "Osebni podatki": {
+            "slo": "Osebni podatki",
+            "ang": "Personal info",
+            "spa": "Info personal"
+        },
+        "Naslov": {
+            "slo": "Naslov",
+            "ang": "Address",
+            "spa": "Address"
+        },
+        "Kontakt": {
+            "slo": "Kontakt",
+            "ang": "Contact",
+            "spa": "Contacto"
+        },
+        "Naziv": {
+            "slo": "Naziv",
+            "ang": "Name",
+            "spa": "Nombre"
+        },
+        "Mesto": {
+            "slo": "Mesto",
+            "ang": "City",
+            "spa": "Ciudad"
+        },
+        "Racuni": {
+            "slo": "Racuni",
+            "ang": "Bills",
+            "spa": "Ventas"
+        },
+        "Cas": {
+            "slo": "Cas",
+            "ang": "Time",
+            "spa": "Tiempo"
+        },
+        "Brez vnosov": {
+            "slo": "Brez vnosov",
+            "ang": "Witout entries",
+            "spa": "No entradas"
+        },
+        "Spremeni popust": {
+            "slo": "Spremeni popust",
+            "ang": "Change discont",
+            "spa": "Cambia discuento"
+        },
+        "Ulica": {
+            "slo": "Ulica",
+            "ang": "Street",
+            "spa": "Calle"
+        },
+        "Davcna": {
+            "slo": "Davcna",
+            "ang": "Tax number",
+            "spa": "Tax number"
+        },
+        "Obstojece stranke": {
+            "slo": "Obstojece stranke",
+            "ang": "Existing clients",
+            "spa": "Cliente"
         },
         "Nova baza": {
             "slo": "Nova baza",
             "ang": "New base",
             "spa": "Nueva base"
+        },
+        "Ni aktivnih baz":{
+            "slo": "Ni aktivnih baz",
+            "ang": "There is no active bases",
+            "spa": "Sin basas activas"
         },
         "Nova inventura": {
             "slo": "Nova inventura",
@@ -467,6 +547,6 @@
         "Cena popusta": {
             "slo": "Cena popusta",
             "ang": "Discount price",
-            "spa": "Precio de discuento"
+            "spa": "Discuento precio"
         }  
     }

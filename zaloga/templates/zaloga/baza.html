@@ -118,7 +118,11 @@
         <select id="radius_box">
             <option value="all"> All </option>
             {% for radius in razlicni_radiusi %}
-                <option value="{{radius}}"> {{radius}} </option>
+                {% if forloop.counter0 == 0 %}
+                    <option value="{{radius}}" selected> {{radius}} </option>
+                {% else %}
+                    <option value="{{radius}}"> {{radius}} </option>
+                {% endif %}
             {% endfor %}
         </select>
         Tip:
@@ -438,6 +442,7 @@
     function Vec_vnosov() {
         toggle('vnosi', 'none')
         toggle('pre_vnosi','inline-block')
+        Filtriraj();
     }
     function Preklici_veckratni_vnos() {
         toggle('vnosi', 'inline-block')

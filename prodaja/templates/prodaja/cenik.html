@@ -16,7 +16,8 @@
         position:relative;
         left:15%;
         width:70%;
-        margin-top:3%
+        margin-top:3%;
+        margin-bottom:4%;
     }
     div.filter{
             display:block;
@@ -48,8 +49,13 @@
     {% for tip in zaloga.vrni_tipe %}
         {{tip.0}}:
         <select style="width:5%" form="filter" name="{{tip.0}}">
-            <option value="true" selected> Yes </option>
-            <option value="false"> No </option>
+            {% if tip.0 in tipi %}
+                <option value="true" selected> Yes </option>
+                <option value="false"> No </option>
+            {% else %}
+                <option value="true"> Yes </option>
+                <option value="false" selected> No </option>
+            {% endif %}
         </select>
     {% endfor %}
     <div style="display:block;margin-top:1%">

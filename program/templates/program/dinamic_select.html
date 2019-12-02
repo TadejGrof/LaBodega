@@ -1,8 +1,12 @@
         Radius:
             <select id='radius' name="radius" onchange="SpremeniRadius()">
                 <option value="all"> All </option>
-                {% for radius in zaloga.vrni_razlicne_radiuse %}
-                    <option value="{{radius}}"> {{radius}} </option>
+                {% for rad in zaloga.vrni_razlicne_radiuse %}
+                    {% if rad == radius %}
+                        <option value="{{rad}}" selected> {{rad}} </option>
+                    {% else %}
+                        <option value="{{rad}}"> {{rad}} </option>
+                    {% endif %}
                 {% endfor %}    
             </select>
             Height:
@@ -84,7 +88,7 @@
                     if (!(heightwidthi.includes(dimenzije[i][2]))) {
                         option = document.createElement("option");
                         option.text = dimenzije[i][2];
-                        option.text = dimenzije[i][2];
+                        option.value = dimenzije[i][2];
                         x.add(option);
                         heightwidthi.push(dimenzije[i][2]) 
                     };

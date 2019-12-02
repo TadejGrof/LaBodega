@@ -19,14 +19,14 @@ program = Program.objects.first()
 def pregled_zaloge(request):
     if request.method == "GET":
         sestavine = zaloga.sestavina_set.all()
-        radius = request.GET.get('radius')
-        height = request.GET.get('height')
-        width = request.GET.get('width')
-        if radius and radius != "all":
+        radius = request.GET.get('radius','R12')
+        height = request.GET.get('height','all')
+        width = request.GET.get('width', 'all')
+        if radius != "all":
             sestavine = sestavine.filter(dimenzija__radius=radius)
-        if height and height != "all":
+        if height != "all":
             sestavine = sestavine.filter(dimenzija__height=height)
-        if width and width != "all":
+        if width != "all":
             if "C" in width:
                 width = width.replace('C','')
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = True)
@@ -45,7 +45,14 @@ def pregled_zaloge(request):
             'JP50',
             'JP70',
         )
-        return pokazi_stran(request, 'zaloga/zaloga.html', {'sestavine':sestavine,'tipi':tipi})
+        slovar = {
+            'sestavine':sestavine,
+            'tipi':tipi,
+            'radius':radius,
+            'height':height,
+            'width':width   
+        }
+        return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 
 @login_required
 def pregled_prometa(request):

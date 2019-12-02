@@ -86,8 +86,6 @@
             <button onclick="Nov_vnos()" class="vnosi"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
             <button onclick="Vec_vnosov()" class="vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
             <button hidden="hidden" class="pre_vnosi" onclick="Preklici_veckratni_vnos()"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
-            <button onclick="Uredi()" class="uredi_gumb vnosi"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}} </button>
-            <button onclick="Preklici_urejanje()" hidden="hidden" class="uredi"> {{slovar|keyvalue:'Preklici urejanje'|keyvalue:jezik}} </button>
         {% endif %} 
         <form enctype='multipart/form-data' style="display:inline-block;margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' tip baza.pk %}" method="POST">
             {% csrf_token %}
@@ -179,7 +177,7 @@
                         </select>
                         <input type="number" required name="stevilo" min="1" max="999" style="text-align:center">
                         <select name="tip">
-                            {% for tip in tipi %}
+                            {% for tip in zaloga.vrni_tipe %}
                                 <option value="{{tip.0}}"> {{tip.1}} </option>
                             {% endfor %}
                         </select>
@@ -187,10 +185,6 @@
                     </form>
                     <button hidden="hidden" class="nov_vnos" onclick="Preklici_nov_vnos()"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
                 </div>
-            {% endif %}
-            {% if perms.zaloga.change_vnos %}
-                <button style="width:15%" class="pre_nov_vnos uredi_gumb" onclick="Uredi()"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}} </button>
-                <button style="width:15%" class="pre_nov_vnos uredi" hidden="hidden" onclick="Preklici_urejanje()"> {{slovar|keyvalue:'Preklici urejanje'|keyvalue:jezik}} </button>
             {% endif %}
         {% endif %}
         <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' tip baza.pk %}" method="POST">
@@ -203,7 +197,7 @@
 
 <div style="display:inline-block;width:80%;margin-top:2%">
     {% if status == "aktivno" %}
-            <table class="inventurni_vnosi pre_vnosi tabela_vnosov">
+            <table style="vertical-align:top;" class="inventurni_vnosi pre_vnosi tabela_vnosov">
                 <tr class="header">
                     <th width="30%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
                     <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
@@ -256,7 +250,7 @@
                 {% endfor %}
             </table>
             {% if tip != "inventura" %}
-            <table class="bazni_vnosi tabela_vnosov vnosi">
+            <table style="vertical-align:top;" class="bazni_vnosi tabela_vnosov vnosi">
                 <tr class="header">
                     <th width="8%"> N. </th>
                     <th width="20%"> Dimenzija: </th>
@@ -266,7 +260,7 @@
                         <th width="14%"> Cena: </th>
                         <th width="14%"> Skupaj: </th>
                     {% endif %}
-                    <th hidden="hidden" class="uredi" width="32%" > Uredi: </th>  
+                    <th width="10%" > Uredi: </th>  
                 </tr>
                 {% for vnos in baza.vnosi_values %}
                     <tr>
@@ -296,11 +290,11 @@
                             </td>
                             <td> {{vnos|skupna_cena}} $ </td>
                         {% endif %}
-                        <td hidden="hidden" class="uredi">
-                            <button class="spremeni_{{vnos.pk}}" onclick="Spremeni_vnos('{{vnos.pk}}')"> Spremeni </button>
-                            <input class="spremeni_{{vnos.pk}}" type="submit" form="izbrisi_vnos_{{vnos.pk}}" value="Izbrisi">
-                            <input class="potrdi_{{vnos.pk}}" hidden="hidden" type="submit" form="spremeni_vnos_{{vnos.pk}}" value="Potrdi">
-                            <button class="potrdi_{{vnos.pk}}" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')" hidden="hidden"> Preklici </button>
+                        <td>
+                            <button class="spremeni_{{vnos.pk}}" onclick="Spremeni_vnos('{{vnos.pk}}')"> E </button>
+                            <input class="spremeni_{{vnos.pk}}" type="submit" form="izbrisi_vnos_{{vnos.pk}}" value="X">
+                            <input class="potrdi_{{vnos.pk}}" hidden="hidden" type="submit" form="spremeni_vnos_{{vnos.pk}}" value="OK">
+                            <button class="potrdi_{{vnos.pk}}" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')" hidden="hidden"> X </button>
                         </td>
                         <form id="spremeni_vnos_{{vnos.pk}}" action="{% url 'baza_spremeni_vnos' tip baza.pk %}" method="POST">
                             {% csrf_token %}
@@ -318,7 +312,7 @@
                         <td> {{baza.skupno_stevilo}} </td>
                         <td> Znesek: </td>
                         <td> {{baza.skupna_cena}} $ </td>
-                        <td colspan="2" hidden="hidden" class="uredi"> </td>
+                        <td colspan="2"> </td>
                     </tr>
                     <tr class="endrow">
                         <td> Popust: </td>
@@ -337,18 +331,18 @@
                         </td>
                         <td colspan="2"> Znesek popusta: </td>
                         <td> {{baza.cena_popusta}} $</td>
-                        <td colspan="2" hidden="hidden" class="uredi"> </td>
+                        <td colspan="2" > </td>
                     </tr>
                     <tr class="endrow">
                         <td colspan="5"> Koncna cena: </td>
                         <td> {{baza.koncna_cena}} $ </td>
-                        <td colspan="2" hidden="hidden" class="uredi"> </td>
+                        <td colspan="2" > </td>
                     </tr>
                 {% else %}
                     <tr>
                         <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
                         <td> {{baza|skupno:"all"}} </td>
-                        <td class="uredi" hidden="hidden"> </td>
+                        <td> </td>
                     </tr>
                 {% endif %}
             </table>
@@ -364,14 +358,14 @@
                     <th width="14%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
                     <th width="14%"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
                 {% endif %}
-                <th hidden="hidden" class="uredi" width="15%"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>
+                <th width="10%"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>
             </tr>
             {% for vnos in baza.vnosi_values %}
                 <tr>
-                    <td> {{ forloop.counter }}. </td>
+                    <td > {{ forloop.counter }}. </td>
                     <td> {{ vnos.dimenzija__dimenzija }} </td>
                     <td> {{ zaloga|dolgi_tip:vnos.tip }} </td>
-                    <td> {{ vnos.stevilo }} </td>
+                    <td > {{ vnos.stevilo }} </td>
                     {% if tip == "vele_prodaja" %}
                         <td> 
                             <div class="spremeni_{{vnos.pk}}">{{vnos.cena}} $</div>
@@ -380,7 +374,7 @@
                         </td>
                         <td> {{vnos|skupna_cena}} $ </td>
                     {% endif %}
-                    <td class="uredi" hidden="hidden"> 
+                    <td> 
                         <form action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
@@ -395,7 +389,7 @@
                     <td> {{baza.skupno_stevilo}} </td>
                     <td> Znesek: </td>
                     <td> {{baza.skupna_cena}} $ </td>
-                    <td colspan="2" hidden="hidden" class="uredi"> </td>
+                    <td colspan="2"> </td>
                 </tr>
                 <tr class="endrow">
                     <td> 
@@ -416,18 +410,18 @@
                     </td>
                     <td colspan="2"> Znesek popusta: </td>
                     <td> {{baza.cena_popusta}} $</td>
-                    <td colspan="2" hidden="hidden" class="uredi"> </td>
+                    <td colspan="2" > </td>
                 </tr>
                 <tr class="endrow">
                     <td colspan="5"> Koncna cena: </td>
                     <td> {{baza.koncna_cena}} $ </td>
-                    <td colspan="2" hidden="hidden" class="uredi"> </td>
+                    <td colspan="2"> </td>
                 </tr>
             {% else %}
                 <tr>
                     <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
                     <td> {{baza|skupno:"all"}} </td>
-                    <td class="uredi" hidden="hidden"> </td>
+                    <td> </td>
                 </tr>
             {% endif %}
         </table>
@@ -576,7 +570,7 @@
         var radiusbox = document.getElementById('radius_box')
         var tip = tipbox.options[tipbox.selectedIndex].value
         var radius = radiusbox.options[radiusbox.selectedIndex].value
-        toggle('vrstica','block')
+        toggle('vrstica','table-row')
         if( tip != 'all'){
             {% for tip in tipi %}
                 if( "{{tip.0}}" != tip){

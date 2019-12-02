@@ -237,9 +237,12 @@ def izbrisi_vnos(request, tip_baze, pk):
         vnos = Vnos.objects.get(pk = request.POST.get('pk'))
         baza = Baza.objects.get(pk = pk)
         if baza.status == "veljavno":
+            tip = vnos.tip
             sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
             vnos.sprememba.delete()
-            sestavina.nastavi_iz_sprememb(vnos.tip)
+            sestavina.nastavi_iz_sprememb(tip)
+        elif baza.status == "aktivno":
+            vnos.delete()
         return redirect('baza', tip_baze=tip_baze, pk = pk)
 
 @login_required

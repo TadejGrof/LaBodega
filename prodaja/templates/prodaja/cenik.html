@@ -16,7 +16,7 @@
         position:relative;
         left:15%;
         width:70%;
-        margin-top:2%
+        margin-top:3%
     }
     div.filter{
             display:block;
@@ -39,17 +39,20 @@
 </div>
 
 <div class="filter">
-    <div style="font-size:3.5vh;display:block">
-        <form action="{% url 'cenik_prodaje' tip %}" method="GET">
+    <div style="margin-bottom:1%;font-size:3.5vh;display:block">
+        <form id="filter" action="{% url 'cenik_prodaje' tip %}" method="GET">
             {% include "program/dinamic_select.html" %} 
             <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
-        
         </form>
     </div>
+    {% for tip in zaloga.vrni_tipe %}
+        {{tip.0}}:
+        <select style="width:5%" form="filter" name="{{tip.0}}">
+            <option value="true" selected> Yes </option>
+            <option value="false"> No </option>
+        </select>
+    {% endfor %}
     <div style="display:block;margin-top:1%">
-        {% for tip in zaloga.vrni_tipe %}
-            <button id="{{tip.0}}_button" onclick="Tip_button('{{tip.0}}')"> {{tip.1}} </button>
-        {% endfor %}
         <form style="display:inline-block" action="{% url 'cenik_pdf' tip %}" method="GET">
             {% csrf_token %}
             <input type="submit" value="PDF">
@@ -58,7 +61,6 @@
         <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="">
     </div>
 </div>
-
 <div class="table">
     <table class="tabela_vnosov" >
         <tr class="header">
@@ -76,28 +78,30 @@
             </th>  
         </tr>
             {% for sestavina in sestavine %}
-                <tr class="vrstica vrstica_{{sestavina.cena__tip}}">
-                    <td> {{sestavina.dimenzija__dimenzija}}</td>
-                    <td> {{sestavina.cena__tip}}</td>
-                    <td> 
-                        <div class="spremeni spremeni_{{sestavina.cena}}">{{sestavina.cena__cena}}$</div>
-                        <div hidden="hidden" class="potrdi_{{sestavina.cena}}">
-                            <input form="spremeni_{{sestavina.cena}}_form" name="cena" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value="" required> $ 
-                        </div>
-                        <div hidden="hidden" class="potrdi">
-                            <input form="spremeni_vse_form" name="cena_{{sestavina.cena}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $ 
-                        </div>
-                    </td>
-                    <td> 
-                        <button onclick="Spremeni_ceno('{{sestavina.cena}}')" class="spremeni spremeni_{{sestavina.cena}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                        <input type="submit" form="spremeni_{{sestavina.cena}}_form" value="potrdi" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden">
-                        <button onclick="Preklici_spremembo_cene('{{sestavina.cena}}')" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
-                    </td>
-                    <form id="spremeni_{{sestavina.cena}}_form" hidden="hidden" action="{% url 'spremeni_ceno' tip %}" method="POST">
-                        {% csrf_token %}
-                        <input id="form_pk" type="hidden" hidden="hidden" name="pk" value="{{sestavina.cena}}">
-                    </form>
-                </tr>
+                {% if sestavina.cena__tip in tipi %}
+                    <tr class="vrstica vrstica_{{sestavina.cena__tip}}">
+                        <td> {{sestavina.dimenzija__dimenzija}}</td>
+                        <td> {{sestavina.cena__tip}}</td>
+                        <td> 
+                            <div class="spremeni spremeni_{{sestavina.cena}}">{{sestavina.cena__cena}}$</div>
+                            <div hidden="hidden" class="potrdi_{{sestavina.cena}}">
+                                <input form="spremeni_{{sestavina.cena}}_form" name="cena" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value="" required> $ 
+                            </div>
+                            <div hidden="hidden" class="potrdi">
+                                <input form="spremeni_vse_form" name="cena_{{sestavina.cena}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $ 
+                            </div>
+                        </td>
+                        <td> 
+                            <button onclick="Spremeni_ceno('{{sestavina.cena}}')" class="spremeni spremeni_{{sestavina.cena}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                            <input type="submit" form="spremeni_{{sestavina.cena}}_form" value="potrdi" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden">
+                            <button onclick="Preklici_spremembo_cene('{{sestavina.cena}}')" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+                        </td>
+                        <form id="spremeni_{{sestavina.cena}}_form" hidden="hidden" action="{% url 'spremeni_ceno' tip %}" method="POST">
+                            {% csrf_token %}
+                            <input id="form_pk" type="hidden" hidden="hidden" name="pk" value="{{sestavina.cena}}">
+                        </form>
+                    </tr>
+                {% endif %}
             {% endfor %}
             <form hidden="hidden" id="spremeni_vse_form" action="{% url 'spremeni_cene' tip %}" method="POST">
                 {% csrf_token %}

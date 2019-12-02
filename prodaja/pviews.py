@@ -140,7 +140,11 @@ def cenik(request,baza):
             'cena',
             'cena__tip',
             'cena__cena')
-    return pokazi_stran(request,'prodaja/cenik.html', {'sestavine': sestavine, 'tip': baza})
+        tipi = []
+        for tip in zaloga.vrni_tipe:
+            if request.GET.get(tip[0],"true") == "true":
+                tipi.append(tip[0])
+    return pokazi_stran(request,'prodaja/cenik.html', {'sestavine': sestavine, 'tip': baza, 'tipi':tipi})
 
 def spremeni_ceno(request, baza):
     nova_cena = float(request.POST.get('cena'))

@@ -544,6 +544,11 @@
             "ang": "Discount",
             "spa": "Discuento"
         },
+        "Brez zgodovine": {
+            "slo": "Brez zgodovine",
+            "ang": "Without history",
+            "spa": "Sin enntradas"
+        },
         "Cena popusta": {
             "slo": "Cena popusta",
             "ang": "Discount price",

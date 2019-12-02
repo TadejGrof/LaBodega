@@ -225,7 +225,7 @@
                         <th width="10%"> N.: </th>
                         <th width="15%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
                         <th width="15%"> Total: </th>
-                        <th hidden="hidden" width="20%" class="uredi"> Edit: </th>
+                        <th width="20%"> Edit: </th>
                     </tr>
                 {% if aktivni_racun.stevilo_vnosov == 0 %}
                     </table>
@@ -266,7 +266,7 @@
                                 </div>
                             </td>
                             <td> {{vnos.skupna_cena}}$ </td>
-                            <td class="uredi" hidden="hidden"> 
+                            <td> 
                                 <button class="spremeni_{{vnos.pk}}" onclick="Spremeni_vnos('{{vnos.pk}}')">E</button>
                                 <input class="spremeni_{{vnos.pk}}" form="izbrisi_{{vnos.pk}}" type="submit" value="X">
                                 <input hidden="hidden" type="submit" class="potrdi_{{vnos.pk}}" value="OK" form="spremeni_{{vnos.pk}}">
@@ -347,10 +347,6 @@
                     <div class="cena_polovica">
                         {{aktivni_racun.koncna_cena}}$
                     </div>
-                </div>
-                <div class="cena_inline">
-                    <button class="uredi_gumb"  style="width:100%;height:100%" onclick="Uredi()"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}} </button>
-                    <button class="uredi" style="width:100%;height:100%" hidden="hidden" onclick="Preklici_urejanje()"> {{slovar|keyvalue:'Preklici urejanje'|keyvalue:jezik}} </button>
                 </div>
                 <div class="cena_inline">
                     <form style="width:100%;height:100%" action="{% url 'uveljavi_racun' aktivni_racun.pk %}" method="POST" onsubmit="return Uveljavi()">

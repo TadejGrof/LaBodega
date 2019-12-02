@@ -55,7 +55,9 @@ MIDDLEWARE = [
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ALLOWED_HOSTS =  ["tadejgrof.pythonanywhere.com"]
+ALLOWED_HOSTS =  [
+    "tadejgrof.pythonanywhere.com",
+    '127.0.0.1']
 
 ROOT_URLCONF = 'mysite.urls'
 

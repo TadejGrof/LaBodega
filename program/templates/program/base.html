@@ -14,8 +14,19 @@
     <script src="{% static 'js/funkcije.js' %}"></script>
     
     <body>
+        <style>
+            body{
+                margin: 0%;
+                padding: 0%;
+                overflow:hidden;
+            }
+            div{
+                margin: 0%;
+                padding: 0%;
+            }
+        </style>
         {% include "css/tabele.html" %}
-        {% include "css/navbar.html" %}
+        {% include "css/topbar.html" %}
 
         <div style="width:100%;height:85.2%;vertical-align:top;text-align:center;overflow:auto">
             {% block content %}

@@ -1,0 +1,187 @@
+
+{% load zaloga_exstras %}
+
+<style class="navbar">
+    .navbar {
+        overflow: hidden;
+        background-color: #333;
+        font-family: Arial;
+        height:12%}
+
+    .navbar a {
+        float: left;
+        font-size: 5vmin;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-align:center;
+        text-decoration: none;
+        height:100%;}
+
+    .navbar .dropdown a{
+        width:100%;
+        height:100%;
+    }
+
+    .navbar .dropdown {
+        float: left;
+        height:100%;
+        width:100%;
+        margin:0;
+        overflow:hidden;}
+
+    .dropdown .dropbtn {
+    font-size: 5vmin; 
+    border: none;
+    outline: none;
+    color: white;
+    padding: 12px 16px;
+    background-color: inherit;
+    font-family: inherit; /* Important for vertical align on mobile phones */
+    margin: 0; /* Important for vertical align on mobile phones */
+    }
+
+    .navbar a:hover, .dropdown:hover .dropbtn {
+    background-color: red;
+    }
+
+    .navbar .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    }
+
+    .navbar .dropdown-content a {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    }
+
+    .navbar .dropdown-content a:hover {
+    background-color: #ddd;
+    }
+
+    .navbar .dropdown:hover .dropdown-content {
+    display: block;
+    } 
+
+    .show {
+    display: block;
+    }
+
+</style>
+
+{% if True %}
+<div class="navbar">
+    <a style="width:7%" href="/">Home</a>
+    {% if perms.zaloga.view_zaloga %}
+        <div style="width:11%" class="dropdown" id="zaloga">
+            <button class="dropbtn"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content" id="myDropdown">
+                <a href="{% url 'pregled_zaloge' %}" >{{slovar|keyvalue:'Pregled zaloge'|keyvalue:jezik}}</a>
+                {% if perms.zaloga.add_dimenzija %}
+                <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
+                {% endif %}
+                {% if perms.zaloga.add_inventura %}
+                <a href="{% url 'baze' 'inventura' %}">{{slovar|keyvalue:'Inventura'|keyvalue:jezik}}</a>
+                {% endif %}
+                {% if perms.zaloga.view_inventura %}
+                <a href="{% url 'arhiv_baz' 'inventura' %}">{{slovar|keyvalue:'Arhiv inventur'|keyvalue:jezik}}</a>
+                {% endif %}
+            </div>
+        </div> 
+    {% endif %}
+    {% if perms.zaloga.view_odpis %}
+        <div style="width:10%" class="dropdown" id="odpis">
+            <button class="dropbtn">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
+            <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content" id="odpis_dropdown">
+            {% if perms.zaloga.add_odpis %}
+            <a href="{% url 'baze' 'odpis' %}">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}</a>
+            {% endif %}
+            <a href="{% url 'arhiv_baz' 'odpis'%}">{{slovar|keyvalue:'Arhiv odpisov'|keyvalue:jezik}}</a>
+            </div>
+        </div> 
+    {% endif %}
+    {% if perms.zaloga.view_prevzem %}
+        <div style="width:13%" class="dropdown" id="prevzem">
+            <button class="dropbtn">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}
+            <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content" id="prevzem">
+            {% if perms.zaloga.add_prevzem %}
+            <a href="{% url 'baze' 'prevzem' %}">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}</a>
+            {% endif %}
+            <a href="{% url 'arhiv_baz' 'prevzem' %}">{{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}</a>
+            </div>
+        </div> 
+    {% endif %}
+    {% if perms.prodaja.view_prodaja %}
+        <div style="width:12%;overflow:hidden" class="dropdown" id="prodaja">
+            <button class="dropbtn" >{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
+            <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content" id="dnevna_prodaja">
+            {% if perms.prodaja.add_vele_prodaja %}
+            <a href="{% url 'baze' 'vele_prodaja' %}">{{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}</a>
+            {% endif %}
+            {% if perms.prodaja.view_stranka %}
+            <a href="{% url 'pregled_strank' %}">{{slovar|keyvalue:'Pregled strank'|keyvalue:jezik}}</a>
+            {% endif %}
+            {% if perms.prodaja.view_vele_prodaja %}
+            <a href="{% url 'arhiv_baz' 'vele_prodaja' %}">{{slovar|keyvalue:'Arhiv vele prodaj'|keyvalue:jezik}}</a>
+            {% endif %}
+            <a href="{% url 'cenik_prodaje' 'vele_prodaja' %}">{{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}</a>
+            <a href="{% url 'cenik_prodaje' 'dnevna_prodaja' %}">{{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}</a>
+            {% if perms.prodaja.view_dnevna_prodaja %}
+            <a href="{% url 'arhiv_baz' 'dnevna_prodaja' %}">{{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}</a>
+            {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if perms.prodaja.add_dnevna_prodaja %}
+        <a style="width:22%" href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
+    {% endif %}
+    <div style="width:15%" class="dropdown" id="racun">
+        <button class="dropbtn" >{{ user.get_username }}
+        <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content" id="profil">
+            {% if perms.admin.view_logentry %}
+            <a href="{% url 'admin:index' %}"> Admin </a>
+            {% endif %}
+            <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if True %}
+    <div class="topbar">
+        <a class="nav active"> <> </a>
+        <a class="active" href="/">Home</a>
+        <div class="box">
+            <a> zaloga </a>
+            <a> odpis </a>
+        </div>
+        <div class="active dropdown" id="racun">
+            <button class="dropbtn" >{{ user.get_username }}
+            <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content" id="profil">
+                {% if perms.admin.view_logentry %}
+                <a href="{% url 'admin:index' %}"> Admin </a>
+                {% endif %}
+                <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
+            </div>
+        </div>
+    </div>
+{% endif %}

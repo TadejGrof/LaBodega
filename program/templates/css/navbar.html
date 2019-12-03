@@ -77,7 +77,6 @@
 
 </style>
 
-{% if True %}
 <div class="navbar">
     <a style="width:7%" href="/">Home</a>
     {% if perms.zaloga.view_zaloga %}
@@ -163,25 +162,3 @@
         </div>
     </div>
 </div>
-{% endif %}
-{% if True %}
-    <div class="topbar">
-        <a class="nav active"> <> </a>
-        <a class="active" href="/">Home</a>
-        <div class="box">
-            <a> zaloga </a>
-            <a> odpis </a>
-        </div>
-        <div class="active dropdown" id="racun">
-            <button class="dropbtn" >{{ user.get_username }}
-            <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content" id="profil">
-                {% if perms.admin.view_logentry %}
-                <a href="{% url 'admin:index' %}"> Admin </a>
-                {% endif %}
-                <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
-            </div>
-        </div>
-    </div>
-{% endif %}

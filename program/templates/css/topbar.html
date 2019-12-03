@@ -17,22 +17,13 @@
   text-decoration: none;
   font-size: 17px;
 }
-/* Add an active class to highlight the current page */
-.active {
-  background-color: #4CAF50;
-  color: white;
-}
-
-/* Hide the link that should open and close the topnav on small screens */
-.topnav .icon {
-  display: none;
-}
 
 /* Dropdown container - needed to position the dropdown content */
 .dropdown {
   float: left;
   overflow: hidden;
 }
+
 /* Style the dropdown button to fit inside the topnav */
 .dropdown .dropbtn {
   font-size: 17px; 
@@ -80,7 +71,6 @@
 .dropdown:hover .dropdown-content {
   display: block;
 }
-
 
 </style>
 
@@ -168,17 +158,4 @@
             <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
         </div>
     </div>
-  <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
 </div> 
-
-<script>
-    /* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
-    function myFunction() {
-    var x = document.getElementById("myTopnav");
-    if (x.className === "topnav") {
-        x.className += " responsive";
-    } else {
-        x.className = "topnav";
-    }
-    } 
-</script>

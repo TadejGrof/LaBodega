@@ -35,6 +35,9 @@
         {% csrf_token %}	
         <input type="submit" value="ponastavi_zalogo">
     </form>
+    <form action="{% url 'some_view' %}" method="GET">	
+        <input type="submit" value="POSKUS PDF">
+    </form>
     {% endif %}
 
     {% if perms.zaloga.view_zaloga %}

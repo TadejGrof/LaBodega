@@ -30,7 +30,6 @@ def pdf_zaloge(request):
     pdf.tabela_zaloge(p,sestavine,tipi)
     p.showPage()
     p.save()
-    buffer.seek(0) 
     return response 
     
 def pdf_cenika(request,tip_prodaje):
@@ -48,7 +47,6 @@ def pdf_cenika(request,tip_prodaje):
     pdf.cenik(p,sestavine,tip_prodaje,tipi)
     p.showPage()
     p.save()
-    buffer.seek(0) 
     return response 
 
 def pdf_baze(request,tip_baze, pk):
@@ -60,6 +58,5 @@ def pdf_baze(request,tip_baze, pk):
     pdf.tabela_baze(p,baza,800)
     p.showPage()
     p.save()
-    buffer.seek(0) 
     return response 
 

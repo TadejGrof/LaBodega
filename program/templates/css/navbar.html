@@ -8,7 +8,7 @@
         font-family: Arial;
         height:12%}
 
-    .navbar a {
+    .navbar a{
         float: left;
         font-size: 5vmin;
         color: white;
@@ -30,7 +30,7 @@
         margin:0;
         overflow:hidden;}
 
-    .dropdown .dropbtn {
+    .dropdown .dropbtn, .nav {
     font-size: 5vmin; 
     border: none;
     outline: none;
@@ -77,7 +77,7 @@
 
 </style>
 
-<div class="navbar">
+<div id="navbar" class="navbar">
     <a style="width:7%" href="/">Home</a>
     {% if perms.zaloga.view_zaloga %}
         <div style="width:11%" class="dropdown" id="zaloga">
@@ -148,9 +148,9 @@
         </div>
     {% endif %}
     {% if perms.prodaja.add_dnevna_prodaja %}
-        <a style="width:22%" href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
+        <a style="width:21%" href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
     {% endif %}
-    <div style="width:15%" class="dropdown" id="racun">
+    <div style="width:14%" class="dropdown" id="racun">
         <button class="dropbtn" >{{ user.get_username }}
         <i class="fa fa-caret-down"></i>
         </button>
@@ -161,4 +161,14 @@
             <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
         </div>
     </div>
+    <button onclick="poskus()" class="nav" style="width:3%"> ☰ </button>
 </div>
+<script>
+    function poskus() {
+        if ( document.getElementById('sidenav').style.display == "none" ){
+            document.getElementById('sidenav').style.display = "block"
+        } else {
+            document.getElementById('sidenav').style.display = "none"
+        }
+}
+</script>

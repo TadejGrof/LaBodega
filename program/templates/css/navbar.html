@@ -13,9 +13,8 @@
         font-size: 5vmin;
         color: white;
         text-align: center;
-        padding: 14px 16px;
-        text-align:center;
-        text-decoration: none;
+        padding: 18px 16px;
+        text-decoration:none;
         height:100%;}
 
     .navbar .dropdown a{
@@ -54,6 +53,7 @@
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
+    width:100%;
     }
 
     .navbar .dropdown-content a {
@@ -87,7 +87,7 @@
     /* Fixed sidenav, full height */
   .sidenav {
     height: 100%;
-    width: 200px;
+    width: auto;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -100,9 +100,10 @@
 
   /* Style the sidenav links and the dropdown button */
   .sidenav a, .dropdown-btn {
-    padding: 6px 8px 6px 16px;
+    padding: 8px 8px 8px 16px;
     text-decoration: none;
-    font-size: 20px;
+    font-size: 5vmin;
+    font-family:Arial;
     color: #818181;
     display: block;
     border: none;
@@ -115,7 +116,7 @@
 
   /* On mouse-over */
   .sidenav a:hover, .dropdown-btn:hover {
-    color: #f1f1f1;
+    background-color: #f1f1f1;
   }
 
   /* Main content */
@@ -162,8 +163,7 @@
 </div>
 
 <div id="sidenav" class="sidenav">
-    <a onclick="zapri()"> Zapri </a>
-    <a href="#about">Home</a>
+    <a style="margin-bottom:10%" onclick="zapri()"> Zapri </a>
     {% if perms.zaloga.view_zaloga %}
         <button class="dropdown-btn">Zaloga
             <i class="fa fa-caret-down"></i>
@@ -225,7 +225,7 @@
         </div>
     {% endif %}
     {% if perms.prodaja.add_dnevna_prodaja %}
-        <a style="width:21%" href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
+        <a href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
     {% endif %}
 </div>
 

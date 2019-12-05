@@ -111,6 +111,13 @@ class Zaloga(models.Model):
                 for prodaja in TIPI_PRODAJE:
                     Cena.objects.create(sestavina = sestavina, tip = tip[0], prodaja = prodaja[0])
 
+    def vrni_slovar_dimenzij(self):
+        slovar = {}
+        dimenzije = self.sestavina_set.values('dimenzija_id','dimenzija__dimenzija')
+        for dimenzija in dimenzije:
+            slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
+        return slovar
+
     @property
     def vrni_tipe(self):
         return TIPI_SESTAVINE

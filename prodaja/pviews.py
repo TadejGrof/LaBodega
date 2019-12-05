@@ -2,7 +2,6 @@ from django.shortcuts import render
 from .models import Stranka, Prodaja, Naslov
 from zaloga.models import Vnos, Zaloga, Dimenzija, Sestavina, Baza, Cena, Dnevna_prodaja
 from django.shortcuts import redirect
-from zaloga.funkcije import dodaj_iz_datoteke
 import datetime
 from django.utils import timezone
 from program.models import Program

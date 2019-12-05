@@ -8,6 +8,7 @@ import datetime
 from django.contrib.auth.decorators import login_required
 import json 
 from program.models import Program
+from . import funkcije
 
 prodaja = Prodaja.objects.first()
 zaloga = Zaloga.objects.first()
@@ -220,7 +221,29 @@ def shrani_vse(request,tip_baze, pk):
 
 @login_required
 def vnosi_iz_datoteke(request, tip_baze, pk):
-    pass
+    seznam = funkcije.vnosi_iz_datoteke(request.FILES.get('datoteka'),zaloga)
+    vnosi = []
+    baza = Baza.objects.get(pk = pk)
+    if tip_baze == "vele_prodaja":
+        for vnos in seznam:
+            sestavina = Sestavina.objects.get(dimenzija_id=vnos['dimenzija_id'])
+            vnosi.append(Vnos(
+                    baza=baza,
+                    stevilo=vnos['stevilo'],
+                    tip=vnos['tip'],
+                    dimenzija_id=vnos['dimenzija_id'],
+                    cena=sestavina.cena('vele_prodaja',vnos['tip'])
+                ))
+    else:
+        for vnos in seznam:
+            vnosi.append(Vnos(
+                baza=baza,
+                stevilo=vnos['stevilo'],
+                tip=vnos['tip'],
+                dimenzija_id=vnos['dimenzija_id']
+            ))
+    Vnos.objects.bulk_create(vnosi)
+    return redirect('baza', tip_baze = tip_baze, pk = pk)
 
 @login_required
 def spremeni_vnos(request, tip_baze, pk):

@@ -89,7 +89,7 @@
         {% endif %} 
         <form enctype='multipart/form-data' style="display:inline-block;margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' tip baza.pk %}" method="POST">
             {% csrf_token %}
-            <input style="display:inline-block;width:150px " id="iz_datoteke" name="file_path" type="file" value="Brskaj" required>
+            <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
             <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
         </form>
         <form style="display:inline-block" action="{% url 'uveljavi_bazo' tip baza.pk %}" onsubmit="return Uveljavi_bazo()" method="POST">

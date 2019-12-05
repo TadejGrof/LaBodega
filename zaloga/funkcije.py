@@ -178,25 +178,22 @@ def doloci_dimenzijo(radius,height,width,special):
     else:
         return height + '/' + width + '/' + radius
 
-def dodaj_iz_datoteke(datoteka):
+def vnosi_iz_datoteke(datoteka,zaloga):
     seznam = []
+    dimenzije = zaloga.vrni_slovar_dimenzij()
     for vrstica in datoteka.readlines():
         locitev = vrstica.decode().split(";")
+        print(locitev)
         dimenzija = locitev[0]
-        yellow = int(locitev[1])
-        white = int(locitev[2])
-        if yellow > 0:
+        tip = locitev[1]
+        stevilo = int(locitev[2])
+        print(stevilo)
+        if dimenzija in dimenzije:
             seznam.append({
-            'dimenzija': dimenzija,
-            'tip': 'yellow',
-            'stevilo': yellow
-        })
-        if white > 0:
-            seznam.append({
-            'dimenzija': dimenzija,
-            'tip': 'white',
-            'stevilo': white
-        })
+                'dimenzija_id':dimenzije[dimenzija],
+                'tip':tip,
+                'stevilo':stevilo
+            })
     return seznam
 
 def dodaj_sestavine_iz_datoteke(datoteka):
@@ -218,6 +215,7 @@ def dodaj_sestavine_iz_datoteke(datoteka):
             'special': special,
         })
     return seznam
+
 
 def ponastavi_program(program,zaloga=True,baze=True,stranke=False,cene=False,datoteke=True):
     if zaloga:

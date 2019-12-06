@@ -57,7 +57,8 @@ MIDDLEWARE = [
 
 ALLOWED_HOSTS =  [
     "tadejgrof.pythonanywhere.com",
-    '127.0.0.1']
+    '127.0.0.1',
+    'www.euronipon.com']
 
 ROOT_URLCONF = 'mysite.urls'
 

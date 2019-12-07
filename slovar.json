@@ -42,7 +42,7 @@
         "Arhiv dnevnih prodaj": {
             "slo": "Arhiv dnevnih prodaj",
             "ang": "Daysale archive",
-            "spa": "Archive de venta diaria"
+            "spa": "Archivo de venta diaria"
         },
         "Cenik vele prodaje": {
             "slo": "Cenik vele prodaje",
@@ -177,7 +177,7 @@
         "Pregled prometa": {
             "slo": "Pregled prometa",
             "ang": "Changes",
-            "spa": ""
+            "spa": "Mira cambias"
         },
         "Dodaj iz datoteke": {
             "slo": "Dodaj iz datoteke",
@@ -267,7 +267,7 @@
         "Uveljavi": {
             "slo": "Uveljavi",
             "ang": "Confirm",
-            "spa": "Uveljavi"
+            "spa": "Valida"
         },
         "Shrani vse": {
             "slo": "Shrani vse",
@@ -472,17 +472,17 @@
         "Trenutno stanje": {
             "slo": "Trenutno stanje",
             "ang": "Current stock",
-            "spa": ""
+            "spa": "Presente"
         },
         "Zacetno stanje": {
             "slo": "Zacetno stanje",
             "ang": "Beginning stock",
-            "spa": ""
+            "spa": "Empezo:"
         },
         "Pregled prometa za": {
             "slo": "Pregled prometa za",
             "ang": "Changes for",
-            "spa": ""
+            "spa": "Transeferencias"
         },
         "tipa": {
             "slo": "tipa",
@@ -548,6 +548,11 @@
             "slo": "Brez zgodovine",
             "ang": "Without history",
             "spa": "Sin entradas"
+        },
+        "Nova dnevna prodaja": {
+            "slo": "Nova dnevna prodaja",
+            "ang": "New daily sale",
+            "spa": "Nueva venta diaria"
         },
         "Cena popusta": {
             "slo": "Cena popusta",

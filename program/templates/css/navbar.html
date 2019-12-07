@@ -164,9 +164,9 @@
 </div>
 
 <div id="sidenav" class="sidenav">
-    <a style="margin-bottom:10%" onclick="zapri()"> Zapri </a>
+    <a style="margin-bottom:10%" onclick="zapri()"> X </a>
     {% if perms.zaloga.view_zaloga %}
-        <button class="dropdown-btn">Zaloga
+        <button class="dropdown-btn">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
@@ -183,7 +183,7 @@
         </div>
     {% endif %}
     {% if perms.zaloga.view_odpis %}
-        <button class="dropdown-btn">Odpis 
+        <button class="dropdown-btn">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
@@ -194,7 +194,7 @@
         </div>
     {% endif %}
     {% if perms.zaloga.view_prevzem %}
-        <button class="dropdown-btn">Prevzem
+        <button class="dropdown-btn">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
@@ -205,7 +205,7 @@
         </div>
     {% endif %}
     {% if perms.prodaja.view_prodaja %}
-        <button class="dropdown-btn">Prodaja 
+        <button class="dropdown-btn">{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">

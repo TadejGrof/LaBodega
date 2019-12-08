@@ -164,6 +164,16 @@
             "ang": "Clients",
             "spa": "Cliente"
         },
+        "Znesek": {
+            "slo": "Znesek",
+            "ang": "Price",
+            "spa": "Precio"
+        },
+        "Znesek popusta": {
+            "slo": "Znesek popusta",
+            "ang": "Discount price",
+            "spa": "Precio de discuento"
+        },
         "Odjava": {
             "slo": "Odjava",
             "ang": "Logout",

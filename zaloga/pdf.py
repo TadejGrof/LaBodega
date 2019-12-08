@@ -108,6 +108,46 @@ def tabela_baze(p, baza, top = 800):
         top = zadnja_vrstica_baze(p,baza,top)
     podpis(p,top)
 
+def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800):
+    if tip_tabele == "activity_log":
+        data = [['Cas', 'Dimenzija', 'Tip', 'Stevilo', 'Cena']] 
+    elif tip_tabele == "prodane":
+        data = [['Dimenzija', 'Tip', 'Stevilo', 'Cena']] 
+    style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+        ])
+    tabela(p,data,style)
+    top = naslednja_vrstica(p,top)
+    if tip_tabele == "activity_log":
+        for prodana in prodaja.activity_log:
+            data = [[
+                str(prodana['cas'])[:5],
+                prodana['dimenzija'],
+                prodana['tip'], 
+                prodana['stevilo'], 
+                str(prodana['cena']) + ' $' ]]
+            style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                    ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                    ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                    ])
+            tabela(p,data,style)
+            top = naslednja_vrstica(p,top)    
+    elif tip_tabele == "prodane":
+        prodane = prodaja.prodane
+        for prodana in prodane:
+            data = [[
+                prodane[prodana]['dimenzija'],
+                prodane[prodana]['tip'],
+                prodane[prodana]['stevilo'], 
+                str(prodane[prodana]['cena']) + ' $']] 
+            style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                    ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                    ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                    ])
+            tabela(p,data,style)
+            top = naslednja_vrstica(p,top)
+
 def zadnja_vrstica_baze(p,baza,top):
     skupno = baza.skupno_stevilo
     data=  [['Skupno stevilo:', baza.skupno_stevilo, '/']] 

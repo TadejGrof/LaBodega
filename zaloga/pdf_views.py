@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Dimenzija, Sestavina, Vnos
+from .models import Dimenzija, Sestavina, Vnos, Dnevna_prodaja
 from .models import Baza, Zaloga
 from django.shortcuts import redirect
 import zaloga.pdf as pdf
@@ -60,3 +60,14 @@ def pdf_baze(request,tip_baze, pk):
     p.save()
     return response 
 
+def pdf_dnevne_prodaje(request,pk,tip):
+    dnevna_prodaja = Dnevna_prodaja.objects.get(pk = pk)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="dnevna_prodaja.pdf"'
+    p = canvas.Canvas(response)
+    p.translate(40,800)
+    p.drawString(180,0,'Pregled prodaje ' + dnevna_prodaja.title)
+    pdf.tabela_dnevne_prodaje(p,dnevna_prodaja,tip)
+    p.showPage()
+    p.save()
+    return response 

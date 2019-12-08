@@ -318,11 +318,25 @@ class Dnevna_prodaja(models.Model):
                 dimenzija_vnos = str(vnos.dimenzija) + '-' + vnos.tip
                 if dimenzija_vnos in prodane:
                     prodane[dimenzija_vnos]['stevilo'] += vnos.stevilo
+                    prodane[dimenzija_vnos]['cena'] += vnos.cena * vnos.stevilo
                 else:
-                    slovar = {'dimenzija':vnos.dimenzija.dimenzija, 'stevilo':vnos.stevilo,'tip':vnos.tip}
+                    slovar = {'dimenzija':vnos.dimenzija.dimenzija, 'stevilo':vnos.stevilo,'tip':vnos.tip,'cena':vnos.cena * vnos.stevilo}
                     prodane.update({dimenzija_vnos:slovar})
         return prodane
 
+    @property
+    def activity_log(self):
+        activity_log = []
+        for racun in self.racuni:
+            for vnos in racun.vnos_set.all():
+                activity_log.append({
+                    'dimenzija':vnos.dimenzija,
+                    'stevilo':vnos.stevilo,
+                    'tip':vnos.tip,
+                    'cena':vnos.stevilo * vnos.cena,
+                    'cas': racun.cas,
+                })
+        return activity_log
 
 class Baza(models.Model):
     author = models.ForeignKey(User,default=1, on_delete=models.CASCADE)

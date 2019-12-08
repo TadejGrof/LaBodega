@@ -20,6 +20,7 @@ dnevna_prodaja_patterns = [
     path('racun/spremeni_popust/', pviews.racun_spremeni_popust, name="racun_spremeni_popust"),
     path('uveljavi_racun/<int:pk>/', pviews.uveljavi_racun, name="uveljavi_racun"),
     path('arhiv/ogled/<int:pk>/', pviews.ogled_dnevne_prodaje, name='ogled_dnevne_prodaje'),
+    path('arhiv/ogled/<int:pk>/pdf/<str:tip>/', pdf_views.pdf_dnevne_prodaje, name='pdf_dnevne_prodaje'),
     path('arhiv/ogled/<int:pk>/storniraj/<int:pk_r>/', pviews.storniraj_racun, name="storniraj_racun"),
 ]
 

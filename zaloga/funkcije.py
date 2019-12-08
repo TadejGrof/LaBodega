@@ -150,11 +150,11 @@ def ustvari_zacetna_stanja(zaloga,datum):
 
 def zacetna_stanja(zaloga):
     stanja = {}
-    for sestavina in zaloga.sestavina_set.all():
+    for sestavina in zaloga.sestavina_set.all().values('dimenzija__dimenzija'):
         slovar = {}
         for tip in zaloga.vrni_tipe:
             slovar.update({tip[0]:0})
-        stanja.update({sestavina.dimenzija.dimenzija:slovar})
+        stanja.update({sestavina['dimenzija__dimenzija']:slovar})
     with open('zacetna_stanja.json', 'w') as dat:
         json.dump(stanja, dat, indent=4)
 

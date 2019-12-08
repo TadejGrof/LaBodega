@@ -12,7 +12,7 @@ from program.models import Program
 import json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .funkcije import ustvari_zacetna_stanja, arhiv_baz, arhiv_prodaj
+from .funkcije import ustvari_zacetna_stanja, arhiv_baz, arhiv_prodaj, zacetna_stanja
 
 TIPI_SESTAVINE = (
         ('Y','Yellow'),
@@ -250,7 +250,7 @@ def create_dimenzija(sender, instance, created, **kwargs):
         for prodaja in TIPI_PRODAJE:
             for tip in TIPI_SESTAVINE:
                 Cena.objects.create(sestavina = sestavina, prodaja = prodaja[0], tip = tip[0])
-
+    zacetna_stanja()
 ###################################################################################################
 
 class Cena(models.Model):

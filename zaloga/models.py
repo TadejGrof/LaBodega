@@ -250,7 +250,7 @@ def create_dimenzija(sender, instance, created, **kwargs):
         for prodaja in TIPI_PRODAJE:
             for tip in TIPI_SESTAVINE:
                 Cena.objects.create(sestavina = sestavina, prodaja = prodaja[0], tip = tip[0])
-    zacetna_stanja()
+    zacetna_stanja(sestavina.zaloga)
 ###################################################################################################
 
 class Cena(models.Model):

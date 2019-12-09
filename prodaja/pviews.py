@@ -20,7 +20,8 @@ def pregled_prodaje(request):
 ###########################################################################################
 
 def dnevna_prodaja(request):
-    danasnja_prodaja = Dnevna_prodaja.objects.filter(datum = datetime.date.today()).first()
+    danes = timezone.localtime(timezone.now())
+    danasnja_prodaja = Dnevna_prodaja.objects.filter(datum = danes).first()
     aktivni_racun = None
     if danasnja_prodaja != None:
         aktivni_racun = danasnja_prodaja.aktivni_racun

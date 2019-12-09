@@ -9,7 +9,7 @@
         }
         div.filter{
             display:block;
-            margin-top:3%;
+            margin-top:1.2%;
             width:100%;
             text-align:center;
             height:15%;
@@ -21,8 +21,15 @@
             left:20%;
             margin-bottom:4%;
         }
+        div.title{
+            margin-top:2%;
+            font-size:4vmin;
+        }
     </style>
 
+    <div class="title">
+        {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: {{skupno}}
+    </div>
     <div class="filter">
         <div style="display:block">
             <form id="filter" action="{% url 'pregled_zaloge' %}" method="GET">

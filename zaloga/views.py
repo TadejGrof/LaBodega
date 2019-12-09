@@ -46,12 +46,17 @@ def pregled_zaloge(request):
             'JP50',
             'JP70',
         )
+        skupno = 0
+        for sestavina in sestavine:
+            for tip in tipi:
+                skupno += sestavina[tip[0]]
         slovar = {
             'sestavine':sestavine,
             'tipi':tipi,
             'radius':radius,
             'height':height,
-            'width':width   
+            'width':width,
+            'skupno':skupno
         }
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 

@@ -55,3 +55,10 @@ class Stranka(models.Model):
     def __str__(self):
         return self.ime
         
+    @property
+    def ima_aktivno_prodajo(self):
+        return self.baza_set.all().filter(status="aktivno").exists()
+
+    @property
+    def aktivna_prodaja(self):
+        return self.baza_set.all().filter(status="aktivno").first()

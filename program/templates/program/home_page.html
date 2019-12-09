@@ -92,12 +92,18 @@
                     <td> {{stranka.telefon}} </td>
                     <td> {{stranka.mail}} </td>
                     <td> 
-                        <form action="{% url 'nova_dnevna_prodaja' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="stranka" value="{{stranka.pk}}">
-                            <input type="date" hidden="hidden" name="datum" value="{{danes}}">
-                            <input type="submit" value="{{slovar|keyvalue:'Nova prodaja'|keyvalue:jezik}}">
-                        </form>
+                        {% if stranka.ima_aktivno_prodajo %}
+                            <form action="{% url 'baza' 'vele_prodaja' stranka.aktivna_prodaja.pk %}" method="GET">
+                                <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                            </form>
+                        {% else %}
+                            <form action="{% url 'nova_baza' 'vele_prodaja' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="stranka" value="{{stranka.pk}}">
+                                <input type="date" hidden="hidden" name="datum" value="{{danes}}">
+                                <input type="submit" value="{{slovar|keyvalue:'Nova prodaja'|keyvalue:jezik}}">
+                            </form>
+                        {% endif %}
                     </tr>
                 </tr>
             {% endfor %}

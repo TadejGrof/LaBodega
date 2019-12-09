@@ -115,6 +115,27 @@ class Zaloga(models.Model):
             slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
         return slovar
 
+    def vrni_top_10(self,radius="all"):
+        sestavine = []
+        radiusi = self.vrni_razlicne_radiuse
+        tipi = self.vrni_tipe
+        if radius in radiusi:
+            sestavine_radiusa = self.sestavina_set.all().filter(dimenzija__radius = radius)
+            for tip in tipi:
+                for sestavina in sestavine_radiusa.order_by('-' + tip[0])[:10].values(tip[0],'dimenzija__dimenzija'):
+                    sestavine.append((sestavina[tip[0]],tip[0],sestavina['dimenzija__dimenzija']))
+            sestavine.sort()
+            sestavine = sestavine[::-1][:10]
+        else:
+            for radius in radiusi:
+                sestavine_radiusa = self.sestavina_set.all().filter(dimenzija__radius = radius)
+                for tip in tipi:
+                    for sestavina in sestavine_radiusa.order_by('-' + tip[0])[:10].values(tip[0],'dimenzija__dimenzija'):
+                        sestavine.append((sestavina[tip[0]],tip[0],sestavina['dimenzija__dimenzija']))
+            sestavine.sort()
+            sestavine = sestavine[::-1][:10]
+        return [{'dimenzija__dimenzija':sestavina[2],sestavina[1]:sestavina[0],'tip':sestavina[1]} for sestavina in sestavine]
+    
     @property
     def vrni_tipe(self):
         return TIPI_SESTAVINE

@@ -49,6 +49,7 @@
                 </select>
                 Tip:
                 <select name="tip" form="top10">
+                    <option value="all"> All </option>
                     {% for tip in zaloga.vrni_tipe %}
                         <option value="{{tip.0}}"> {{tip.1}} </option>
                     {% endfor %}
@@ -65,9 +66,11 @@
                 </tr>
                 {% for sestavina in sestavine %}
                     <tr>
-                        <td> {{sestavina.dimenzija}} </td>
-                        <td> {{tip}} </td>
-                        <td> {{sestavina|stringvalue:tip}} </td>
+                        <td> {{sestavina.dimenzija__dimenzija}} </td>
+                        {% with sestavina.tip as tip_sestavine %}
+                        <td> {{tip_sestavine}} </td>
+                        <td> {{sestavina|keyvalue:tip_sestavine}} </td>
+                        {% endwith %}
                     <tr>
                 {% endfor %}
             </table>

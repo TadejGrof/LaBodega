@@ -58,7 +58,7 @@
                 <td> {{program.naslednji_prevzem}} </td>
                 <td> {{slovar|keyvalue:'Izvor'|keyvalue:jezik}}: </td> 
                 <td>
-                    <select name="drzava">
+                    <select form="nova_baza" name="drzava">
                         {% for drzava in zaloga.drzave %}
                             <option value="{{drzava.0}}"> {{drzava.1}} </option>
                         {% endfor %}
@@ -70,7 +70,7 @@
                 <td> {{zaloga.danes}} </td>
                 <td> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
                 <td> 
-                    <select name="posiljatelj">
+                    <select form="nova_baza" name="posiljatelj">
                         {% for posiljatelj in zaloga.posiljatelji %}
                             <option value="{{posiljatelj.0}}"> {{posiljatelj.1}} </option>
                         {% endfor %}

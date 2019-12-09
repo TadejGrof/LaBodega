@@ -57,13 +57,25 @@
                 <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
                 <td> {{program.naslednji_prevzem}} </td>
                 <td> {{slovar|keyvalue:'Izvor'|keyvalue:jezik}}: </td> 
-                <td> <input form="nova_baza" name="drzava" type="text" required> </td>
+                <td>
+                    <select name="drzava">
+                        {% for drzava in zaloga.drzave %}
+                            <option value="{{drzava.0}}"> {{drzava.1}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
                 <td> {{zaloga.danes}} </td>
                 <td> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
-                <td> <input form="nova_baza" name="posiljatelj" type="text" required> </td>
+                <td> 
+                    <select name="posiljatelj">
+                        {% for posiljatelj in zaloga.posiljatelji %}
+                            <option value="{{posiljatelj.0}}"> {{posiljatelj.1}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
             </tr>
         </table>
     {% elif tip == "vele_prodaja" %}

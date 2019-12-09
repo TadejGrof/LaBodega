@@ -310,7 +310,11 @@
                     <div style="width:30%;height:15%;text-align:center;display:inline-block"> Tip: </div> 
                     <select style="width:40%;height:15%;display:inline-block" id="tip" name="tip" form="nov_vnos" onchange="Pokazi_zalogo()">
                         {% for tip in zaloga.vrni_tipe %}
-                            <option value="{{tip.0}}"> {{tip.1}} </option>
+                            {% if tip.0 == "W" %}
+                                <option value="{{tip.0}}" selected> {{tip.1}} </option>
+                            {% else %}
+                                <option value="{{tip.0}}"> {{tip.1}} </option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                     <input style="width:40%;height:15%;display:inline-block;margin:10%;margin-top:3%" type="submit" value="Nov vnos" form="nov_vnos">

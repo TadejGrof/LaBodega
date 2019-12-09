@@ -459,6 +459,11 @@
             "ang": "Change all",
             "spa": "Cambia todo"
         },
+        "Ogled prodaje na dan": {
+            "slo": "Ogled prodaje na dan",
+            "ang": "Daily sale",
+            "spa": "Venta dia"
+        },
         "Potrdi": {
             "slo": "Potrdi",
             "ang": "Confirm",
@@ -538,6 +543,21 @@
             "slo": "Stevilo prodanih",
             "ang": "Amount of sold tires",
             "spa": "Numero de llantas"
+        },
+        "Skupno": {
+            "slo": "Skupno",
+            "ang": "Combined",
+            "spa": "Junto"
+        },
+        "Brez veljavnih racunov": {
+            "slo": "Brez veljavnih racunov",
+            "ang": "Without valid bills",
+            "spa": "Sin cuentas validas"
+        },
+        "Racun": {
+            "slo": "Racun",
+            "ang": "Bill",
+            "spa": "Cuenta"
         },
         "Skupna cena": {
             "slo": "Skupna cena",

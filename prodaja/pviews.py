@@ -99,8 +99,11 @@ def uveljavi_racun(request,pk):
 
 def ogled_dnevne_prodaje(request, pk):
     prodaja = Dnevna_prodaja.objects.get(pk = pk)
-    racun_pk = request.GET.get('racun_pk', prodaja.baza_set.filter(tip='racun', status='veljavno').last().pk)
-    racun = Baza.objects.get(pk = racun_pk)
+    if prodaja.stevilo_veljavnih_racunov() > 0:
+        racun_pk = request.GET.get('racun_pk', prodaja.baza_set.filter(tip='racun', status='veljavno').last().pk)
+        racun = Baza.objects.get(pk = racun_pk)
+    else:
+        racun = None
     racuni = prodaja.baza_set.all().filter(tip='racun', status__in = ['veljavno','storno']).order_by('-pk').prefetch_related('vnos_set')
     return pokazi_stran(request,'prodaja/ogled_dnevne_prodaje.html',{'prodaja':prodaja, 'racuni': racuni, 'racun': racun})
 

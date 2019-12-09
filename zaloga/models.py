@@ -30,17 +30,15 @@ TIPI_PRODAJE = (
 POSILJATELJI = (
     ('bozo', 'Bozo'),
     ('japan', 'Japan'),
-    ('anglija', 'Anglija'),
-    ('poljska', 'Poljska')
 )
 
 DRZAVE = (
-    ('pan', 'Panama'),
-    ('slo', 'Slovenija'),
-    ('jap', 'Japonska'),
-    ('pol', 'Poljska'),
-    ('ang', 'Anglija'),
+    ('slo', 'Slovenia'),
+    ('jap', 'Japan'),
+    ('pol', 'Poland'),
+    ('ang', 'England'),
     ('kor', 'Korea'),
+    ('pan', 'Panama'),
 )
 
 TIPI_BAZE = (
@@ -53,7 +51,6 @@ TIPI_BAZE = (
 
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
-    
 
     def __str__(self):
         return self.title
@@ -121,6 +118,14 @@ class Zaloga(models.Model):
     @property
     def vrni_tipe(self):
         return TIPI_SESTAVINE
+
+    @property
+    def drzave(self):
+        return DRZAVE
+    
+    @property
+    def posiljatelji(self):
+        return POSILJATELJI
 
     def vrni_dimenzijo(self,radius,height,width):
         special = False
@@ -263,8 +268,8 @@ class Cena(models.Model):
 
 class Kontejner(models.Model):
     stevilka = models.CharField(default="", max_length=20)
-    posiljatelj = models.CharField(default="", max_length=20)
-    drzava = models.CharField(default="", max_length=20)
+    posiljatelj = models.CharField(default="", max_length=20, choices=POSILJATELJI)
+    drzava = models.CharField(default="", max_length=20, choices=DRZAVE)
 
 ##################################################################################################
 

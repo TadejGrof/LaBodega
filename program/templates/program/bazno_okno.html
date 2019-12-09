@@ -28,13 +28,13 @@
             <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
             <td class="podatek"> {{baza.title}} </td>
             <td class="info"> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.kontejner.posiljatelj}} </td>
+            <td class="podatek"> {{baza.kontejner.get_posiljatelj_display}} </td>
         </tr>
         <tr>
             <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
             <td class="podatek"> {{baza.datum}} </td>
             <td class="info"> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.kontejner.drzava}} </td>
+            <td class="podatek"> {{baza.kontejner.get_drzava_display}} </td>
         </tr>
     </table>
 {% elif baza.tip == "vele_prodaja" %}

@@ -109,6 +109,11 @@
             "ang": "Sale info",
             "spa": "Info de venta"
         },
+        "Podatki uporabnika": {
+            "slo": "Podatki uporabnika",
+            "ang": "User info",
+            "spa": "Otro info"
+        },
         "Podatki stranke": {
             "slo": "Podatki stranke",
             "ang": "Cliente's info",
@@ -543,6 +548,11 @@
             "slo": "Stevilo prodanih",
             "ang": "Amount of sold tires",
             "spa": "Numero de llantas"
+        },
+        "Podpis": {
+            "slo": "Podpis",
+            "ang": "Signiture",
+            "spa": "Firma"
         },
         "Skupno": {
             "slo": "Skupno",

@@ -218,8 +218,8 @@ def title_prevzema(p,baza,top = 800, jezik = "spa"):
     top = naslednja_vrstica(p,top,visina=30)
     data = [
         [slovar['Tip'][jezik] + ':',baza.tip,slovar['Stevilo'][jezik] + ':',baza.kontejner.stevilka,slovar['Ime'][jezik] + ':',baza.author.username],
-        [slovar['Title'][jezik] + ':',baza.title,slovar['Posiljatelj'][jezik] + ':',baza.kontejner.posiljatelj, slovar['Telefon'][jezik] + ':' ,"/"],
-        [slovar['Datum'][jezik] + ':',baza.datum,slovar['Drzava'][jezik] + ':',baza.kontejner.drzava,'E-mail','/']
+        [slovar['Title'][jezik] + ':',baza.title,slovar['Posiljatelj'][jezik] + ':',baza.kontejner.get_posiljatelj_display(), slovar['Telefon'][jezik] + ':' ,"/"],
+        [slovar['Datum'][jezik] + ':',baza.datum,slovar['Drzava'][jezik] + ':',baza.kontejner.get_drzava_display(),'E-mail','/']
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'LEFT')])
     tabela(p,data,style,[55,85,65,95,65,95])

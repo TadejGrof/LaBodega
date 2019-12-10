@@ -649,3 +649,16 @@ class Vnos(models.Model):
             sestavina = sestavina 
         )
         self.save()
+
+class Stroski_Group(models.Model):
+    title = models.CharField(default="",max_length=20)
+    tip = models.CharField(default="",max_length=20)
+    datum = models.DateField(default=timezone.now)
+    status = models.CharField(default="aktivno",max_length=20)
+    kontejner = models.ForeignKey(Kontejner,default=None,null=True,blank=True,on_delete=models.CASCADE)
+
+class Strosek(models.Model):
+    title = models.CharField(default="",max_length=20)
+    group = models.ForeignKey(Stroski_Group,default=0,on_delete=models.CASCADE)
+    delavec = models.ForeignKey(User,default=None,null=True,blank=True,on_delete=models.CASCADE)
+    znesek = models.DecimalField(default=0,max_digits=8,decimal_places=2)

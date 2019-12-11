@@ -1,6 +1,7 @@
 from django.urls import include,path
 from . import views
 from . import pdf_views
+from . import stroski_views
 
 ogled_patterns = [
     path('',views.baza, name="baza"),
@@ -22,12 +23,22 @@ baza_patterns = [
     path('arhiv/', views.arhiv, name='arhiv_baz'),
 ]
 
+strosek_patterns = [
+    path('',stroski_views.strosek, 'strosek'),
+    path('nov_strosek/',stroski_views.nov_strosek, name="nov_strosek")
+]
+
+stroski_patterns = [
+    path('',stroski_views.pregled, 'pregled_stroskov'),
+]
 
 urlpatterns = [
     path('', views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/', views.pregled_prometa, name='pregled_prometa'),
     path('pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
-    path('iz_datoteke', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
+    path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
+    path('pregled/', include(stroski_patterns)),
+    path('nov_strosek/', include(strosek_patterns)),
     path('<str:tip_baze>/', include(baza_patterns)),
 ]

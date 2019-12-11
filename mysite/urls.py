@@ -24,5 +24,6 @@ urlpatterns = [
     path('', include('program.urls')),
     path('prodaja/', include('prodaja.urls')),
     path('program/', include('program.urls')),
+    path('stroski/', include('zaloga.urls')),
     #path(r'^__debug__' , include(debug_toolbar.urls)),
 ]

@@ -5,4 +5,59 @@
 
 {% block content %}
 
+{% if strosek == None %}
+    <h2> Nov strosek </h2>
+    <div class="table">
+        <table class="tabela_podatkov">
+            <tr>
+                <td width="20%"> Title: </td>
+                <td width="30%"> <input tpye="text" form="nov_strosek" name="title" required>
+                <td width="20%"> Tip: </td>
+                <td width="30%">
+                    <select name="tip" form="nov_strosek">
+                        {% for tip in tipi_stroska %}
+                            <option value="{{tip.0}}"> {{tip.1}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td width="20%"> Datum: </td>
+                <td width="30%"> <input tpye="date" form="nov_strosek" name="datum" value="{{zaloga.danes}}">
+                <td width="20%" hidden="hidden" class="kontejner"> Kontejner: </td>
+                <td width="30%" hidden="hidden" class="kontejner">
+                    <select name="kontejner" form="nov_strosek">
+                        {% for kontejner in kontejnerji %}
+                            <option value="{{kontejner.pk}}"> {{kontejner.stevilka}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <form id="nov_strosek" action="{% url 'nov_strosek' %}" method="POST">
+        <input type="submit" value="Nov strosek">
+    </form>
+{% else %}
+    <h2> Strosek </h2>
+    <div class="table">
+        <table class="tabela_vnosov">
+            <tr class="header">
+                <td> Tip: </td>
+                <td> Znesek: </td>
+            </tr>
+            {% for vnos in vnosi %}
+                <tr>
+                    <td> {{vnos.tip}}
+                    <td> {{vnos.znesek}}
+                </tr>
+            {% endfor %}
+            <tr>
+                <td> Skupno: </td>
+                <td> {{strosek.skupno}} </td>
+            </tr>
+        </table>
+    </div>
+{% endif %}
+
 {% endblock %}

@@ -484,6 +484,21 @@
             "ang": "Change",
             "spa": "Cambio"
         },
+        "Nov strosek": {
+            "slo": "Nov strosek",
+            "ang": "New expense",
+            "spa": "New expense"
+        },
+        "Stroski": {
+            "slo": "Stroski",
+            "ang": "Expenses",
+            "spa": "Expenses"
+        },
+        "Pregled": {
+            "slo": "Pregled",
+            "ang": "Overview",
+            "spa": "Overview"
+        },
         "Zaloga": {
             "slo": "Zaloga",
             "ang": "Stock",

@@ -228,6 +228,15 @@
     {% if perms.prodaja.add_dnevna_prodaja %}
         <a href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
     {% endif %}
+    {% if perms.admin.view_logentry %}
+        <button class="dropdown-btn">{{slovar|keyvalue:'Stroski'|keyvalue:jezik}}
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a href="{% url 'strosek'%}">{{slovar|keyvalue:'Nov strosek'|keyvalue:jezik}}</a>
+            <a href="{% url 'pregled_stroskov' %}">{{slovar|keyvalue:'Pregled'|keyvalue:jezik}}</a>
+        </div>
+    {% endif %}
 </div>
 
 <script>

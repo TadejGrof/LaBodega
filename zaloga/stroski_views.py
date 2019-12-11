@@ -4,18 +4,19 @@ from .models import Baza, Zaloga
 from django.shortcuts import redirect
 import datetime
 from django.contrib.auth.decorators import login_required
+import json 
 
 @login_required
 def pregled(request):
     od = request.GET.get('od',datetime.date(2019,12,1))
     do = request.GET.get('do', datetime.date.today())
     stroski = stroski.filter(datum__gte = od, datum__lte = do)
-    pokazi_stran(request,'stroski/pregled_stroskov.html',{'stroski':stroski})
+    return pokazi_stran(request,'stroski/pregled_stroskov.html',{'stroski':stroski})
 
 @login_required
 def strosek(request):
-    strosek = Stroski_Group.objects.all().filter(status = 'aktivno')
-    pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek})
+    strosek = Stroski_Group.objects.all().filter(status = 'aktivno').first()
+    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek})
 
 @login_required
 def nov_strosek(request):

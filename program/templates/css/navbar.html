@@ -156,7 +156,7 @@
         </button>
         <div class="dropdown-content" id="profil">
             {% if perms.admin.view_logentry %}
-            <a href="{% url 'admin:index' %}"> Admin </a>
+                <a href="{% url 'admin:index' %}"> Admin </a>
             {% endif %}
             <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
         </div>

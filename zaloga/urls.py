@@ -24,12 +24,12 @@ baza_patterns = [
 ]
 
 strosek_patterns = [
-    path('',stroski_views.strosek, 'strosek'),
+    path('',stroski_views.strosek, name='strosek'),
     path('nov_strosek/',stroski_views.nov_strosek, name="nov_strosek")
 ]
 
 stroski_patterns = [
-    path('',stroski_views.pregled, 'pregled_stroskov'),
+    path('',stroski_views.pregled, name='pregled_stroskov'),
 ]
 
 urlpatterns = [

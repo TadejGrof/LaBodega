@@ -5,27 +5,32 @@
 
 {% block content %}
 
+<style>
+    .okence{
+        width:80%
+    }
+</style>
 {% if strosek == None %}
     <h2> Nov strosek </h2>
-    <div class="table">
-        <table class="tabela_podatkov">
+    <div style="margin:2%;display:inline-block;width:50%">
+        <table class="tabela_podatkov" style="padding:2%;border: 1px solid black">
             <tr>
-                <td width="20%"> Title: </td>
-                <td width="30%"> <input tpye="text" form="nov_strosek" name="title" required>
-                <td width="20%"> Tip: </td>
-                <td width="30%">
-                    <select name="tip" form="nov_strosek">
-                        {% for tip in tipi_stroska %}
+                <td width="15%"> Title: </td>
+                <td width="35%"> <input class="okence" tpye="text" form="nov_strosek" name="title" autocomplete="off" required>
+                <td width="15%"> Tip: </td>
+                <td width="35%">
+                    <select onchange="Sprememba_tipa()" class="okence" name="tip" form="nov_strosek">
+                        {% for tip in zaloga.tipi_stroskov %}
                             <option value="{{tip.0}}"> {{tip.1}} </option>
                         {% endfor %}
                     </select>
                 </td>
             </tr>
             <tr>
-                <td width="20%"> Datum: </td>
-                <td width="30%"> <input tpye="date" form="nov_strosek" name="datum" value="{{zaloga.danes}}">
-                <td width="20%" hidden="hidden" class="kontejner"> Kontejner: </td>
-                <td width="30%" hidden="hidden" class="kontejner">
+                <td> Datum: </td>
+                <td> <input type="date" class="okence" form="nov_strosek" name="datum" value="{{zaloga.danes}}">
+                <td hidden="hidden" class="kontejner"> Kontejner: </td>
+                <td hidden="hidden" class="kontejner">
                     <select name="kontejner" form="nov_strosek">
                         {% for kontejner in kontejnerji %}
                             <option value="{{kontejner.pk}}"> {{kontejner.stevilka}} </option>
@@ -60,4 +65,9 @@
     </div>
 {% endif %}
 
+<script>
+    function Sprememba_tipa(){
+        
+    }
+</script>
 {% endblock %}

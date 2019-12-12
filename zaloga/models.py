@@ -49,6 +49,14 @@ TIPI_BAZE = (
     ('racun','Racun'),
 )
 
+TIPI_STROSKOV = (
+    ('placilo','Placilo'),
+    ('kontejner','Kontejner'),
+    ('najem', 'Najemnina'),
+    ('placa','Placa'),
+    ('drugo','Drugo')
+)
+
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
 
@@ -139,6 +147,10 @@ class Zaloga(models.Model):
     @property
     def vrni_tipe(self):
         return TIPI_SESTAVINE
+
+    @property
+    def tipi_stroskov(self):
+        return TIPI_STROSKOV
 
     @property
     def drzave(self):

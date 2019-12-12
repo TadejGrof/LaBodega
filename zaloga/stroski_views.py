@@ -6,6 +6,8 @@ import datetime
 from django.contrib.auth.decorators import login_required
 import json 
 
+zaloga = Zaloga.objects.all().first()
+
 @login_required
 def pregled(request):
     od = request.GET.get('od',datetime.date(2019,12,1))
@@ -46,6 +48,6 @@ def vrni_slovar(request):
     return slovar
 
 def pokazi_stran(request, html, baze={}):
-    slovar = {'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
+    slovar = {'zaloga':zaloga,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
     slovar.update(baze)
     return render(request, html, slovar)

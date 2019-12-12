@@ -38,7 +38,7 @@ urlpatterns = [
     path('pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
     path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
-    path('pregled/', include(stroski_patterns)),
+    path('pregled_stroskov/', include(stroski_patterns)),
     path('nov_strosek/', include(strosek_patterns)),
     path('<str:tip_baze>/', include(baza_patterns)),
 ]

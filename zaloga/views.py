@@ -114,7 +114,10 @@ def baze(request, tip_baze):
 @login_required
 def nova_baza(request, tip_baze):
     if request.method == "POST":
-        title = program.naslednja_baza(tip_baze,delaj = True)
+        if tip_baze == "narocilo":
+            title = "narocilo"
+        else:
+            title = program.naslednja_baza(tip_baze,delaj = True)
         if tip_baze == "prevzem":
             stevilka = request.POST.get('stevilka')
             posiljatelj = request.POST.get('posiljatelj')
@@ -129,7 +132,7 @@ def nova_baza(request, tip_baze):
                 author=request.user,
                 tip=tip_baze,
                 sprememba_zaloge = 1)
-        elif tip_baze == "vele_prodaja":
+        elif tip_baze == "vele_prodaja" or tip_baze == "narocilo":
             stranka = Stranka.objects.get(pk = int(request.POST.get('stranka')))
             Baza.objects.create(
                 stranka = stranka,

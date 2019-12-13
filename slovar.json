@@ -14,6 +14,11 @@
             "ang": "Delete",
             "spa": "Eliminar"
         },
+        "narocilo":{
+            "slo":"Narocilo",
+            "ang":"Order",
+            "spa":"Order"
+        },
         "Aktivno": {
             "slo": "Aktivno",
             "ang": "Active",

@@ -1,32 +1,94 @@
 from zaloga.models import Sestavina, Baza
+from zaloga.models import Zaloga
 
-pomembne_dimenzije_l = []
-with open('pomembne_dimenzije.txt') as dat:
-    for dimenzija in dat.readlines():
-        dimenzija = vrstica.replace('\n','')
-        pomembne_dimenzije_l.append(dimenzija)
+zaloga = Zaloga.objects.all().first()
 
-pomembne_dimenzije = Sestavina.objects.filter(dimenzija__dimenzija__in = pomembne_dimenzije_l )
+class Skripta():
+    def __init__(self,narocila):
+        self.zaloga = zaloga
+        self.narocila = [Narocilo(narocilo) for narocilo in narocila]
+        self.skupno = ustvari_skupno(self.narocila,zaloga)
+        self.skupno_stevilo = sum([narocilo.skupno_stevilo for narocilo in narocila])
+        self.na_zalogi = zaloga.zaloga
+        self.na_voljo = zaloga.zaloga
 
-def vrni_mozne_posiljke(narocila,zaloga):
-    posiljke = []
-    skupno = ustvari_skupno(narocila,zaloga)
-    for narocilo in narocila:
-        posiljke.append(vrni_posiljko(narocilo,skupno))
-    return posiljke
+    def razporedi(self,dimenzija,tip):
+        # odštej še minimalno zalogo
+        skupno = self.skupno[dimenzija][tip]['kolicina']
+        zaloga = self.skupno[dimenzija][tip]['zaloga']
+        narocila = self.skupno[dimenzija][tip]['narocila']
+        if skupno <= zaloga:
+        # dodaj maksimum
+            for narocilo in narocila:
+                narocilo.posiljka[dimenzija][tip] = narocilo.narocilo[dimenzija][tip]
+        else:
+        #odštej še minimalno
+            while skupno > zaloga:
+                najmanjsi = min([narocilo.narocilo[dimenzija][tip] for narocilo in narocila])
+                for narocilo in narocila:
+                    razlika = round(narocilo.narocilo[dimenzija][tip] / najmanjsi)
+                    narocilo.narocilo[dimenzija][tip] -= razlika
+                    skupno -= razlika
+            else:
+                while skupno - zaloga < 0:
+                    for narocilo in narocila:
+                        narocilo.narocilo[dimenzija][tip] += 1
+                        skupno += 1
+                for narocilo in narocila:
+                    narocilo.posiljka[dimenzija][tip] = narocilo.narocilo[dimenzija][tip]
 
-def vrni_posiljko(narocilo,skupno):
-    posiljka = Baza.objects.create(tip='narocilo',title = narocilo.stranka.ime)
+class Narocilo():
+    def __init__(self,narocilo):
+        self.baza = narocilo
+        self.stanka = narocilo.stranka
+        self.skupno_stevilo = narocilo.skupno_stevilo
+        self.narocilo = vrni_narocilo(narocilo)
+        self.posiljka = vrni_posiljko(narocilo)
+        
+    def izpolnjeno(self):
+        for vnos in self.posiljka:
+            if vnos.izpoljeno == False:
+                return False
+        return True
+
+    def ustvari_posiljko(self):
+        posiljka = Baza.objects.create(tip='narocilo',title = narocilo.stranka.ime)
+        for dimenzija in self.posiljka:
+            for tip in self.posiljka[dimenzija]:
+                Vnos.objects.create(
+                    baza = posiljka,
+                    stevilo = self.posiljka[dimenzija][tip],
+                    tip = tip,
+                    dimenzija__dimenzija = dimenzija,
+                    )
+        return posiljka
+        
+def vrni_narocilo(baza):
+    narocilo = {}
+    vnosi = baza.vnos_set.all().values('stevilo','dimenzija__dimenzija','tip')
     for vnos in vnosi:
-        stevilo = izracunaj_mozno_kolicino(vnos,skupno)
-    
+        dimenzija = vnos['dimenzija__dimenzija']
+        stevilo = vnos['stevilo']
+        tip = vnos['tip']
+        if dimenzija in narocilo:
+            if tip in narocilo[dimenzija]:
+                narocilo[dimenzija][tip] += stevilo
+            else:
+                narocilo[dimenzija][tip] = stevilo
+        else:
+            narocilo[dimenzija] = {tip:stevilo}
+    return narocilo
+def vrni_posiljko(baza):
+    posiljka = {}
+    vnosi = baza.vnos_set.all().values('stevilo','dimenzija__dimenzija','tip')
     for vnos in vnosi:
-        Vnos.objects.create(
-            baza = posiljka,
-            stevilo = stevilo,
-            tip = vnos.tip
-            dimenzija__dimenzija = vnos.dimenzija
-            )
+        dimenzija = vnos['dimenzija__dimenzija']
+        stevilo = vnos['stevilo']
+        tip = vnos['tip']
+        if dimenzija in posiljka:
+            posiljka[dimenzija][tip] = 0
+        else:
+            posiljka[dimenzija] = {tip: 0}
     return posiljka
 
 def ustvari_skupno(narocila, zaloga):
@@ -42,60 +104,20 @@ def ustvari_skupno(narocila, zaloga):
 def sestej_narocila(narocila):
     skupno = {}
     for narocilo in narocila:
-        vnosi = narocilo.baza.vnos_set.all().values('stevilo','dimenzija__dimenzija','tip'):
+        vnosi = narocilo.baza.vnos_set.all().values('stevilo','dimenzija__dimenzija','tip')
         for vnos in vnosi:
             dimenzija = vnos['dimenzija__dimenzija']
             stevilo = vnos['stevilo']
+            tip = vnos['tip']
             if dimenzija in skupno:
                 if tip in skupno[dimenzija]:
                     skupno[dimenzija][tip]['kolicina'] += stevilo
                     skupno[dimenzija][tip]['ponovitev'] += 1
+                    skupno[dimenzija][tip]['narocila'].append(narocilo)
                 else:
-                    skupno[dimenzija][tip] = {'kolicina':stevilo, 'ponovitev':1}
+                    skupno[dimenzija][tip] = {'kolicina':stevilo, 'ponovitev':1,'narocila':[narocilo]}
             else:
-                skupno[dimenzija] = {tip:{'kolicina:':stevilo,'ponovitev':1}}
+                skupno[dimenzija] = {tip:{'kolicina':stevilo,'ponovitev':1,'narocila':[narocilo]}}
     return skupno
 
-def izracunaj_mozno_kolicino(vnos,narocilo,skupno):
-    min_zaloge = 0
-    dimenzija = vnos.dimenzija
-    tip = vnos.tip
-    stevila = skupno[dimenzija][tip]
-    if dimenzija in minimumi:
-        if tip in minimumi[dimenzija]
-            min_zaloge = minimumi[dimenzija][tip]
-    if stevila[koncno] >= (stevila[zaloga] - min_zaloge):
-        return {
-            'kolicina': vnos.stevilo
-            'maks': maksimum(vnos,narocilo,skupno)
-        }
-    else:
-        kolicina = razporedi(vnos,narocilo,skupno)
-        return {
-            'kolicina':kolicina,
-            'maks':kolicina
-        }
-
-def maksimum(vnos,narocilo,skupno):
-    stevila = skupno[vnos.dimenzija][vnos.tip]
-    zaloga = stevila['zaloga']
-    kolicina = stevila['kolicina']
-    ponovitev = stevila['ponovitev']
-    procent_iz_narocil = vnos.stevilo / kolicina
-    procent_iz_sestevka = vnos.stevilo / narocilo.baza.skupno_stevilo
-    return vnos.stevilo + ((zaloga - kolicina) // ponovitev)
-    
-def razporedi(vnos,narocilo,skupno):
-    stevila = skupno[vnos.dimenzija][vnos.tip]
-    zaloga = stevila['zaloga']
-    kolicina = stevila['kolicina']
-    ponovitev = stevila['ponovitev']
-    procent_narocila = narocila.baza.skupno_stevilo / skupno['skupno']
-    procent_iz_narocil = vnos.stevilo / kolicina
-    procent_iz_sestevka = vnos.stevilo / narocilo.baza.skupno_stevilo
-    razlika = kolicina - zaloga
-    if vnos.stevilo < zaloga / ponovitev:
-        return vnos.stevilo
-    else:
-        return int((vnos.stevilo - (razlika * procent_narocila))
 

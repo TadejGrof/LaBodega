@@ -47,6 +47,7 @@ TIPI_BAZE = (
     ('odpis', 'Odpis'),
     ('vele_prodaja', 'Vele prodaja'),
     ('racun','Racun'),
+    ('narocilo','Narocilo'),
 )
 
 TIPI_STROSKOV = (

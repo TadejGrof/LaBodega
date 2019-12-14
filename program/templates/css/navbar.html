@@ -237,6 +237,14 @@
             <a href="{% url 'pregled_stroskov' %}">{{slovar|keyvalue:'Pregled'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
+    {% if perms.admin.view_logentry %}
+        <button class="dropdown-btn"> Narocilo
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a href="{% url 'baze' 'narocilo' %}">Narocilo</a>
+        </div>
+    {% endif %}
 </div>
 
 <script>

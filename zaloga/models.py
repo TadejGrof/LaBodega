@@ -47,6 +47,7 @@ TIPI_BAZE = (
     ('odpis', 'Odpis'),
     ('vele_prodaja', 'Vele prodaja'),
     ('racun','Racun'),
+    ('narocilo','Narocilo'),
 )
 
 TIPI_STROSKOV = (
@@ -66,6 +67,18 @@ class Zaloga(models.Model):
     @property
     def danes(self):
         return datetime.today().strftime('%Y-%m-%d')
+
+    @property
+    def zaloga(self):
+        dimenzije = self.vrni_slovar_dimenzij(True)
+        zaloga = {}
+        for sestavina in self.sestavina_set.all().values():
+            dimenzija = dimenzije[sestavina['dimenzija_id']]
+            zaloga.update({dimenzija:{}})
+            for tip in self.vrni_tipe:
+                zaloga[dimenzija].update({tip[0]:sestavina[tip[0]]})
+        return zaloga
+                
 
     @property
     def vrni_razlicne_radiuse(self):
@@ -116,11 +129,15 @@ class Zaloga(models.Model):
                 for prodaja in TIPI_PRODAJE:
                     Cena.objects.create(sestavina = sestavina, tip = tip[0], prodaja = prodaja[0])
 
-    def vrni_slovar_dimenzij(self):
+    def vrni_slovar_dimenzij(self, obratno = False):
         slovar = {}
         dimenzije = self.sestavina_set.values('dimenzija_id','dimenzija__dimenzija')
-        for dimenzija in dimenzije:
-            slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
+        if obratno:
+            for dimenzija in dimenzije:
+                slovar.update({dimenzija['dimenzija_id']:dimenzija['dimenzija__dimenzija']})
+        else: 
+            for dimenzija in dimenzije:
+                slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
         return slovar
 
     def vrni_top_10(self,radius="all"):
@@ -167,14 +184,6 @@ class Zaloga(models.Model):
             width = width[:-1]
         return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
  
-    @property
-    def sestavine(self):
-        return self.sestavina_set.all().values(
-            dim=F('dimenzija__dimenzija'),
-            pk=F('pk'),
-            sestavina_yellow=F('Y'),
-            sestavina_white=F('W')
-        )
 
     @property
     def vrni_zalogo(self):

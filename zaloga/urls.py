@@ -24,8 +24,9 @@ baza_patterns = [
 ]
 
 strosek_patterns = [
-    path('',stroski_views.strosek, name='strosek'),
-    path('nov_strosek/',stroski_views.nov_strosek, name="nov_strosek")
+    path('', stroski_views.strosek, name='strosek'),
+    path('nov_strosek/', stroski_views.nov_strosek, name="nov_strosek"),
+    path('uveljavi/<int:pk>/', stroski_views.uveljavi, name="uveljavi_strosek")
 ]
 
 stroski_patterns = [

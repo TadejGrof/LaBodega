@@ -18,7 +18,8 @@ def pregled(request):
 @login_required
 def strosek(request):
     strosek = Stroski_Group.objects.all().filter(status = 'aktivno').first()
-    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek})
+    kontejnerji = Kontejner.objects.all().order_by('-baza__datum')[:10].values('stevilka','pk')
+    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek,'kontejnerji':kontejnerji})
 
 @login_required
 def nov_strosek(request):
@@ -28,14 +29,22 @@ def nov_strosek(request):
         datum = request.POST.get('datum')
         kontejner = None
         if tip == "kontejner":
-            kontejner = Kontejner.objects.get(pk = request.POST.get('kontejner'))
+            kontejner = Kontejner.objects.get(pk = int(request.POST.get('kontejner')))
         Stroski_Group.objects.create(
             title = title,
             tip = tip,
             datum = datum,
             kontejner = kontejner
         )
-    return redirect('nov_strosek')
+    return redirect('strosek')
+
+@login_required
+def uveljavi(requestl,pk):
+    if request.method == "POST":
+        strosek = Stroski_Group.objects.get(pk = pk)
+        strosek.status = "veljavno"
+        strosek.save()
+    return redirect('pregled_stroskov')
 
 
 ###################################################################################

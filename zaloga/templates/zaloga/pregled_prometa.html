@@ -13,20 +13,26 @@
         margin-top:2%
     }
     div.table{
-        position:relative;
-        left:15%;
+        display:inline-block;
         width:70%;
         margin-top:2%;
     }
 </style>
 
-<div class="okno">
+<h1>
     {{slovar|keyvalue:'Pregled prometa za'|keyvalue:jezik}}
      {{sestavina.dimenzija.dimenzija}}
      {{slovar|keyvalue:'tipa'|keyvalue:jezik}}
      {{tip}}
-</div>
+</h1>
 
+
+<h2> {{slovar|keyvalue:'Spremembe'|keyvalue:jezik}}: </h2>
+<div class="filter">
+    {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_sprememb}}" name="zacetek_sprememb">
+    {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_sprememb}}" name="konec_sprememb">
+    <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
+</div>
 <div class="table">
     <table class="tabela_vnosov">
         <tr>    
@@ -63,4 +69,51 @@
         </tr>
     </table>
 </div>
+
+<h2> {{slovar|keyvalue:'Vele prodaja'|keyvalue:jezik}}: </h2>
+<div class="filter">
+    {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_vp}}" name="zacetek_vp">
+    c{{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_vp}}" name="konec_vp">
+    <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
+</div>
+<div class="table" style="width:40%">
+    <table class="tabela_vnosov">
+        <tr>
+            <td width="50%"> {{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}: </td>
+            <td width="50%"> {{vp_stevilo}}
+        </tr>
+        <tr>
+            <td> {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:    </td>
+            <td> {{vp_cena}} $ </td>
+        </tr>
+    </table>
+</div>
+
+<h2> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}: </h2>
+<div class="filter">
+    {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_dp}}" name="zacetek_dp">
+    {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_dp}}" name="konec_dp">
+    <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
+</div>
+<div class="table" style="width:40%">
+    <table class="tabela_vnosov">
+        <tr>
+            <td width="50%"> {{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}: </td>
+            <td width="50%"> {{dp_stevilo}} </td>
+        </tr>
+        <tr>
+            <td> "{{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}": </td>
+            <td> {{dp_cena}} $ </td>
+        </tr>
+    </table>
+</div>
+
+<div style="height:3%">
+</div>
+<form id="filter" action="{% url 'pregled_prometa' %}" method="GET">
+    <input type="hidden" name="tip" value="{{tip}}">
+    <input type="number" hidden="hidden" name="pk" value={{sestavina.pk}}>
+</form>
+
+
 {% endblock %}

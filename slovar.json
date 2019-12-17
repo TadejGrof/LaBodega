@@ -52,12 +52,12 @@
         "Cenik vele prodaje": {
             "slo": "Cenik vele prodaje",
             "ang": "Wholesale prices",
-            "spa": "Precios por mayor"
+            "spa": "Precios a por mayor"
         },
         "Cenik dnevne prodaje": {
             "slo": "Cenik dnevne prodaje",
             "ang": "Daysale prices",
-            "spa": "Precios por menor"
+            "spa": "Precios a por menor"
         },
         "Skupaj": {
             "slo": "Skupaj",
@@ -77,7 +77,7 @@
         "prevzem":{
             "slo": "Prevzem",
             "ang": "Takein",
-            "spa": "Container"
+            "spa": "Contenedor"
         },
         "inventura": {
             "slo": "Inventura",
@@ -92,7 +92,12 @@
         "Prevzem":{
             "slo": "Prevzem",
             "ang": "Takein",
-            "spa": "Container"
+            "spa": "Contenedor"
+        },
+        "Spremembe":{
+            "slo": "Spremembe",
+            "ang": "Changes",
+            "spa": "Cambias"
         },
         "Inventura": {
             "slo": "Inventura",
@@ -172,7 +177,17 @@
         "Stranke": {
             "slo": "Stranke",
             "ang": "Clients",
-            "spa": "Cliente"
+            "spa": "Clientes"
+        },
+        "Od": {
+            "slo": "Od",
+            "ang": "From",
+            "spa": "Desde"
+        },
+        "Do": {
+            "slo": "Do",
+            "ang": "To",
+            "spa": "Hasta"
         },
         "Znesek": {
             "slo": "Znesek",
@@ -402,7 +417,7 @@
         "Nov prevzem": {
             "slo": "Nov prevzem",
             "ang": "New takein",
-            "spa": "New contenedor"
+            "spa": "Nuevo contenedor"
         },
         "Nov odpis": {
             "slo": "Nov odpis",
@@ -522,7 +537,7 @@
         "Pregled prometa za": {
             "slo": "Pregled prometa za",
             "ang": "Changes for",
-            "spa": "Transeferencias"
+            "spa": "Cambias de"
         },
         "tipa": {
             "slo": "tipa",

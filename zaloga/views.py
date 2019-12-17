@@ -14,6 +14,7 @@ prodaja = Prodaja.objects.first()
 zaloga = Zaloga.objects.first()
 program = Program.objects.first()
 
+
 ##################################################################################################
 
 @login_required
@@ -62,13 +63,40 @@ def pregled_zaloge(request):
 
 @login_required
 def pregled_prometa(request):
-    if request.method == "GET" and request.GET.get('pk') and request.GET.get('tip'):
-        pk = int(request.GET.get('pk'))
-        tip = request.GET.get('tip')
+    if request.method == "GET":
+        pk = request.GET.get('pk', Sestavina.objects.first().pk)
+        tip = request.GET.get('tip', zaloga.vrni_tipe[0][0])
         sestavina = Sestavina.objects.get(pk=pk)
         spremembe = sestavina.sprememba_set.filter(tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
         zaporedna_stanja = sestavina.vrni_stanja(tip)[::-1]
-    return pokazi_stran(request, 'zaloga/pregled_prometa.html', {'zaporedna_stanja': zaporedna_stanja, 'tip': tip, 'spremembe': spremembe, 'sestavina': sestavina})
+        danes = datetime.date.today().strftime('%Y-%m-%d')
+        pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+        zacetek_sprememb = request.GET.get('zacetek_sprememb', pred_mescem)
+        konec_sprememb = request.GET.get('konec_sprememb', danes)
+        zacetek_dp = request.GET.get('zacetek_dp', pred_mescem)
+        konec_dp = request.GET.get('konec_dp', danes)
+        zacetek_vp = request.GET.get('zacetek_vp', pred_mescem)
+        konec_vp = request.GET.get('konec_vp', danes)
+        dp_stevilo, dp_cena = sestavina.prodaja('racun',tip, zacetek_dp, konec_dp)
+        vp_stevilo, vp_cena = sestavina.prodaja('vele_prodaja',tip, zacetek_vp, konec_vp)
+        slovar = {
+            'zaporedna_stanja': zaporedna_stanja,
+            'tip': tip,
+            'sestavina': sestavina,
+            'spremembe': spremembe,
+            'zacetek_sprememb': zacetek_sprememb,
+            'zacetek_dp': zacetek_dp,
+            'zacetek_vp': zacetek_vp,
+            'konec_sprememb': konec_sprememb,
+            'konec_dp': konec_dp,
+            'konec_vp': konec_vp,
+            'dp_stevilo': dp_stevilo,
+            'dp_cena': dp_cena,
+            'vp_stevilo': vp_stevilo,
+            'vp_cena': vp_cena
+        }
+        print(slovar)
+    return pokazi_stran(request, 'zaloga/pregled_prometa.html', slovar)
 
 @login_required
 def dodaj_dimenzijo(request):

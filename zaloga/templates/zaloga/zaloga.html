@@ -85,7 +85,7 @@
                             <td>
                                 <form action="{% url 'pregled_prometa' %}" method="GET">
                                     <input type="hidden" name="tip" value="{{tip.0}}">
-                                    <input type="hidden" name="pk" value="{{sestavina.pk}}">
+                                    <input type="number" hidden="hidden" name="pk" value={{sestavina.pk}}>
                                     <input type="submit" value="{{slovar|keyvalue:'Pregled prometa'|keyvalue:jezik}}">
                                 </form>
                             </td>

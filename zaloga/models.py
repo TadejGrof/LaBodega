@@ -243,6 +243,19 @@ class Sestavina(models.Model):
                 setattr(self,tip,stevilo)
         self.save()
 
+    def prodaja(self,tip_baze,tip,zacetek,konec):
+        spremembe = self.sprememba_set.all().filter(baza__tip = tip_baze, tip=tip, baza__datum__gte = zacetek, baza__datum__lte = konec)
+        print(spremembe)
+        cena = 0
+        stevilo = 0
+        for sprememba in spremembe:
+            popust = 0
+            if tip_baze == "vele_prodaja":
+                popust = sprememba.baza.popust
+            for vnos in sprememba.vnos_set.all().values('stevilo','cena'):
+                stevilo += vnos['stevilo']
+                cena += round(float(vnos['stevilo'] * float(vnos['cena']) * ((100 - popust) / 100)))
+        return stevilo, cena
 
     def __str__(self):
         return self.dimenzija.dimenzija

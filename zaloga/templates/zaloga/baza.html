@@ -304,7 +304,7 @@
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
-                        <form id="izbrisi_vnos_{{vnos.pk}}" action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST">
+                        <form id="izbrisi_vnos_{{vnos.pk}}" action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST" onsubmit="return Confirm()">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
@@ -380,10 +380,10 @@
                     {% endif %}
                     <td> 
                         <button class="spremeni_{{vnos.pk}}" onclick="Spremeni_vnos('{{vnos.pk}}')"> E </button>
-                        <input class="spremeni_{{vnos.pk}}" type="submit" form="izbrisi_vnos_{{vnos.pk}}" value="X">
+                        <input class="spremeni_{{vnos.pk}}" type="submit" form="izbrisi_vnos_{{vnos.pk}}" value="X" >
                         <input class="potrdi_{{vnos.pk}}" hidden="hidden" type="submit" form="spremeni_vnos_{{vnos.pk}}" value="OK">
                         <button class="potrdi_{{vnos.pk}}" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')" hidden="hidden"> X </button>
-                        <form id="izbrisi_vnos_{{vnos.pk}}" hidden="hidden" action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST">
+                        <form id="izbrisi_vnos_{{vnos.pk}}" hidden="hidden" action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST" onsubmit="return Confirm()">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
@@ -444,6 +444,13 @@
         if ( {{baza.stevilo_vnosov}} == 0){
             alert('Baza mora vsebovati vsaj en vnos!');
             return false;
+        } else{
+            return Confirm();
+        }
+    }
+    function Confirm() {
+        if (!confirm('are you sure?')){
+            return false
         }
     }
     function Vec_vnosov() {

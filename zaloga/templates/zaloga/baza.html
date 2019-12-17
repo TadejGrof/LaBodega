@@ -206,7 +206,11 @@
                     <th width="30%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
                     <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
                     <th width="15%"> {{slovar|keyvalue:'Vnos'|keyvalue:jezik}}: </th>
-                    <th width="15%"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
+                    {% if tip == "vele_prodaja" %}
+                        <th width="15%"> {{slovar|keyvalue:'Na voljo'|keyvalue:jezik}}: </th>
+                    {% elif tip == "inventura" %}
+                        <th width="15%"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
+                    {% endif %}
                     <th id="razlika_header" hidden="hidden"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
                     <th width="20%" class="vpogled"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}: </th>  
                 </tr>
@@ -226,7 +230,11 @@
                     {% else %}
                         <td> <input id="{{vnos.dimenzija}}_{{vnos.tip}}" type="number" style="width:60%;text-align:center" name="stevilo" form="nov_vnos_{{vnos.pk}}"value="" min="0" autocomplete="off" required> </td>
                     {% endif %}
+                    {% if tip == "vele_prodaja" %}
+                    <td> {{vnos.na_voljo}} </td>
+                    {% elif tip == "inventura" %}
                     <td> {{vnos.zaloga}} </td>
+                    {% endif %}
                     <td>
                         {% if vnos.vneseno %}
                             <button class="spremeni_{{vnos.pk}}" onclick="Spremeni_vnos('{{vnos.pk}}')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
@@ -517,16 +525,16 @@
         var dimenzija = document.getElementById('dimension_label').innerHTML
         var tipbox = document.getElementById("tip");
         var tip = tipbox.options[tipbox.selectedIndex].value
-        {% for sestavina in sestavine %}
-            if( "{{sestavina|keyvalue:'dimenzija'}}" == dimenzija ){
-                {% for tip in tipi %}
+        {% for sestavina in na_voljo %}
+            if( "{{sestavina}}" == dimenzija ){
+                {% for tip in zaloga.vrni_tipe %}
                     if( "{{tip.0}}" == tip ){
-                        document.getElementById('zaloga_div').innerHTML = '/ {{sestavina|zaloga:tip.0}}'
+                        document.getElementById('zaloga_div').innerHTML = '/ {{na_voljo|keyvalue:sestavina|keyvalue:tip.0}}'
                     }
                 {% endfor %}
             }
         {% endfor %}
-    };
+    }
     function PokaziKoncno(){
         var dimenzija = Tvori_dimenzijo()
         document.getElementById('dimension_label').innerHTML = dimenzija

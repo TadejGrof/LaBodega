@@ -23,9 +23,10 @@ def dnevna_prodaja(request):
     danes = timezone.localtime(timezone.now())
     danasnja_prodaja = Dnevna_prodaja.objects.filter(datum = danes).first()
     aktivni_racun = None
+    na_voljo = zaloga.na_voljo
     if danasnja_prodaja != None:
         aktivni_racun = danasnja_prodaja.aktivni_racun
-    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun})
+    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
 
 def nova_dnevna_prodaja(request):
     if request.method == "POST":

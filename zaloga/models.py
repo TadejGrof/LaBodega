@@ -78,7 +78,34 @@ class Zaloga(models.Model):
             for tip in self.vrni_tipe:
                 zaloga[dimenzija].update({tip[0]:sestavina[tip[0]]})
         return zaloga
-                
+
+    @property            
+    def rezervirane(self):
+        rezervirane = {}
+        for baza in self.baza_set.all().filter(status="aktivno", tip="vele_prodaja"):
+            for vnos in baza.vnos_set.all().values('dimenzija__dimenzija','stevilo','tip'):
+                dimenzija = vnos['dimenzija__dimenzija']
+                stevilo = vnos['stevilo']
+                tip = vnos['tip']
+                if dimenzija in rezervirane:
+                    if tip in rezervirane[dimenzija]:
+                        rezervirane[dimenzija][tip] += stevilo
+                    else:
+                        rezervirane[dimenzija].update({tip:stevilo})
+                else:
+                    rezervirane.update({dimenzija:{tip:stevilo}})
+        return rezervirane
+
+    @property
+    def na_voljo(self):
+        zaloga = self.zaloga
+        rezervirane = self.rezervirane
+        print(rezervirane)
+        for sestavina in rezervirane:
+            tipi = rezervirane[sestavina]
+            for tip in tipi:
+                zaloga[sestavina][tip] -= rezervirane[sestavina][tip]
+        return zaloga
 
     @property
     def vrni_razlicne_radiuse(self):
@@ -547,12 +574,14 @@ class Baza(models.Model):
     def inventurni_vnosi(self):
         vnosi = {}
         count = 0
+        na_voljo = self.zaloga.na_voljo
         for sestavina in self.zaloga.vrni_zalogo:
             for tip in self.zaloga.vrni_tipe:
                 count += 1
                 slovar = {'dimenzija': sestavina['dimenzija'],
                         'tip': tip[0],
                         'zaloga': sestavina[tip[0]],
+                        'na_voljo': na_voljo[sestavina['dimenzija']][tip[0]],
                         'radius': sestavina['radius'],
                         'pk': count,
                         'vneseno':False,

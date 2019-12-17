@@ -414,11 +414,11 @@
         var dimenzija = document.getElementById('dimension_label').innerHTML
         var tipbox = document.getElementById("tip");
         var tip = tipbox.options[tipbox.selectedIndex].value
-        {% for sestavina in zaloga.vrni_zalogo %}
-            if( "{{sestavina|keyvalue:'dimenzija'}}" == dimenzija ){
+        {% for sestavina in na_voljo %}
+            if( "{{sestavina}}" == dimenzija ){
                 {% for tip in zaloga.vrni_tipe %}
                     if( "{{tip.0}}" == tip ){
-                        document.getElementById('zaloga_div').innerHTML = '/ {{sestavina|zaloga:tip.0}}'
+                        document.getElementById('zaloga_div').innerHTML = '/ {{na_voljo|keyvalue:sestavina|keyvalue:tip.0}}'
                     }
                 {% endfor %}
             }

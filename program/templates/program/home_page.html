@@ -94,7 +94,7 @@
                                 <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                             </form>
                         {% else %}
-                            <form action="{% url 'nova_baza' 'vele_prodaja' %}" method="POST">
+                            <form action="{% url 'nova_baza' 'vele_prodaja' %}" method="POST" onsubmit="return Confirm()">
                                 {% csrf_token %}
                                 <input type="hidden" name="stranka" value="{{stranka.pk}}">
                                 <input type="date" hidden="hidden" name="datum" value="{{danes}}">
@@ -161,13 +161,9 @@
     
 
     <script>
-        function pokazi_pogoste_dimenzije(tip){
-            if (tip == "yellow"){
-                toggle('tabela_yellow', 'block')
-                toggle('tabela_white', 'none')
-            } else if (tip == "white"){
-                toggle('tabela_yellow', 'none')
-                toggle('tabela_white', 'block')
+        function Confirm() {
+            if (!confirm('are you sure?')){
+                return false
             }
         }
     </script>

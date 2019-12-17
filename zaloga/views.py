@@ -194,6 +194,7 @@ def baza(request, tip_baze, pk):
                 'vnosi':baza.inventurni_vnosi,
                 'tip':tip_baze,
                 'status':"aktivno",
+                'na_voljo':zaloga.na_voljo,
                 'razlicni_radiusi':zaloga.vrni_razlicne_radiuse,
                 'sestavine':zaloga.vrni_zalogo,
                 'tipi': zaloga.vrni_tipe}

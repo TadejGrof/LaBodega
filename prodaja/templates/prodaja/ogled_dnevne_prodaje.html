@@ -129,7 +129,7 @@
         </div>
         {% if racun.status == "veljavno" %}
             <div style="margin-top:4%">
-                <form action="{% url 'storniraj_racun' prodaja.pk racun.pk %}" method="GET">
+                <form action="{% url 'storniraj_racun' prodaja.pk racun.pk %}" method="POST" onsubmit="return Confirm()">
                     <input type="submit" value="STORNO">
                 </form>
             </div>
@@ -196,4 +196,11 @@
         </table>
     </div>
 </div>
+<script>
+    function Confirm() {
+        if (!confirm('are you sure?')){
+            return false
+        }
+    }
+</script>
 {% endblock %}

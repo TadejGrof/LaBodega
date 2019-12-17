@@ -25,21 +25,18 @@
         a:hover{
             background-color: red;
         }
+        h2{
+            margin: 2%;
+        }
     </style>
 
     {% include "css/tabele.html" %}
 
     <div style="height:2%"></div>
-    {% if perms.admin.view_logentry %}
-    <form action="{% url 'ponastavi_zalogo' %}" method="POST">
-        {% csrf_token %}	
-        <input type="submit" value="ponastavi_zalogo">
-    </form>
-    {% endif %}
 
     {% if perms.zaloga.view_zaloga %}
         <div class="cetrt pogoste_dimenzije">
-            <div class="title">
+            <h2>
                 Radius:
                 <select name="radius" form="top10">
                     <option value="all"> All </option>
@@ -57,7 +54,7 @@
                 <form style="display:inline-block" id="top10" action="{% url 'home_page' %}" method="GET">
                     <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
                 </form>
-            </div>
+            </h2>
             <table style="table-layout: fixed; width: 100% " class="tabela_vnosov">
                 <tr>
                     <th width="50%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:</th>
@@ -78,7 +75,7 @@
     {% endif %}
     {% if perms.prodaja.view_stranka %}
     <div class="cetrt stranke">
-        <div class="title"> {{slovar|keyvalue:'Stranke'|keyvalue:jezik}}: </div>
+        <h2> {{slovar|keyvalue:'Stranke'|keyvalue:jezik}}: </h2>
         <table class="tabela_vnosov">
             <tr class="header">
                 <th> {{slovar|keyvalue:'Ime'|keyvalue:jezik}}: </th>
@@ -114,9 +111,9 @@
     {% if perms.zaloga.view_dnevna_prodaja %}
     <div class="cetrt dnevna_prodaja">
         {% if dnevna_prodaja == None %}
-            <div style="font-size:6vh;margin-top:5%" class="title">
+            <h1>
                 {{zaloga.danes}}
-            </div>
+            </h1>
             <div class="ustvari_prodajo" style="margin-top:5%">
                 <form style="width:90%;height:50%;display:inline-block" action="{% url 'nova_dnevna_prodaja' %}" method="POST">
                     {% csrf_token %}
@@ -124,7 +121,7 @@
                 </form>
             </div>
         {% else %}
-            <div class="title"> {{dnevna_prodaja.title}} {{slovar|keyvalue:'Prodane'|keyvalue:jezik}}: </div>
+            <h2> {{dnevna_prodaja.title}} {{slovar|keyvalue:'Prodane'|keyvalue:jezik}}: </h2>
             <table class="tabela_vnosov">
                 <tr>
                     <th> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:</th>

@@ -60,8 +60,11 @@
     {% endfor %}
     <div style="display:block;margin-top:1%">
         <form style="display:inline-block" action="{% url 'cenik_pdf' tip %}" method="GET">
-            {% csrf_token %}
             <input type="submit" value="PDF">
+            <input type="hidden"  value="{{radius}}" name="radius">
+            {% for tip in tipi %}
+                <input type="hidden" value="True" name="{{tip}}">
+            {% endfor %}
         </form>
         <button onclick="Spremeni_vse()" class="spremeni"> {{slovar|keyvalue:'Spremeni vse'|keyvalue:jezik}} </button>
         <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}">

@@ -16,11 +16,14 @@ from django.http import HttpResponse
 zaloga = Zaloga.objects.first()
 
 def pdf_zaloge(request):
-    radius = request.POST.get('radius')
+    radius = request.GET.get('radius')
     sestavine = zaloga.sestavina_set.all()
-    tipi = zaloga.vrni_tipe
     if radius != 'all':
-        sestavine = zaloga.sestavina_set.all().filter(radius = radius)
+        sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius)
+    tipi = []
+    for tip in zaloga.vrni_tipe:
+        if request.GET.get(tip[0]):
+            tipi.append(tip)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="zaloga.pdf"'
     
@@ -33,8 +36,15 @@ def pdf_zaloge(request):
     return response 
     
 def pdf_cenika(request,tip_prodaje):
+    radius = request.GET.get('radius')
     sestavine = zaloga.sestavina_set.all()
-    tipi = zaloga.vrni_tipe
+    if radius != 'all':
+        sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius)
+    tipi = []
+    for tip in zaloga.vrni_tipe:
+        if request.GET.get(tip[0]):
+            tipi.append(tip)
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="cenik.pdf"'
     p = canvas.Canvas(response)

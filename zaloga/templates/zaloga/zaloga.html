@@ -50,9 +50,11 @@
                     {% endif %}
                 </select>
             {% endfor %}
-            <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' %}" method="POST">
-                {% csrf_token %}
-                <input type="hidden" value="all" name="radius">
+            <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' %}" method="GET">
+                <input type="hidden"  value="{{radius}}" name="radius">
+                {% for tip in tipi %}
+                <input type="hidden" value="True" name="{{tip.0}}">
+                {% endfor %}
                 <input style="width:100%"type="submit" value="pdf">
             </form>
         </div>

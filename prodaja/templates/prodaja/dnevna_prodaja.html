@@ -5,18 +5,6 @@
 {% block content %}
 
 <style>
-    div.title{
-        display:block;
-        font-size:4vh;
-        text-align:center;
-        margin-top:3%;
-    }
-    div.sredinsko_besedilo{
-        display:block;
-        font-size:3.5vh;
-        text-align:center;
-        margin-top:10%;
-    }
     div.ustvari_prodajo{
         display:block;
         height:60%;
@@ -74,7 +62,7 @@
         display:block;
         height:10%;
         vertical-align:top;
-        font-size:2.4vh;
+        font-size:80%;
         text-align:center;
         margin-top:3%;
     }
@@ -104,14 +92,14 @@
         display:block;
         text-align:center;
         margin-top:5%;
-        font-size:4vh;
+        font-size:120%;
     }
     input.stevilo{
         display:block;
         text-align:center;
         margin-top:3%;
         position:relative;
-        font-size:6vh;
+        font-size:150%;
         left:25%;
         width:50%;
         height:30%
@@ -134,7 +122,7 @@
     div.cena_polovica{
         display:block;
         height:50%;
-        font-size:3vh;
+        font-size:100%;
         text-align:center;
         vertical-align:top;
     }
@@ -144,6 +132,9 @@
         width:48%;
         text-align:center;
         vertical-align:center;
+    }
+    h2,h1{
+        margin:2%;
     }
     div.cena input {
         width:60%;
@@ -159,25 +150,25 @@
     }
 </style>
 {% if prodaja == None %}
-    <div style="font-size:10vh;margin-top:5%" class="title">
+    <h1>
         {{zaloga.danes}}
-    </div>
+    </h1>
     <div class="ustvari_prodajo">
         <form style="width:100%;height:100%;display:inline-block" action="{% url 'nova_dnevna_prodaja' %}" method="POST">
             {% csrf_token %}
-            <input style="width:60%;height:35%;font-size:5vh" type="submit" value="{{slovar|keyvalue:'Nova dnevna prodaja'|keyvalue:jezik}}">
+            <input style="width:60%;height:35%;font-size:150%" type="submit" value="{{slovar|keyvalue:'Nova dnevna prodaja'|keyvalue:jezik}}">
         </form>
     </div>
 {% else %}
     <div class="prodaja">
-        <div class="title" style="font-size:6vh">
+        <h1>
             {{prodaja.title}} {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
-        </div>
+        </h1>
 
         <div class="racuni">
-            <div class="title"> {{slovar|keyvalue:'Racuni'|keyvalue:jezik}} </div>
+            <h2> {{slovar|keyvalue:'Racuni'|keyvalue:jezik}} </h2>
             {% if prodaja.stevilo_veljavnih_racunov == 0 %}
-                <div class="sredinsko_besedilo"> {{slovar|keyvalue:'Brez zgodovine'|keyvalue:jezik}} </div>
+                <h3> {{slovar|keyvalue:'Brez zgodovine'|keyvalue:jezik}}</h3>
             {% else %}
                 <div class="tabela">
                     <table class="tabela_vnosov">
@@ -229,9 +220,9 @@
                     </tr>
                 {% if aktivni_racun.stevilo_vnosov == 0 %}
                     </table>
-                    <div class="sredinsko_besedilo">
+                    <h2 style="margin-top:5%">
                         {{slovar|keyvalue:'Brez vnosov'|keyvalue:jezik}}
-                    </div>
+                    </h2>
                 {% else %}
                     {% for vnos in aktivni_racun.vrni_vnose %}
                         <tr>

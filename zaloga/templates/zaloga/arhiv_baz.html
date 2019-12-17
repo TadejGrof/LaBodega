@@ -20,7 +20,7 @@
     }
 </style>
 
-<div class="besedilo">
+<h1>
 {% if tip == 'prevzem' %}
     {{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}
 {% elif tip == 'odpis' %}
@@ -32,7 +32,7 @@
 {% elif tip == 'dnevna_prodaja' %}
     {{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}
 {% endif %}
-</div>
+</h1>
 
 <div class="filter" style="margin-top:3%">
     <form action="{% url 'arhiv_baz' tip %}" method="GET">

@@ -26,7 +26,7 @@
     }
 </style>
 
-<div class="title">
+<h1>
 {% if tip == "prevzem" %}
     {{slovar|keyvalue:'Nov prevzem'|keyvalue:jezik}}
 {% elif tip == "odpis" %}
@@ -36,7 +36,7 @@
 {% elif tip == "vele_prodaja" %}
     {{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}
 {% endif %}
-</div>
+</h1>
 <div class="okno">
     {% if tip == "prevzem" %}
         <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
@@ -151,14 +151,14 @@
     </form>
 </div>
 
-<div class="title" style="margin-top:4%">
+<h1>
     {{slovar|keyvalue:'Aktivno'|keyvalue:jezik}}:
-</div>
+</h1>
 
 {% if baze.count == 0 %}
-    <div class="title" style="margin-top:2%">
+    <h2>
         {{slovar|keyvalue:'Ni aktivnih baz'|keyvalue:jezik}}
-    </div>
+    </h2>
 {% else %}
     <div style="width:70%;display:inline-block;margin-top:2%" >
         <table class="tabela_vnosov">
@@ -188,7 +188,7 @@
                     </form>
                 </td>
                 <td class="izbris">
-                    <form action="{% url 'izbris_baze' baza.tip baza.pk %}" method="POST">
+                    <form action="{% url 'izbris_baze' baza.tip baza.pk %}" onsubmit="return Confirm()" method="POST">
                         {% csrf_token %}
                         <input type="submit" value="{{slovar|keyvalue:'Izbris'|keyvalue:jezik}}">
                     </form>
@@ -198,4 +198,11 @@
         </table>
     </div>
 {% endif %}
+<script>
+    function Confirm() {
+        if (!confirm('are you sure?')){
+            return false
+        }
+    }
+</script>
 {% endblock %}

@@ -151,6 +151,18 @@ def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):
                     ])
             tabela(p,data,style)
             top = naslednja_vrstica(p,top)
+    top = zadnja_vrstica_dnevne_prodaje(p,prodaja,top)
+
+def zadnja_vrstica_dnevne_prodaje(p,prodaja,top, jezik = "spa"):
+    skupno = prodaja.skupno_stevilo
+    cena = str(prodaja.skupna_cena) + ' $'
+    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno, slovar['Skupna cena'][jezik] + ':', cena]] 
+    style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ])
+    tabela(p,data,style)
+    return naslednja_vrstica(p,top)
 
 def zadnja_vrstica_baze(p,baza,top, jezik = "spa"):
     skupno = baza.skupno_stevilo

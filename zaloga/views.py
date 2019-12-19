@@ -338,12 +338,20 @@ def uveljavi_bazo(request, tip_baze, pk):
 @login_required
 def arhiv(request, tip_baze):
     if request.method == "GET":
+        danes = datetime.date.today().strftime('%Y-%m-%d')
+        pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+        zacetek = request.GET.get('zacetek', pred_mescem)
+        konec = request.GET.get('konec', danes)
+        stranke = Stranka.objects.all()
         if tip_baze == "dnevna_prodaja":
-            baze = Dnevna_prodaja.objects.prefetch_related('baza_set').order_by('-datum')
-            print(baze)
+            baze = Dnevna_prodaja.objects.filter(datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
         else:
-            baze = Baza.objects.filter(tip=tip_baze,status='veljavno').prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
-        return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'baze': baze, 'tip': tip_baze})
+            baze = Baza.objects.filter(tip=tip_baze,status='veljavno',datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
+            stranka = request.GET.get('stranka','all')
+            if tip_baze == "vele_prodaja" and stranka != "all":
+                stranka = int(stranka)
+                baze = baze.filter(stranka__id = stranka)
+        return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})
 
 ###################################################################################
 ###################################################################################

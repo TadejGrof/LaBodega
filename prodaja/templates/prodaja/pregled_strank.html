@@ -62,7 +62,9 @@
                     <td> {{stranka.telefon}} </td>
                     <td style="overflow:hidden"> {{stranka.mail}} </td>
                     <td>
-                        <button> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}} </button>
+                        <form action="{% url 'ogled_stranke' stranka.pk %}" method="GET">
+                            <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                        </form> 
                     </td>
                 </tr>
             {% endfor %}

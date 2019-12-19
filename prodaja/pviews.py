@@ -188,13 +188,23 @@ def izbris_stranke(request, pk):
     stranka.izbrisi()
     return redirect('pregled_strank')
 
+def ogled_stranke(request, pk):
+    stranka = Stranka.objects.get(pk=pk)
+    return pokazi_stran(request,'prodaja/stranka.html',{'stranka':stranka})
+
 def spremembna_stranke(request, pk):
-    stranka = Stranka.objects.get(pk = pk)
-    stranka.ime = request.POST.get('ime')
-    stranka.telefon = request.POST.get('telefon')
-    stranka.mail = request.POST.get('mail')
-    stranka.save()
-    return redirect('pregled_strank')
+    if request.method=="POST":
+        stranka = Stranka.objects.get(pk = pk)
+        stranka.ime = request.POST.get('ime')
+        stranka.naziv = request.POST.get('naziv')
+        stranka.telefon = request.POST.get('telefon')
+        stranka.mail = request.POST.get('mail')
+        stranka.davcna = request.POST.get('davcna')
+        stranka.naslov.drzava = request.POST.get('drzava')
+        stranka.naslov.mesto = request.POST.get('mesto')
+        stranka.naslov.naslov = request.POST.get('naslov')
+        stranka.save()
+    return redirect('ogled_stranke', pk = pk)
 
 def nova_stranka(request):
     naziv = request.POST.get('naziv')

@@ -438,6 +438,7 @@ class Baza(models.Model):
     stranka = models.ForeignKey(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
     cas = models.TimeField(default=None,null=True,blank=True)
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
 
     def __str__(self):
         return self.title
@@ -615,8 +616,16 @@ class Baza(models.Model):
         return round(float(self.skupna_cena) * (self.popust / 100))
 
     @property
+    def cena_prevoza(self):
+        if self.prevoz != None:
+            return self.skupno_stevilo * self.prevoz
+    
+    @property
     def koncna_cena(self):
-        return self.skupna_cena - self.cena_popusta
+        if self.prevoz != None:
+            return self.skupna_cena - self.cena_popusta + self.cena_prevoza
+        else:
+            return self.skupna_cena - self.cena_popusta
 
 ###################################################################################################
 

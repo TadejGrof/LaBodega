@@ -1,0 +1,47 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<h1 style="margin-top:2%"> {{stranka.naziv}} </h1>
+
+<h2 style="margin-top:2%"> Podatki stranke: </h2>
+
+<div style="display:inline-block;width:70%;text-align:center">
+    <table style="padding:1%;border:1px solid black" class="tabela_podatkov">
+        <tr>
+            <th width="33%" colspan="2"> {{slovar|keyvalue:'Osebni podatki'|keyvalue:jezik}}: </th>
+            <th width="42%" colspan="2"> {{slovar|keyvalue:'Naslov'|keyvalue:jezik}}: </th>
+            <th width="25%" colspan="2"> {{slovar|keyvalue:'Kontakt'|keyvalue:jezik}}: </th>
+        </tr>
+        <tr>
+            <td> {{slovar|keyvalue:'Naziv'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" value="{{stranka.naziv}}" name="naziv" type="text" required autocomplete="off"> </td>
+            <td> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" value="{{stranka.naslov.drzava}}" name="drzava" type="text" required autocomplete="off"> </td>
+            <td> {{slovar|keyvalue:'Telefon'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" name="telefon" value="{{stranka.telefon}}" type="text" autocomplete="off"> </td>
+        </tr>
+        <tr>
+            <td> {{slovar|keyvalue:'Ime'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" value="{{stranka.ime}}" name="ime" type="text" required autocomplete="off"> </td>
+            <td> {{slovar|keyvalue:'Mesto'|keyvalue:jezik}}: </td> 
+            <td> <input form="spremeni" value="{{stranka.naslov.mesto}}" name="mesto" type="text" required autocomplete="off"> </td>
+            <td> {{slovar|keyvalue:'E-mail'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" value="{{stranka.mail}}" name="mail" type="text" autocomplete="off"> </td>
+        </tr>
+        <tr>
+            <td> {{slovar|keyvalue:'Davcna'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" value="{{stranka.davcna}}" name="davcna" type="text" autocomplete="off"> </td>
+            <td> {{slovar|keyvalue:'Ulica'|keyvalue:jezik}}: </td>
+            <td> <input form="spremeni" value="{{stranka.naslov.naslov}}" name="naslov" type="text" required autocomplete="off"> </td>
+        </tr>
+    </table>
+    <form id="spremeni" action="{% url 'sprememba_stranke' stranka.pk %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="{{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}">
+    </form>
+</div>
+
+{% endblock %}

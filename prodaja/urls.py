@@ -6,6 +6,7 @@ from zaloga import pdf_views
 pregled_strank_patterns = [
     path('', pviews.pregled_strank, name='pregled_strank'),
     path('nova_stranka/', pviews.nova_stranka, name='nova_stranka'),
+    path('ogled_stranke/<int:pk>/',pviews.ogled_stranke, name="ogled_stranke"),
     path('spremembna_stranke/<int:pk>/', pviews.spremembna_stranke, name='sprememba_stranke'),
     path('izbris_stranke/<int:pk>/', pviews.izbris_stranke, name='izbris_stranke'),
 ]

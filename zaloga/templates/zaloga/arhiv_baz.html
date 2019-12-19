@@ -33,16 +33,25 @@
     {{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}
 {% endif %}
 </h1>
-
 <div class="filter" style="margin-top:3%">
     <form action="{% url 'arhiv_baz' tip %}" method="GET">
-        {% if tip == "prevzem" %}
-        {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}:
-        <select name="drzava">
-        </select>
+        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{zacetek}}" name="zacetek">
+        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{konec}}" name="konec">
+        {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:
+        {% if tip == "vele_prodaja" %}
+            <select name="stranka">
+                <option value="all"> All </option>
+                {% for cliente in stranke %}
+                    {% if cliente.pk == stranka %}
+                        <option value="{{cliente.pk}}" selected> {{cliente.naziv}} </option>
+                    {% else %}
+                        <option value="{{cliente.pk}}"> {{cliente.naziv}} </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
         {% endif %}
-        <input style="width:10%" type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
-    </form>
+        <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
+    <form>
 </div>
 
 <div class="table">

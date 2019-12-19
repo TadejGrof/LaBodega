@@ -622,10 +622,10 @@ class Baza(models.Model):
     
     @property
     def koncna_cena(self):
-        if self.prevoz != None:
-            return self.skupna_cena - self.cena_popusta + self.cena_prevoza
-        else:
-            return self.skupna_cena - self.cena_popusta
+        #if self.prevoz != None:
+        #    return self.skupna_cena - self.cena_popusta + self.cena_prevoza
+        #else:
+        return self.skupna_cena - self.cena_popusta
 
 ###################################################################################################
 

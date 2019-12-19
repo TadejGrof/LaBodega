@@ -2,7 +2,7 @@
         "Arhiv inventur": {
             "slo": "Arhiv inventur",
             "ang": "Stocktaking archive",
-            "spa": "Archivo de inventarios"
+            "spa": "Archivo de reportes"
         },
         "Podatki kontejnerja": {
             "slo": "Podatki kontejnerja",
@@ -12,7 +12,7 @@
         "Izbris": {
             "slo": "Izbris",
             "ang": "Delete",
-            "spa": "Eliminar"
+            "spa": "Elimina"
         },
         "narocilo":{
             "slo":"Narocilo",
@@ -37,7 +37,7 @@
         "Arhiv prevzemov": {
             "slo": "Arhiv prevzemov",
             "ang": "Takein archive",
-            "spa": "Archivo de containers"
+            "spa": "Archivo de entradas"
         },
         "Arhiv vele prodaj": {
             "slo": "Arhiv vele prodaj",
@@ -77,12 +77,17 @@
         "prevzem":{
             "slo": "Prevzem",
             "ang": "Takein",
-            "spa": "Contenedor"
+            "spa": "Entrada"
+        },
+        "Prevzemi":{
+            "slo": "Prevzemi",
+            "ang": "Takein's",
+            "spa": "Entradas"
         },
         "inventura": {
             "slo": "Inventura",
             "ang": "Stocktaking",
-            "spa": "Inventario"
+            "spa": "Reportes"
         },
         "Odpis": {
             "slo": "Odpis",
@@ -92,7 +97,7 @@
         "Prevzem":{
             "slo": "Prevzem",
             "ang": "Takein",
-            "spa": "Contenedor"
+            "spa": "Entrada"
         },
         "Spremembe":{
             "slo": "Spremembe",
@@ -102,7 +107,7 @@
         "Inventura": {
             "slo": "Inventura",
             "ang": "Stocktaking",
-            "spa": "Inventario"
+            "spa": "Reportes"
         },
         "Vele prodaja": {
             "slo": "Vele prodaja",
@@ -202,12 +207,12 @@
         "Odjava": {
             "slo": "Odjava",
             "ang": "Logout",
-            "spa": "Logout"
+            "spa": "Salir"
         },
         "Filtriraj": {
             "slo": "Filtriraj",
             "ang": "Filter",
-            "spa": "Filtre"
+            "spa": "Filtra"
         },
         "Pregled prometa": {
             "slo": "Pregled prometa",
@@ -217,12 +222,32 @@
         "Dodaj iz datoteke": {
             "slo": "Dodaj iz datoteke",
             "ang": "Add from file",
-            "spa": "Agregga de file"
+            "spa": "Agregga de archivo"
         },
         "Nova dimenzija": {
             "slo": "Nova dimenzija",
             "ang": "New dimension",
-            "spa": "Nueva dimension"
+            "spa": "Nueva numeracion"
+        },
+        "Radius": {
+            "slo": "Radij",
+            "ang": "Radius",
+            "spa": "Perfil"
+        },
+        "Height": {
+            "slo": "Visina",
+            "ang": "Height",
+            "spa": "Altura"
+        },
+        "Width": {
+            "slo": "Sirina",
+            "ang": "Width",
+            "spa": "Anchura"
+        },
+        "Special": {
+            "slo": "Posebno",
+            "ang": "Special",
+            "spa": "Especial"
         },
         "Dodaj": {
             "slo": "Dodaj",
@@ -237,7 +262,7 @@
         "Ime": {
             "slo": "Ime",
             "ang": "Name",
-            "spa": "Nombre"
+            "spa": "Nombre completo"
         },
         "Stevilo": {
             "slo": "Stevilo",
@@ -267,7 +292,7 @@
         "Ime baze": {
             "slo": "Ime baze",
             "ang": "Base title",
-            "spa": "Titolo"
+            "spa": "Titulo"
         },
         "Tip baze": {
             "slo": "Tip baze",
@@ -302,7 +327,7 @@
         "Uveljavi": {
             "slo": "Uveljavi",
             "ang": "Confirm",
-            "spa": "Valida"
+            "spa": "Validar"
         },
         "Shrani vse": {
             "slo": "Shrani vse",
@@ -347,7 +372,7 @@
         "Naslov": {
             "slo": "Naslov",
             "ang": "Address",
-            "spa": "Address"
+            "spa": "Direcion"
         },
         "Kontakt": {
             "slo": "Kontakt",
@@ -412,12 +437,12 @@
         "Nova inventura": {
             "slo": "Nova inventura",
             "ang": "New stockhold",
-            "spa": "Nuevo inventario"
+            "spa": "Nuevo reporte"
         },
         "Nov prevzem": {
             "slo": "Nov prevzem",
             "ang": "New takein",
-            "spa": "Nuevo contenedor"
+            "spa": "Nueva entrada"
         },
         "Nov odpis": {
             "slo": "Nov odpis",
@@ -427,12 +452,12 @@
         "Vpogled": {
             "slo": "Vpogled",
             "ang": "Lookin",
-            "spa": "Lookin"
+            "spa": "Salidas"
         },
         "Ogled": {
             "slo": "Ogled",
             "ang": "Look",
-            "spa": "Look"
+            "spa": "Chequear"
         },
         "Ime stranke": {
             "slo": "Ime stranke",
@@ -472,7 +497,7 @@
         "Dimenzija": {
             "slo": "Dimenzija",
             "ang": "Dimension",
-            "spa": "Dimension"
+            "spa": "Numeracion"
         },
         "Cena": {
             "slo": "Cena",
@@ -507,12 +532,12 @@
         "Nov strosek": {
             "slo": "Nov strosek",
             "ang": "New expense",
-            "spa": "New expense"
+            "spa": "Nueva cuenta"
         },
         "Stroski": {
             "slo": "Stroski",
             "ang": "Expenses",
-            "spa": "Expenses"
+            "spa": "Cuentas por pagar"
         },
         "Pregled": {
             "slo": "Pregled",

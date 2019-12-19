@@ -265,14 +265,14 @@
             <table style="vertical-align:top;" class="bazni_vnosi tabela_vnosov vnosi">
                 <tr class="header">
                     <th width="8%"> N. </th>
-                    <th width="20%"> Dimenzija: </th>
-                    <th width="12%"> Tip: </th>
-                    <th width="12%"> Število: </th>
+                    <th width="20%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+                    <th width="12%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                    <th width="12%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
                     {% if tip == "vele_prodaja" %}
-                        <th width="14%"> Cena: </th>
-                        <th width="14%"> Skupaj: </th>
+                        <th width="14%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                        <th width="14%"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
                     {% endif %}
-                    <th width="10%" > Uredi: </th>  
+                    <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
                 </tr>
                 {% for vnos in baza.vnosi_values %}
                     <tr>
@@ -320,14 +320,14 @@
                 {% endfor %}
                 {% if tip == "vele_prodaja" %}
                     <tr class="endrow">
-                        <td colspan="3"> Skupno stevilo:</td>
+                        <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}:</td>
                         <td> {{baza.skupno_stevilo}} </td>
-                        <td> Znesek: </td>
+                        <td> {{slovar|keyvalue:'Znesek'|keyvalue:jezik}}: </td>
                         <td> {{baza.skupna_cena}} $ </td>
                         <td colspan="2"> </td>
                     </tr>
                     <tr class="endrow">
-                        <td> Popust: </td>
+                        <td> {{slovar|keyvalue:'Popust'|keyvalue:jezik}}: </td>
                         <td>  
                             <div class="spremeni_popust"> {{baza.popust}} % </div>
                             <input form="spremeni_popust" style="width:60%" type="text" hidden="hidden" class="potrdi_popust" value="" name="popust" required>
@@ -337,16 +337,16 @@
                                 {% csrf_token %}  
                         </form>
                         <td>   
-                            <button class="spremeni_popust" onclick="Spremeni_popust()"> Spremeni </button>
+                            <button class="spremeni_popust" onclick="Spremeni_popust()"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
                             <input hidden="hidde" type="submit" form="spremeni_popust" value="potrdi" class="potrdi_popust">
                             <button hidden="hidden" class="potrdi_popust" onclick="Preklici_spremembo_popusta()"> X </button>
                         </td>
-                        <td colspan="2"> Znesek popusta: </td>
+                        <td colspan="2"> {{slovar|keyvalue:'Znesek popusta'|keyvalue:jezik}}: </td>
                         <td> {{baza.cena_popusta}} $</td>
                         <td colspan="2" > </td>
                     </tr>
                     <tr class="endrow">
-                        <td colspan="5"> Koncna cena: </td>
+                        <td colspan="5"> {{slovar|keyvalue:'Koncna cena'|keyvalue:jezik}}: </td>
                         <td> {{baza.koncna_cena}} $ </td>
                         <td colspan="2" > </td>
                     </tr>

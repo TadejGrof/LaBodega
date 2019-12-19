@@ -176,21 +176,21 @@ def zadnja_vrstica_baze(p,baza,top, jezik = "spa"):
 
 def zadnja_vrstica_vele_prodaje(p,baza,top, jezik = "spa"):
     skupno = baza.skupno_stevilo
-    data=  [['Skupno stevilo:', baza.skupno_stevilo, 'Cena',str(baza.skupna_cena) + "$"]] 
+    data=  [[slovar['Skupno stevilo'][jezik] + ':', baza.skupno_stevilo, slovar['Cena'][jezik] + ':',str(baza.skupna_cena) + "$"]] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
                         ])
     tabela(p,data,style,colWidths=[168,84,84,84])
     top = naslednja_vrstica(p,top)
-    data=  [['Popust:', str(baza.popust) + " %", 'Cena popusta:', str(baza.cena_popusta) + '$']] 
+    data=  [[slovar['Popust'][jezik] + ':', str(baza.popust) + " %", slovar['Cena popusta'][jezik] + ':', str(baza.cena_popusta) + '$']] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
                         ])
     tabela(p,data,style,colWidths=[84,84,168,84])
     top = naslednja_vrstica(p,top)
-    data=  [['Koncna cena:', str(baza.koncna_cena) + "$"]] 
+    data=  [[slovar['Koncna cena'][jezik] + ':', str(baza.koncna_cena) + "$"]] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
@@ -208,7 +208,7 @@ def title_baze(p,baza,top = 800, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
-        [slovar['Tip'][jezik] + ':',baza.tip,slovar['Ime'][jezik] + ':',baza.author.username],
+        [slovar['Tip'][jezik] + ':',baza.tip,slovar['Naziv'][jezik] + ':',baza.author.username],
         [slovar['Title'][jezik] + ':',baza.title, slovar['Telefon'][jezik] + ':',"/"],
         [slovar['Datum'][jezik] + ':',baza.datum,'E-mail', '/']
         ]
@@ -249,9 +249,9 @@ def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
-        [slovar['Tip'][jezik] + ':', baza.tip , slovar['Ime'][jezik] + ':', baza.stranka.ime, slovar['Ime'][jezik] + ':', baza.author.username],
+        [slovar['Tip'][jezik] + ':', baza.tip , slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
         [slovar['Title'][jezik] + ':', baza.title,slovar['Naslov'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Telefon'][jezik] + ':',baza.stranka.telefon],
-        [slovar['Datum'][jezik] + ':', baza.datum,slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail',baza.stranka.mail]
+        [slovar['Datum'][jezik] + ':', baza.datum,slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail]
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'LEFT')])
     tabela(p,data,style,[55,85,65,95,65,95])

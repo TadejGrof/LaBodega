@@ -343,6 +343,7 @@ def arhiv(request, tip_baze):
         zacetek = request.GET.get('zacetek', pred_mescem)
         konec = request.GET.get('konec', danes)
         stranke = Stranka.objects.all()
+        stranka = None
         if tip_baze == "dnevna_prodaja":
             baze = Dnevna_prodaja.objects.filter(datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
         else:

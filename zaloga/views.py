@@ -24,6 +24,7 @@ def pregled_zaloge(request):
         radius = request.GET.get('radius','R12')
         height = request.GET.get('height','all')
         width = request.GET.get('width', 'all')
+        nicelne = request.GET.get('nicelne','true')
         if radius != "all":
             sestavine = sestavine.filter(dimenzija__radius=radius)
         if height != "all":
@@ -47,6 +48,14 @@ def pregled_zaloge(request):
             'JP50',
             'JP70',
         )
+        if nicelne == "false":
+            ne_prazne = []
+            for sestavina in sestavine:
+                for tip in tipi:
+                    if sestavina[tip[0]] != 0:
+                        ne_prazne.append(sestavina)
+                        break
+            sestavine = ne_prazne
         skupno = 0
         for sestavina in sestavine:
             for tip in tipi:
@@ -57,7 +66,8 @@ def pregled_zaloge(request):
             'radius':radius,
             'height':height,
             'width':width,
-            'skupno':skupno
+            'skupno':skupno,
+            'nicelne': nicelne
         }
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 

@@ -46,8 +46,8 @@ def tabela_zaloge(p, sestavine, tipi, top=800, jezik = "spa"):
     for sestavina in sestavine:
         zaloga = []
         for tip in kratki_tipi:
-            zaloga.append(getattr(sestavina,tip))
-        data= [[sestavina.dimenzija.dimenzija] + zaloga]
+            zaloga.append(sestavina[tip])
+        data= [[sestavina['dimenzija__dimenzija']] + zaloga]
         style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                             ('BOX', (0,0), (-1,-1), 0.5, colors.black),      

@@ -50,12 +50,31 @@
                     {% endif %}
                 </select>
             {% endfor %}
+            Nicelne:
+            <select form="filter" name="nicelne" style="width:5%">
+                {% if nicelne == "true" %}
+                    <option value="true"> Yes </option>
+                    <option value="false"> No </option>
+                {% else %}
+                    <option value="true"> Yes </option>
+                    <option value="false" selected> No </option>
+                {% endif %}
+            </select>
             <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' %}" method="GET">
                 <input type="hidden"  value="{{radius}}" name="radius">
                 {% for tip in tipi %}
                 <input type="hidden" value="True" name="{{tip.0}}">
                 {% endfor %}
                 <input style="width:100%"type="submit" value="pdf">
+                <select hidden="hidden" name="nicelne" style="width:5%">
+                    {% if nicelne == "true" %}
+                        <option value="true"> Yes </option>
+                        <option value="false"> No </option>
+                    {% else %}
+                        <option value="true"> Yes </option>
+                        <option value="false" selected> No </option>
+                    {% endif %}
+                </select>
             </form>
         </div>
     </div>

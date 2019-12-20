@@ -18,12 +18,31 @@ zaloga = Zaloga.objects.first()
 def pdf_zaloge(request):
     radius = request.GET.get('radius')
     sestavine = zaloga.sestavina_set.all()
+    nicelne = request.GET.get('nicelne','true')
     if radius != 'all':
         sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius)
     tipi = []
     for tip in zaloga.vrni_tipe:
         if request.GET.get(tip[0]):
             tipi.append(tip)
+    sestavine = sestavine.values(
+        'dimenzija__dimenzija',
+        'pk',
+        'Y',
+        'W',
+        'JP',
+        'JP50',
+        'JP70',
+    )
+    if nicelne == "false":
+            ne_prazne = []
+            for sestavina in sestavine:
+                for tip in tipi:
+                    if sestavina[tip[0]] != 0:
+                        ne_prazne.append(sestavina)
+                        break
+            sestavine = ne_prazne
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="zaloga.pdf"'
     

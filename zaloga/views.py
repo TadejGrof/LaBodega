@@ -25,6 +25,7 @@ def pregled_zaloge(request):
         height = request.GET.get('height','all')
         width = request.GET.get('width', 'all')
         nicelne = request.GET.get('nicelne','true')
+        cenik = zaloga.cenik('vele_prodaja')
         if radius != "all":
             sestavine = sestavine.filter(dimenzija__radius=radius)
         if height != "all":
@@ -56,10 +57,21 @@ def pregled_zaloge(request):
                         ne_prazne.append(sestavina)
                         break
             sestavine = ne_prazne
+        cene = {}
         skupno = 0
+        vrednost = 0
         for sestavina in sestavine:
+            dimenzija = sestavina['dimenzija__dimenzija']
             for tip in tipi:
-                skupno += sestavina[tip[0]]
+                stevilo = sestavina[tip[0]]
+                cena = cenik[dimenzija][tip[0]]
+                skupno += stevilo
+                vrednost += cena * stevilo
+                if dimenzija in cene:
+                    if not tip[0] in cene[dimenzija]:
+                        cene[dimenzija].update({tip[0]:stevilo * cena})
+                else:
+                    cene.update({dimenzija:{tip[0]:stevilo * cena}})
         slovar = {
             'sestavine':sestavine,
             'tipi':tipi,
@@ -67,7 +79,9 @@ def pregled_zaloge(request):
             'height':height,
             'width':width,
             'skupno':skupno,
-            'nicelne': nicelne
+            'nicelne': nicelne,
+            'cene':cene,
+            'vrednost':vrednost
         }
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 
@@ -327,6 +341,14 @@ def spremeni_popust(request,tip_baze, pk):
     if request.method == "POST":
         prodaja = Baza.objects.get(pk = pk)
         prodaja.popust = request.POST.get('popust')
+        prodaja.save()
+        return redirect('baza',tip_baze=tip_baze,pk=pk)
+
+@login_required
+def spremeni_prevoz(request,tip_baze, pk):
+    if request.method == "POST":
+        prodaja = Baza.objects.get(pk = pk)
+        prodaja.prevoz = request.POST.get('prevoz')
         prodaja.save()
         return redirect('baza',tip_baze=tip_baze,pk=pk)
 

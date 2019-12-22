@@ -156,6 +156,25 @@ class Zaloga(models.Model):
                 for prodaja in TIPI_PRODAJE:
                     Cena.objects.create(sestavina = sestavina, tip = tip[0], prodaja = prodaja[0])
 
+    def cenik(self,tip):
+        cene = {}
+        cenik = self.sestavina_set.all().prefetch_related('cena_set').filter(cena__prodaja='vele_prodaja').values(
+            'dimenzija__dimenzija',
+            'pk',
+            'cena',
+            'cena__tip',
+            'cena__cena')
+        for cena in cenik:
+            dimenzija = cena['dimenzija__dimenzija']
+            tip = cena['cena__tip']
+            cena = cena['cena__cena']
+            if dimenzija in cene:
+                if not tip in cene[dimenzija]:
+                    cene[dimenzija].update({tip:float(cena)})
+            else:
+                    cene.update({dimenzija:{tip:float(cena)}})
+        return cene
+
     def vrni_slovar_dimenzij(self, obratno = False):
         slovar = {}
         dimenzije = self.sestavina_set.values('dimenzija_id','dimenzija__dimenzija')
@@ -438,7 +457,7 @@ class Baza(models.Model):
     stranka = models.ForeignKey(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
     cas = models.TimeField(default=None,null=True,blank=True)
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
-    #prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
+    prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
 
     def __str__(self):
         return self.title
@@ -613,6 +632,8 @@ class Baza(models.Model):
 
     @property
     def cena_popusta(self):
+        print(self.skupna_cena)
+        print(self.popust)
         return round(float(self.skupna_cena) * (self.popust / 100))
 
     @property
@@ -622,10 +643,10 @@ class Baza(models.Model):
     
     @property
     def koncna_cena(self):
-        #if self.prevoz != None:
-        #    return self.skupna_cena - self.cena_popusta + self.cena_prevoza
-        #else:
-        return self.skupna_cena - self.cena_popusta
+        if self.prevoz != None:
+            return self.skupna_cena - self.cena_popusta + self.cena_prevoza
+        else:
+            return self.skupna_cena - self.cena_popusta
 
 ###################################################################################################
 

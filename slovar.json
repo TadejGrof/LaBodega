@@ -549,6 +549,16 @@
             "ang": "Stock",
             "spa": "Inventario"
         },
+        "Cena prevoza": {
+            "slo": "Cena prevoza",
+            "ang": "Transport price",
+            "spa": "Precio de transporte"
+        },
+        "Vrednost": {
+            "slo": "Vrednost",
+            "ang": "Value",
+            "spa": "Valor"
+        },
         "Trenutno stanje": {
             "slo": "Trenutno stanje",
             "ang": "Current stock",

@@ -18,6 +18,14 @@ function Preklici_spremembo_popusta(){
     toggle('spremeni_popust','inline-block')
     toggle('potrdi_popust','none')
 };
+function Spremeni_prevoz(){
+    toggle('spremeni_prevoz','none')
+    toggle('potrdi_prevoz','inline-block')
+};
+function Preklici_spremembo_prevoza(){
+    toggle('spremeni_prevoz','inline-block')
+    toggle('potrdi_prevoz','none')
+};
 function Spremeni_vnos(pk){
     toggle('spremeni_' + pk, 'none');
     toggle('potrdi_' + pk, 'inline-block')

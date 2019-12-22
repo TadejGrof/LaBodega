@@ -27,8 +27,15 @@
         }
     </style>
 
-    <div class="title">
-        {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: {{skupno}}
+    <div style="margin-top:3%;display:inline-block;width:50%" >
+        <table class="tabela_vnosov">
+            <tr>
+                <td width="30%"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
+                <td width="20%"> {{skupno}} </td>
+                <td width="30%"> {{slovar|keyvalue:'Vrednost'|keyvalue:jezik}}: </td>
+                <td width="20%"> {{vrednost}} $</td>
+            </tr>
+        </table>
     </div>
     <div class="filter">
         <div style="display:block">
@@ -82,17 +89,20 @@
     <div class="table">
         <table class="tabela_vnosov" >
             <tr class="header">
-                <th width="30%">
+                <th width="25%">
                     {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}:
                 </th>
-                <th width="25%" class="tip">
+                <th width="20%" class="tip">
                     {{slovar|keyvalue:'Tip'|keyvalue:jezik}}:
                 </th>
-                <th width="25% class="total">
+                <th width="20%" class="total">
                     {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
                 </th>
+                <th width="20%" class="total">
+                    {{slovar|keyvalue:'Vrednost'|keyvalue:jezik}}
+                </th>
                 {% if perms.zaloga.view_sprememba %}
-                <th width="20%" class="vpogled">
+                <th width="15%" class="vpogled">
                     {{slovar|keyvalue:'Vpogled'|keyvalue:jezik}}
                 </th>  
                 {% endif %}
@@ -103,6 +113,7 @@
                             <td> {{sestavina.dimenzija__dimenzija}} </td>
                             <td> {{ tip.1 }} </td>
                             <td> {{sestavina|keyvalue:tip.0}} </td>
+                            <td> {{cene|keyvalue:sestavina.dimenzija__dimenzija|keyvalue:tip.0}}$</td>
                             <td>
                                 <form action="{% url 'pregled_prometa' %}" method="GET">
                                     <input type="hidden" name="tip" value="{{tip.0}}">

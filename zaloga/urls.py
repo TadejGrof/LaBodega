@@ -12,6 +12,7 @@ ogled_patterns = [
     path('izbrisi_vnos/', views.izbrisi_vnos, name='baza_izbrisi_vnos'),
     path('uveljavi/', views.uveljavi_bazo, name='uveljavi_bazo'),
     path('spremeni_popust/', views.spremeni_popust, name='spremeni_popust'),
+    path('spremeni_prevoz/', views.spremeni_prevoz, name='spremeni_prevoz'),
     path('pdf/', pdf_views.pdf_baze, name='pdf_baze')
 ]
 

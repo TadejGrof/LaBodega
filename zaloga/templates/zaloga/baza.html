@@ -451,6 +451,25 @@
                     <td colspan="2" > </td>
                 </tr>
                 <tr class="endrow">
+                    <td> Prevoz: </td>
+                    <td>  
+                        <div class="spremeni_prevoz"> {{baza.prevoz}} $ </div>
+                        <input form="spremeni_prevoz" style="width:60%" type="text" hidden="hidden" class="potrdi_prevoz" value="" name="prevoz" required>
+                        <div hidden="hidden" class="potrdi_prevoz">$</div>  
+                    </td>
+                    <form display="inline-block" id="spremeni_prevoz" action="{% url 'spremeni_prevoz' tip baza.pk %}" method="POST">
+                            {% csrf_token %}  
+                    </form>
+                    <td>   
+                        <button class="spremeni_prevoz" onclick="Spremeni_prevoz()"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                        <input hidden="hidden" type="submit" form="spremeni_prevoz" value="potrdi" class="potrdi_prevoz">
+                        <button hidden="hidden" class="potrdi_prevoz" onclick="Preklici_spremembo_prevoza()"> X </button>
+                    </td>
+                    <td colspan="2"> {{slovar|keyvalue:'Cena prevoza'|keyvalue:jezik}}: </td>
+                    <td> {{baza.cena_prevoza}} $</td>
+                    <td colspan="2" > </td>
+                </tr>
+                <tr class="endrow">
                     <td colspan="5"> {{slovar|keyvalue:'Koncna cena'|keyvalue:jezik}}: </td>
                     <td> {{baza.koncna_cena}} $ </td>
                     <td colspan="2"> </td>

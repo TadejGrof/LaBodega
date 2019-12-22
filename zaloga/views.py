@@ -190,6 +190,7 @@ def nova_baza(request, tip_baze):
                 stranka = stranka,
                 title = title,
                 popust = 0,
+                prevoz = 0,
                 author = request.user,
                 tip = tip_baze)
         elif tip_baze == 'inventura' or tip_baze == "odpis":

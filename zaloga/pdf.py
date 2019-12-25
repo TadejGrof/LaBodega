@@ -5,6 +5,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.pdfgen import canvas
 import datetime
 import json 
+from zaloga.models import Zaloga
+
+zaloga = Zaloga.objects.all().first()
 
 with open('slovar.json') as dat:
         slovar = json.load(dat)
@@ -53,7 +56,8 @@ def tabela_zaloge(p, sestavine, tipi, top=800, jezik = "spa"):
                             ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
                             ])
         tabela(p,data,style)
-        top = naslednja_vrstica(p, top)
+        top = naslednja_vrstica(p, top) 
+    top = zaloga_skupno(p,sestavine,kratki_tipi,top)
 
 def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
     kratki_tipi = [tip[0] for tip in tipi]  
@@ -196,6 +200,34 @@ def zadnja_vrstica_vele_prodaje(p,baza,top, jezik = "spa"):
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
                         ])
     tabela(p,data,style,colWidths=[336,84])
+    return naslednja_vrstica(p,top)
+
+def zaloga_skupno(p,sestavine,tipi,top,jezik="spa"):
+    stevilo = [0 for tip in tipi]
+    cena = [0 for tip in tipi]
+    cenik = zaloga.cenik()
+    for sestavina in sestavine:
+        n = 0
+        for tip in tipi:
+            stevilo[n] += sestavina[tip]
+            cena[n] += cenik[sestavina['dimenzija__dimenzija']][tip] * sestavina[tip]
+            n += 1
+    for n in range(len(cena)):
+        cena[n] = str(cena[n]) + '$'
+
+    data=  [[slovar['Skupno stevilo'][jezik] + ':'] + stevilo] 
+    style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ])
+    tabela(p,data,style)
+    top = naslednja_vrstica(p,top)
+    data=  [[slovar['Vrednost'][jezik] + ':'] + cena] 
+    style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ])
+    tabela(p,data,style)
     return naslednja_vrstica(p,top)
 
 ##################################TITLI##################################################

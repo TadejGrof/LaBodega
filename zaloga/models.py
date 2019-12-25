@@ -156,9 +156,9 @@ class Zaloga(models.Model):
                 for prodaja in TIPI_PRODAJE:
                     Cena.objects.create(sestavina = sestavina, tip = tip[0], prodaja = prodaja[0])
 
-    def cenik(self,tip):
+    def cenik(self,tip='vele_prodaja'):
         cene = {}
-        cenik = self.sestavina_set.all().prefetch_related('cena_set').filter(cena__prodaja='vele_prodaja').values(
+        cenik = self.sestavina_set.all().prefetch_related('cena_set').filter(cena__prodaja=tip).values(
             'dimenzija__dimenzija',
             'pk',
             'cena',
@@ -735,13 +735,37 @@ class Vnos(models.Model):
     def ustvari_spremembo(self,sestavina = None):
         if sestavina == None:
             sestavina = Sestavina.objects.get(dimenzija = self.dimenzija)
-        self.sprememba = Sprememba.objects.create(
-            baza = self.baza,
-            stevilo = self.stevilo,
-            tip = self.tip,
-            sestavina = sestavina 
-        )
+        if self.baza.tip == "inventura":
+            Sprememba.objects.create(
+                baza = self.baza,
+                zaloga = self.stevilo,
+                tip = self.tip,
+                sestavina = sestavina 
+            )
+        else:
+            self.sprememba = Sprememba.objects.create(
+                baza = self.baza,
+                stevilo = self.stevilo,
+                tip = self.tip,
+                sestavina = sestavina 
+            )
         self.save()
+
+    def inventurna_sprememba(self,stevilo):
+        self.stevilo = stevilo
+        sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
+        sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
+        sprememba.stanje = stevilo
+        sprememba.save()
+        self.save()
+        sestavina.nastavi_iz_sprememb(self.tip)
+        
+    def inventurni_izbris(self):
+        sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
+        sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
+        sprememba.delete()
+        sestavina.nastavi_iz_sprememb(self.tip)
+        self.delete()
 
 class Stroski_Group(models.Model):
     title = models.CharField(default="",max_length=20)
@@ -749,9 +773,22 @@ class Stroski_Group(models.Model):
     datum = models.DateField(default=timezone.now)
     status = models.CharField(default="aktivno",max_length=20)
     kontejner = models.ForeignKey(Kontejner,default=None,null=True,blank=True,on_delete=models.CASCADE)
+    tip = "strosek"
 
+    def skupni_znesek(self):
+        znesek = 0
+        for strosek in self.strosek_set.all():
+            znesek += strosek.znesek
+        return znesek
+        
 class Strosek(models.Model):
     title = models.CharField(default="",max_length=20)
     group = models.ForeignKey(Stroski_Group,default=0,on_delete=models.CASCADE)
     delavec = models.ForeignKey(User,default=None,null=True,blank=True,on_delete=models.CASCADE)
     znesek = models.DecimalField(default=0,max_digits=8,decimal_places=2)
+
+class Profit(models.Model):
+    baza = models.ForeignKey(Baza,default=None,null=True,blank=True,on_delete=models.CASCADE)
+    dnevna_prodaja = models.ForeignKey(Dnevna_prodaja,default=None,null=True,blank=True,on_delete=models.CASCADE)
+    znesek = models.DecimalField(default=0,max_digits=8,decimal_places=2)
+    tip = "profit"

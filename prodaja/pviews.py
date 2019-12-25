@@ -232,6 +232,16 @@ def nova_stranka(request):
     return redirect('pregled_strank')
 
 ###########################################################################################
+
+def porocilo(request):
+    danes = datetime.date.today().strftime('%Y-%m-%d')
+    pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+    zacetek = request.GET.get('zacetek', pred_mescem)
+    konec = request.GET.get('konec', danes)
+    
+
+
+###########################################################################################
 ###########################################################################################
 ###########################################################################################
 

@@ -92,9 +92,9 @@
             <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
             <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
         </form>
-        <form style="display:inline-block" action="{% url 'uveljavi_bazo' tip baza.pk %}" onsubmit="return Uveljavi_bazo()" method="POST">
+        <form style="display:inline-block" action="{% url 'uveljavi_bazo' tip baza.pk %}" method="POST">
             {% csrf_token %}
-            <input type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
+            <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
         </form>
         <form style="display:inline-block" action="{% url 'shrani_vse' tip baza.pk %}" method="POST" onsubmit="return Shrani_vse()">
             {% csrf_token %}
@@ -493,17 +493,24 @@
 </div>
 
 <script>
-    function Uveljavi_bazo() {
-        if ( {{baza.stevilo_vnosov}} == 0){
-            alert('Baza mora vsebovati vsaj en vnos!');
+    function Uveljavi_bazo(gumb){
+        {% if baza.stevilo_vnosov == 0 %}
+            alert('baza mora vsebovati vsaj en vnos');
             return false;
-        } else{
-            return Confirm();
-        }
-    }
+        {% else %}
+            if( Confirm() ){
+                gumb.disabled = true;
+                gumb.form.submit();
+            } else{
+                return false
+            }
+        {% endif %}
+    };
     function Confirm() {
         if (!confirm('are you sure?')){
             return false
+        } else{
+            return true
         }
     }
     function Vec_vnosov() {

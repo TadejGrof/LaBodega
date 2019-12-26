@@ -39,6 +39,11 @@
             "ang": "Takein archive",
             "spa": "Archivo de entradas"
         },
+        "vele_prodaja": {
+            "slo": "Vele prodaja",
+            "ang": "Wholesale",
+            "spa": "Venta por mayor"
+        },
         "Arhiv vele prodaj": {
             "slo": "Arhiv vele prodaj",
             "ang": "Wholesale archive",
@@ -554,6 +559,11 @@
             "ang": "Transport price",
             "spa": "Precio de transporte"
         },
+        "Prevoz": {
+            "slo": "Prevoz",
+            "ang": "Transport",
+            "spa": "Transporte"
+        },
         "Vrednost": {
             "slo": "Vrednost",
             "ang": "Value",
@@ -672,6 +682,6 @@
         "Cena popusta": {
             "slo": "Cena popusta",
             "ang": "Discount price",
-            "spa": "Discuento precio"
+            "spa": "Precio de discuento"
         }  
     }

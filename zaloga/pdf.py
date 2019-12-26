@@ -102,8 +102,8 @@ def tabela_baze(p, baza, top = 800, jezik = "spa"):
             vnos.dimenzija,
             vnos.tip, 
             vnos.stevilo, 
-            vnos.cena if baza.tip == "vele_prodaja" else "/", 
-            vnos.skupna_cena if baza.tip == "vele_prodaja" else "/"]] 
+            str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/", 
+            str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]] 
         style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
@@ -188,6 +188,13 @@ def zadnja_vrstica_vele_prodaje(p,baza,top, jezik = "spa"):
     tabela(p,data,style,colWidths=[168,84,84,84])
     top = naslednja_vrstica(p,top)
     data=  [[slovar['Popust'][jezik] + ':', str(baza.popust) + " %", slovar['Cena popusta'][jezik] + ':', str(baza.cena_popusta) + '$']] 
+    style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ])
+    tabela(p,data,style,colWidths=[84,84,168,84])
+    top = naslednja_vrstica(p,top)
+    data=  [[slovar['Prevoz'][jezik] + ':', str(baza.prevoz) + " $", slovar['Cena prevoza'][jezik] + ':', str(baza.cena_prevoza) + '$']] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
@@ -281,7 +288,7 @@ def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
-        [slovar['Tip'][jezik] + ':', baza.tip , slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
+        [slovar['Tip'][jezik] + ':', slovar[baza.tip][jezik] , slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
         [slovar['Title'][jezik] + ':', baza.title,slovar['Naslov'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Telefon'][jezik] + ':',baza.stranka.telefon],
         [slovar['Datum'][jezik] + ':', baza.datum,slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail]
         ]

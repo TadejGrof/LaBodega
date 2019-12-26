@@ -130,6 +130,7 @@
         {% if racun.status == "veljavno" %}
             <div style="margin-top:4%">
                 <form action="{% url 'storniraj_racun' prodaja.pk racun.pk %}" method="POST" onsubmit="return Confirm()">
+                    {% csrf_token %}
                     <input type="submit" value="STORNO">
                 </form>
             </div>

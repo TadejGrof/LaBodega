@@ -308,7 +308,7 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <input style="width:40%;height:15%;display:inline-block;margin:10%;margin-top:3%" type="submit" value="Nov vnos" form="nov_vnos" onclick="this.disabled=true;this.click()">
+                    <input style="width:40%;height:15%;display:inline-block;margin:10%;margin-top:3%" type="submit" value="Nov vnos" form="nov_vnos" onclick="this.disabled=true;this.form.submit()">
                 </div>
             </div>
             <div class="cena">
@@ -360,7 +360,7 @@
             return false;
         {% else %}
             gumb.disabled = true;
-            gumb.click();
+            gumb.form.submit();
         {% endif %}
     };
     function Pocisti(){

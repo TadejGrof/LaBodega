@@ -58,6 +58,7 @@ TIPI_STROSKOV = (
     ('drugo','Drugo')
 )
 
+
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
 
@@ -773,8 +774,8 @@ class Stroski_Group(models.Model):
     datum = models.DateField(default=timezone.now)
     status = models.CharField(default="aktivno",max_length=20)
     kontejner = models.ForeignKey(Kontejner,default=None,null=True,blank=True,on_delete=models.CASCADE)
-    tip = "strosek"
 
+    @property
     def skupni_znesek(self):
         znesek = 0
         for strosek in self.strosek_set.all():

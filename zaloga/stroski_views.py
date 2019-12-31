@@ -10,16 +10,28 @@ zaloga = Zaloga.objects.all().first()
 
 @login_required
 def pregled(request):
-    od = request.GET.get('od',datetime.date(2019,12,1))
-    do = request.GET.get('do', datetime.date.today())
-    stroski = stroski.filter(datum__gte = od, datum__lte = do)
-    return pokazi_stran(request,'stroski/pregled_stroskov.html',{'stroski':stroski})
+    danes = datetime.date.today().strftime('%Y-%m-%d')
+    pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+    od = request.GET.get('od',pred_mescem)
+    do = request.GET.get('do', danes)
+    stroski = Stroski_Group.objects.all().filter(datum__gte = od, datum__lte = do)
+    skupno = 0
+    for strosek in stroski:
+        skupno += strosek.skupni_znesek
+    slovar = {
+        'od':od,
+        'do':do,
+        'stroski':stroski,
+        'skupno':skupno,
+    }
+    return pokazi_stran(request,'stroski/pregled_stroskov.html',slovar)
 
 @login_required
 def strosek(request):
     strosek = Stroski_Group.objects.all().filter(status = 'aktivno').first()
     kontejnerji = Kontejner.objects.all().order_by('-baza__datum')[:10].values('stevilka','pk')
-    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek,'kontejnerji':kontejnerji})
+    vnosi = strosek.strosek_set.all() if strosek != None else None
+    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek,'kontejnerji':kontejnerji,'vnosi':vnosi})
 
 @login_required
 def nov_strosek(request):
@@ -39,13 +51,33 @@ def nov_strosek(request):
     return redirect('strosek')
 
 @login_required
-def uveljavi(requestl,pk):
+def izbris_vnosa(request, pk , pk_vnosa):
+    if request.method == "POST":
+        Strosek.objects.get(pk = pk_vnosa).delete()
+    return redirect('strosek')
+
+@login_required
+def uveljavi(request,pk):
     if request.method == "POST":
         strosek = Stroski_Group.objects.get(pk = pk)
         strosek.status = "veljavno"
         strosek.save()
     return redirect('pregled_stroskov')
 
+@login_required
+def nov_vnos(request, pk):
+    if request.method == "POST":
+        strosek = Stroski_Group.objects.get(pk = pk)
+        delavec = None
+        if strosek.tip == "placa":
+            delavec = User.objects.get(pk = int(request.POST.get('delavec')))
+        Strosek.objects.create(
+            group = strosek,
+            delavec = delavec,
+            title = request.POST.get('tip'),
+            znesek = float(request.POST.get('znesek'))
+        )
+        return redirect('strosek')
 
 ###################################################################################
 ###################################################################################

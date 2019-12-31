@@ -1,8 +1,72 @@
 {% extends 'program/base.html' %}
 
-
 {% load zaloga_exstras %}
 
 {% block content %}
+    <style>
+        i.down {
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            display: inline-block;
+            padding: 2.5px;
+            margin:0%;
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+        } 
+    </style>
+
+    <h2> Pregled stroskov </h2>
+
+    <div class="filter" style="margin-top:3%">
+        <form action="{% url 'pregled_stroskov' %}" method="GET">
+            {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{od}}" name="od">
+            {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{do}}" name="do">
+            <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
+        </form>
+    </div>
+
+    <div class="tabela" style="width:60%;display:inline-block;margin-top:3%">
+        <table class="tabela_vnosov">
+            <tr class="header">
+                <th width="25%"> Datum: </th>
+                <th width="45%" colspan="2"> Tip: </th>
+                <th width="25%"> Znesek: </th>
+                <th width="5%"> Pregled: </th>
+            </tr>
+            {% for strosek in stroski %}
+            <tr>
+                <td> {{strosek.datum}} </td>
+                {% if strosek.tip == "kontejner" %}
+                    <td width="20%"> {{strosek.title}} </td>
+                    <td> {{strosek.kontejner.stevilka}} </td>
+                {% else %}
+                    <td colspan="2"> {{strosek.title}} </td>
+                {% endif %}
+                <td> 
+                    {% with strosek.skupni_znesek as skupno %}
+                        {% if skupno > 0 %}
+                            <div style="color:red">-{{skupno}} $ </div>
+                        {% else %}
+                            <div style="color:green">{{skupno}} $ </div>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>
+                    <button onclick="Pokazi_vnose('{{strosek.pk}}')" style="width:80%;height:22px"><i class="arrow down"></i></button> 
+                </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <th colspan="3"> Skupni znesek: </th>
+                <th colspan="2">
+                    {% if skupno > 0 %}
+                        <div style="color:#ff4d4d">-{{skupno}} $ </div>
+                    {% else %}
+                        <div style="color:green">{{skupno}} $ </div>
+                    {% endif %}
+                </th>
+            </tr>
+        </table>
+    </div>
 
 {% endblock %}

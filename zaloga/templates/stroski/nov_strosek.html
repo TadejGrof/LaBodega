@@ -51,44 +51,74 @@
             {% if strosek.tip == "kontejner" %}
                 <tr>
                     <td> Kontejner </td>
-                    <td> {{strosek.kontejner.stevilka}} </td>
+                    <td colspan="2"> {{strosek.kontejner.stevilka}} </td>
                 </tr>
             {% endif %}
             <tr class="header">
-                <td> Tip: </td>
-                <td> Znesek: </td>
-                <td> Edit: </td>
+                {% if tip == "placa" %}
+                    <th> Zaposleni: </td>
+                {% else %}
+                    <th> Tip: </td>
+                {% endif %}
+                <th> Znesek: </td>
+                <th> Edit: </td>
             </tr>
             {% for vnos in vnosi %}
                 <tr>
-                    <td> {{vnos.tip}}
-                    <td> {{vnos.znesek}}
-                    <td> <button> E </button>
+                    <td> {{vnos.title}} </td>
+                    <td> {{vnos.znesek}} $ </td>
+                    <td>
+                        <form style="display:inline-block" action="{% url 'strosek_izbris_vnosa' strosek.pk vnos.pk %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Izbris">
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             <tr class="nov_vnos_row" hidden="hidden">
+                {% if strosek.tip == "placa" %}
+                    <td>
+                        <select name="zaposleni" form="nov_vnos">
+                            {% for delavec in zaposleni %}
+                                <option value="{{delavec.id}}"> {{delavec.username}} </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                {% elif strosek.tip == "kontejner" %}
                 <td> 
-                    <select name="tip" form="nov_vnos">
-                        {% for tip in tipi %}
-                            <option value="{{tip.0}}"> {{tip.1}} </option>
-                        {% endfor %}
+                    <select  onchange="Sprememba_tipa_vnosa()" name="tip" form="nov_vnos">
+                        <option value="Ladijski prevoz" > Ladijski prevoz </option>
+                        <option value="Carina" > Carina </option>
+                        <option value="Nakup" > Nakup </option>
+                        <option value="Prevoz" > Prevoz </option>
+                        <option value="Delo" > Delo </option>
+                        <option value="drugo" id="drugo_option"> Drugo </option>
                     </select>
+                    <input hidden="hidden" type="text" value="" id="drugo_input">
                 </td>
-                <td> <input type="text" name="znesek" form="nov_vnos" value="" autocomplete="off" required> $ </td>
+                {% else %}
+                    <input type="text" name="tip" form="nov_vnos">
+                {% endif %}
+                <td> <input type="text" name="znesek" form="nov_vnos" value="" autocomplete="off" required pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}"> $ </td>
                 <td>
-                    <form id="nov_vnos" action="Nov vnos" method="POST">
+                    <form id="nov_vnos" action="{% url 'strosek_nov_vnos' strosek.pk %}" method="POST">
+                        {% csrf_token %}
                         <input type="submit" value="POTRDI">
                     </form>
                 </td>
             </tr>
             <tr>
-                <td> Skupno: </td>
-                <td> {{strosek.skupno}} </td>
-                <td> <button onclick="Nov_vnos()"> Nov vnos </button> </td>
+                <th> Skupno: </th>
+                <th> {{strosek.skupni_znesek}} $ </th>
+                <th> 
+                    <button onclick="Nov_vnos()" class="nov_vnos_button"> Nov vnos </button>
+                    <button hidden="hidden" onclick="Preklici_nov_vnos()" class="preklici_vnos_button"> Preklici </button>
+                </th>
             </tr>
         </table>
     </div>
     <form style="margin-top:3%" action="{% url 'uveljavi_strosek' strosek.pk %}" method="POST">
+        {% csrf_token %}
         <input style="width:150px;height:40px" type="submit" value="Uveljavi">
     </form>
 
@@ -106,6 +136,13 @@
     }
     function Nov_vnos(){
         toggle('nov_vnos_row','inline-block')
+        toggle('nov_vnos_button','none')
+        toggle('preklici_vnos_button','inline-block')
+    }
+    function Preklici_nov_vnos(){
+        toggle('nov_vnos_row','none')
+        toggle('nov_vnos_button','inline-block')
+        toggle('preklici_vnos_button','none')
     }
 </script>
 {% endblock %}

@@ -297,7 +297,7 @@
                         {% if tip == "vele_prodaja" %}
                             <td class="cena"> 
                                 <div class="spremeni_{{vnos.pk}}">{{vnos.cena}} $</div>
-                                <input class="potrdi_{{vnos.pk}}" type="text" name="cena" form="spremeni_vnos_{{vnos.pk}}" style="text-align:center;width:60%" hidden="hidden" placeholder="({{vnos.cena}} $)" autocomplete="off">
+                                <input class="potrdi_{{vnos.pk}}" type="text" name="cena" form="spremeni_vnos_{{vnos.pk}}" style="text-align:center;width:60%" hidden="hidden" placeholder="({{vnos.cena}} $)" autocomplete="off" pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
                                 <div class="potrdi_{{vnos.pk}}" hidden="hidden"> $ </div>
                             </td>
                             <td> {{vnos|skupna_cena}} $ </td>
@@ -357,7 +357,7 @@
                         </form>
                         <td>   
                             <button class="spremeni_popust" onclick="Spremeni_popust()"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                            <input hidden="hidde" type="submit" form="spremeni_popust" value="potrdi" class="potrdi_popust">
+                            <input hidden="hidden" type="submit" form="spremeni_popust" value="potrdi" class="potrdi_popust">
                             <button hidden="hidden" class="potrdi_popust" onclick="Preklici_spremembo_popusta()"> X </button>
                         </td>
                         <td colspan="2"> {{slovar|keyvalue:'Znesek popusta'|keyvalue:jezik}}: </td>
@@ -405,7 +405,7 @@
                     {% if tip == "vele_prodaja" %}
                         <td> 
                             <div class="spremeni_{{vnos.pk}}">{{vnos.cena}} $</div>
-                            <input class="potrdi_{{vnos.pk}}" type="text" name="cena" form="spremeni_vnos_{{vnos.pk}}" hidden="hidden" placeholder="({{vnos.cena}} $)" autocomplete="off">
+                            <input class="potrdi_{{vnos.pk}}" type="text" name="cena" form="spremeni_vnos_{{vnos.pk}}" hidden="hidden" placeholder="({{vnos.cena}} $)" autocomplete="off" pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
                             <div class="potrdi_{{vnos.pk}}" hidden="hidden"> $ </div>
                         </td>
                         <td> {{vnos|skupna_cena}} $ </td>

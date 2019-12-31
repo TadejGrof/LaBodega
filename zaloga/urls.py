@@ -27,7 +27,9 @@ baza_patterns = [
 strosek_patterns = [
     path('', stroski_views.strosek, name='strosek'),
     path('nov_strosek/', stroski_views.nov_strosek, name="nov_strosek"),
-    path('uveljavi/<int:pk>/', stroski_views.uveljavi, name="uveljavi_strosek")
+    path('<int:pk>/uveljavi/', stroski_views.uveljavi, name="uveljavi_strosek"),
+    path('<int:pk>/nov_vnos/', stroski_views.nov_vnos, name="strosek_nov_vnos"),
+    path('<int:pk>/izbris_vnosa/<int:pk_vnosa>/', stroski_views.izbris_vnosa, name="strosek_izbris_vnosa")
 ]
 
 stroski_patterns = [
@@ -41,6 +43,6 @@ urlpatterns = [
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
     path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
     path('pregled_stroskov/', include(stroski_patterns)),
-    path('nov_strosek/', include(strosek_patterns)),
+    path('strosek/', include(strosek_patterns)),
     path('<str:tip_baze>/', include(baza_patterns)),
 ]

@@ -65,7 +65,11 @@
             </tr>
             {% for vnos in vnosi %}
                 <tr>
-                    <td> {{vnos.title}} </td>
+                    {% if strosek.tip == "placa" %}
+                        <td> {{vnos.title}} </td>
+                    {% else %}
+                        <td> {{vnos.title}} </td>
+                    {% endif %}
                     <td> {{vnos.znesek}} $ </td>
                     <td>
                         <form style="display:inline-block" action="{% url 'strosek_izbris_vnosa' strosek.pk vnos.pk %}" method="POST">
@@ -78,7 +82,7 @@
             <tr class="nov_vnos_row" hidden="hidden">
                 {% if strosek.tip == "placa" %}
                     <td>
-                        <select name="zaposleni" form="nov_vnos">
+                        <select name="delavec" form="nov_vnos">
                             {% for delavec in zaposleni %}
                                 <option value="{{delavec.id}}"> {{delavec.username}} </option>
                             {% endfor %}

@@ -13,6 +13,15 @@
             transform: rotate(45deg);
             -webkit-transform: rotate(45deg);
         } 
+        i.up {
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            display: inline-block;
+            padding: 2.5px;
+            margin:0%;
+            transform: rotate(-135deg);
+            -webkit-transform: rotate(-135deg);
+        } 
     </style>
 
     <h2> Pregled stroskov </h2>
@@ -34,27 +43,36 @@
                 <th width="5%"> Pregled: </th>
             </tr>
             {% for strosek in stroski %}
-            <tr>
-                <td> {{strosek.datum}} </td>
-                {% if strosek.tip == "kontejner" %}
-                    <td width="20%"> {{strosek.title}} </td>
-                    <td> {{strosek.kontejner.stevilka}} </td>
-                {% else %}
-                    <td colspan="2"> {{strosek.title}} </td>
-                {% endif %}
-                <td> 
-                    {% with strosek.skupni_znesek as skupno %}
-                        {% if skupno > 0 %}
-                            <div style="color:red">-{{skupno}} $ </div>
-                        {% else %}
-                            <div style="color:green">{{skupno}} $ </div>
-                        {% endif %}
-                    {% endwith %}
-                </td>
-                <td>
-                    <button onclick="Pokazi_vnose('{{strosek.pk}}')" style="width:80%;height:22px"><i class="arrow down"></i></button> 
-                </td>
-            </tr>
+                <tr>
+                    <td> {{strosek.datum}} </td>
+                    {% if strosek.tip == "kontejner" %}
+                        <td width="20%"> {{strosek.title}} </td>
+                        <td> {{strosek.kontejner.stevilka}} </td>
+                    {% else %}
+                        <td colspan="2"> {{strosek.title}} </td>
+                    {% endif %}
+                    <td> 
+                        {% with strosek.skupni_znesek as skupno %}
+                            {% if skupno > 0 %}
+                                <div style="color:red">-{{skupno}} $ </div>
+                            {% else %}
+                                <div style="color:green">{{skupno}} $ </div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <button class="pokazi_{{strosek.pk}}" onclick="Pokazi_vnose('{{strosek.pk}}')" style="width:80%;height:22px"><i class="arrow down"></i></button> 
+                        <button class="skrij_{{strosek.pk}}" hidden="hidden" onclick="Skrij_vnose('{{strosek.pk}}')" style="width:80%;height:22px"><i class="arrow up"></i></button> 
+                    </td>
+                </tr>
+                {% for podstrosek in pod_stroski|keyvalue:forloop.counter0 %}
+                    <tr hidden="hidden" class="vrstica_{{strosek.pk}}">
+                        <td></td>
+                        <td colspan="2"> {{podstrosek.title}} </td>
+                        <td> {{podstrosek.znesek}} $ </td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
             {% endfor %}
             <tr>
                 <th colspan="3"> Skupni znesek: </th>
@@ -69,4 +87,16 @@
         </table>
     </div>
 
+<script>
+    function Pokazi_vnose(pk){
+        toggle('pokazi_' + pk, 'none')
+        toggle('skrij_' + pk, 'inline-block')
+        toggle('vrstica_' + pk, 'table-row')
+    };
+    function Skrij_vnose(pk){
+        toggle('pokazi_' + pk, 'inline-block')
+        toggle('skrij_' + pk, 'none')
+        toggle('vrstica_' + pk, 'none')
+    }
+</script>
 {% endblock %}

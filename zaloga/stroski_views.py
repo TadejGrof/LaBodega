@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 import datetime
 from django.contrib.auth.decorators import login_required
 import json 
+from django.contrib.auth.models import User
 
 zaloga = Zaloga.objects.all().first()
 
@@ -14,7 +15,10 @@ def pregled(request):
     pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
     od = request.GET.get('od',pred_mescem)
     do = request.GET.get('do', danes)
-    stroski = Stroski_Group.objects.all().filter(datum__gte = od, datum__lte = do)
+    stroski = Stroski_Group.objects.all().filter(datum__gte = od, datum__lte = do).order_by('-datum','-pk').prefetch_related('strosek_set')
+    pod_stroski = []
+    for strosek in stroski:
+        pod_stroski.append(strosek.strosek_set.all().values())
     skupno = 0
     for strosek in stroski:
         skupno += strosek.skupni_znesek
@@ -23,6 +27,7 @@ def pregled(request):
         'do':do,
         'stroski':stroski,
         'skupno':skupno,
+        'pod_stroski':pod_stroski,
     }
     return pokazi_stran(request,'stroski/pregled_stroskov.html',slovar)
 
@@ -31,7 +36,8 @@ def strosek(request):
     strosek = Stroski_Group.objects.all().filter(status = 'aktivno').first()
     kontejnerji = Kontejner.objects.all().order_by('-baza__datum')[:10].values('stevilka','pk')
     vnosi = strosek.strosek_set.all() if strosek != None else None
-    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek,'kontejnerji':kontejnerji,'vnosi':vnosi})
+    zaposleni = User.objects.filter(groups__name='Zaposleni')
+    return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek,'kontejnerji':kontejnerji,'vnosi':vnosi,'zaposleni':zaposleni})
 
 @login_required
 def nov_strosek(request):
@@ -69,12 +75,14 @@ def nov_vnos(request, pk):
     if request.method == "POST":
         strosek = Stroski_Group.objects.get(pk = pk)
         delavec = None
+        title = request.POST.get('tip')
         if strosek.tip == "placa":
             delavec = User.objects.get(pk = int(request.POST.get('delavec')))
+            title = delavec.username
         Strosek.objects.create(
             group = strosek,
             delavec = delavec,
-            title = request.POST.get('tip'),
+            title = title,
             znesek = float(request.POST.get('znesek'))
         )
         return redirect('strosek')

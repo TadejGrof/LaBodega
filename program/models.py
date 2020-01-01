@@ -33,9 +33,9 @@ class Program(models.Model):
         if delaj:
             self.stevilo_faktur += 1
             self.save()
-            return str(self.stevilo_faktur) + '/2019'
+            return str(self.stevilo_faktur) + '/2020'
         else:
-            return str(self.stevilo_faktur + 1) + '/2019'
+            return str(self.stevilo_faktur + 1) + '/2020'
         
     def naslednji_racun(self,delaj=False):
         if delaj:
@@ -53,25 +53,25 @@ class Program(models.Model):
         if delaj:
             self.stevilo_prevzemov += 1
             self.save()
-            return 'P-2019-' + str(self.stevilo_prevzemov)
+            return 'P-2020-' + str(self.stevilo_prevzemov)
         else:
-            return 'P-2019-' + str(self.stevilo_prevzemov + 1)
+            return 'P-2020-' + str(self.stevilo_prevzemov + 1)
         
     def naslednji_odpis(self,delaj=False):
         if delaj:
             self.stevilo_odpisov += 1
             self.save()
-            return 'O-2019-' + str(self.stevilo_odpisov)
+            return 'O-2020-' + str(self.stevilo_odpisov)
         else:
-            return 'O-2019-' + str(self.stevilo_odpisov + 1)
+            return 'O-2020-' + str(self.stevilo_odpisov + 1)
         
     def naslednja_inventura(self,delaj=False):
         if delaj:
             self.stevilo_inventur += 1
             self.save()
-            return 'I-2019-' + str(self.stevilo_inventur)
+            return 'I-2020-' + str(self.stevilo_inventur)
         else:
-            return 'I-2019-' + str(self.stevilo_inventur + 1)
+            return 'I-2020-' + str(self.stevilo_inventur + 1)
         
     @property
     def vrni_jezike(self):

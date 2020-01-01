@@ -238,6 +238,9 @@
         </div>
     {% endif %}
     {% if perms.admin.view_logentry %}
+        <a href="{% url 'porocilo' %}">{{slovar|keyvalue:'Porocilo'|keyvalue:jezik}}</a>
+    {% endif %}
+    {% if perms.admin.view_logentry %}
         <button class="dropdown-btn"> Narocilo
             <i class="fa fa-caret-down"></i>
         </button>

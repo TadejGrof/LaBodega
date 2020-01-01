@@ -554,6 +554,26 @@
             "ang": "Stock",
             "spa": "Inventario"
         },
+        "Strosek": {
+            "slo": "Strosek",
+            "ang": "Expense",
+            "spa": "Cuenta por pagar"
+        },
+        "Koncno stanje": {
+            "slo": "Koncno stanje",
+            "ang": "Final state",
+            "spa": "Junto"
+        },
+        "Stanje": {
+            "slo": "Stanje",
+            "ang": "Stanje",
+            "spa": "Stanje"
+        },
+        "Porocilo": {
+            "slo": "Porocilo",
+            "ang": "Report",
+            "spa": "Report"
+        },
         "Cena prevoza": {
             "slo": "Cena prevoza",
             "ang": "Transport price",

@@ -788,8 +788,3 @@ class Strosek(models.Model):
     delavec = models.ForeignKey(User,default=None,null=True,blank=True,on_delete=models.CASCADE)
     znesek = models.DecimalField(default=0,max_digits=8,decimal_places=2)
 
-class Profit(models.Model):
-    baza = models.ForeignKey(Baza,default=None,null=True,blank=True,on_delete=models.CASCADE)
-    dnevna_prodaja = models.ForeignKey(Dnevna_prodaja,default=None,null=True,blank=True,on_delete=models.CASCADE)
-    znesek = models.DecimalField(default=0,max_digits=8,decimal_places=2)
-    tip = "profit"

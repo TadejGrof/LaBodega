@@ -14,10 +14,9 @@
 <h1 style="margin-top:3%"> Porocilo prometa </h1>
 
 <div class="filter" style="margin-top:3%">
-    <form action="{% url 'arhiv_baz' tip %}" method="GET">
-        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{zacetek}}" name="zacetek">
-        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{konec}}" name="konec">
-        {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:
+    <form action="{% url 'porocilo'%}" method="GET">
+        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{od}}" name="od">
+        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{do}}" name="do">
         <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
     </form>
 </div>
@@ -27,51 +26,36 @@
         <tr>
             <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
             <td> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </td>
+            <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
             <td> {{slovar|keyvalue:'Znesek'|keyvalue:jezik}}: </td>
             <td> {{slovar|keyvalue:'Stanje'|keyvalue:jezik}}: </td>
         </tr>
-        {% for promet in porocilo %}
-            {% if promet.tip = "strosek" %}
+        {% for sprememba in promet %}
             <tr>
-                <td> {{promet.datum}} </td>
-                <td> {{promet.title}} </td>
-                <td> {{promet.skupni_znesek}} </td>
-                <td> 
-                    {{skupno|keyvalue:forloop.counter0}}
-                    <button> V </button> 
-                </td>
+                <td> {{sprememba.datum}} </td> 
+                <td> {{slovar|keyvalue:sprememba.tip|keyvalue:jezik}} </td> 
+                <td> {{sprememba.title}} </td>
+                {% if sprememba.znesek < 0 %}
+                    <td> <div style="color:red">{{sprememba.znesek}} $</div> </td>
+                {% else %}
+                     <td> <div style="color:green">+{{sprememba.znesek}} $</div> </td>
+                {% endif %}
+                {% if pretok|keyvalue:forloop.counter0 < 0 %}
+                    <td> <div style="color:red">{{pretok|keyvalue:forloop.counter0}} $</div> </td>
+                {% else %}
+                     <td> <div style="color:green">+{{pretok|keyvalue:forloop.counter0}} $</div> </td>
+                {% endif %}
             </tr>
-                {% for strosek in promet.vrni_stroske %}
-                    <tr hidden="hidden">
-                        <td></td>
-                        <td> {{strosek.title}} </td>
-                        <td> {{strosek.znesek}} </td>
-                        <td></td>
-                    </tr>
-                {% endfor %}
-            {% elif promet.tip == "profit" %}
-                <tr>
-                    {% if promet.baza != None %}
-                        <td> {{promet.baza__datum}} </td>
-                        <td> {{promet.baza__title}} </td>
-                    {% elif promet.dnevna_prodaja != None %}
-                        <td> {{promet.dnevna_prodaja__datum}} </td>
-                        <td> Dnevna prodaja </td>
-                    {% endif %}
-                    <td> {{promet.skupni_znesek}} </td>
-                    <td> 
-                        {{skupno|keyvalue:forloop.counter0}}
-                    </td>
-                </tr>
-            {% endif %}
         {% endfor %}
         <tr>
-            <td> Koncno stanje </td>
-            <td> {{stanje}} </td>
+            <th colspan="4"> {{slovar|keyvalue:'Koncno stanje'|keyvalue:jezik}}  </th>
+            {% if skupno < 0 %}
+                <th> <div style="color:red">{{skupno}} $</div> </th>
+            {% else %}
+                <th> <div style="color:green">+{{skupno}} $</div> </th>
+            {% endif %}
         </tr>
     </table>
 </div>
-
-
 
 {% endblock %}

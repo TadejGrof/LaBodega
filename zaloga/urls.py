@@ -44,5 +44,6 @@ urlpatterns = [
     path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
     path('pregled_stroskov/', include(stroski_patterns)),
     path('strosek/', include(strosek_patterns)),
+    path('porocilo/',stroski_views.porocilo,name='porocilo'),
     path('<str:tip_baze>/', include(baza_patterns)),
 ]

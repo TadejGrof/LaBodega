@@ -22,42 +22,50 @@
 </div>
 
 <div style="margin-top:2%;display:inline-block;width:70%">
+    <table style="width:100%">
+        <tr>
+            <td colspan="2" width="24%"></td>
+            <td class="vele_prodaja" colspan="2"  width="26%" style="text-align:center"> <button onclick="toggle('vele_prodaja','none')"> Skrij </button> </td>
+            <td class="dnevna_prodaja" colspan="2"  width="26%" style="text-align:center"> <button onclick="toggle('dnevna_prodaja','none')"> Skrij </button> </td>
+            <td class="skupno" colspan="2"  width="26%" style="text-align:center"></td>
+        </tr>
+    </table>
     <table class="tabela_vnosov">
         <tr>
             <th rowspan="2" width="15%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
             <th rowspan="2" width="7%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
-            <th colspan="2"> {{slovar|keyvalue:'Vele prodaja'|keyvalue:jezik}}: </th>
-            <th colspan="2"> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}: </th>
-            <th colspan="2"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </th>
+            <th class="vele_prodaja" colspan="2"> {{slovar|keyvalue:'Vele prodaja'|keyvalue:jezik}}: </th>
+            <th class="dnevna_prodaja" colspan="2"> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}: </th>
+            <th class="skupno" colspan="2"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </th>
         </tr>
         <tr>
-            <th width="13%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
-            <th width="13%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
-            <th width="13%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
-            <th width="13%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
-            <th width="13%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
-            <th width="13%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+            <th class="vele_prodaja" width="13%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+            <th class="vele_prodaja" width="13%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+            <th class="dnevna_prodaja" width="13%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+            <th class="dnevna_prodaja" width="13%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+            <th class="skupno" width="13%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+            <th class="skupno" width="13%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
         </tr>
         {% for sestavina in sestavine %}
             <tr>
                 <td> {{sestavina.0|split:'-'|keyvalue:0}}</td> 
                 <td> {{sestavina.0|split:'-'|keyvalue:1}} </td> 
-                <td>{{sestavina.1.stevilo_vele_prodaje}}</td>
-                <td>{{sestavina.1.cena_vele_prodaje}} $</td>
-                <td>{{sestavina.1.stevilo_dnevne_prodaje}}</td>
-                <td>{{sestavina.1.cena_dnevne_prodaje}} $</td>
-                <td> {{sestavina.1.stevilo}} </td>
-                <td> {{sestavina.1.cena}} $ </td>
+                <td class="vele_prodaja">{{sestavina.1.stevilo_vele_prodaje}}</td>
+                <td class="vele_prodaja">{{sestavina.1.cena_vele_prodaje}} $</td>
+                <td class="dnevna_prodaja">{{sestavina.1.stevilo_dnevne_prodaje}}</td>
+                <td class="dnevna_prodaja">{{sestavina.1.cena_dnevne_prodaje}} $</td>
+                <td class="skupno"> {{sestavina.1.stevilo}} </td>
+                <td class="skupno"> {{sestavina.1.cena}} $ </td>
             </tr>
         {% endfor %}
         <tr>
             <th colspan="2"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}  </th>
-            <th>{{skupno.stevilo.vele_prodaja}}</th>
-            <th>{{skupno.cena.vele_prodaja}} $</th>
-            <th>{{skupno.stevilo.dnevna_prodaja}}</th>
-            <th>{{skupno.cena.dnevna_prodaja}} $</th>
-            <th>{{skupno.stevilo.skupno}}</th>
-            <th>{{skupno.cena.skupno}} $</th>
+            <th class="vele_prodaja">{{skupno.stevilo.vele_prodaja}}</th>
+            <th class="vele_prodaja">{{skupno.cena.vele_prodaja}} $</th>
+            <th class="dnevna_prodaja">{{skupno.stevilo.dnevna_prodaja}}</th>
+            <th class="dnevna_prodaja">{{skupno.cena.dnevna_prodaja}} $</th>
+            <th class="skupno">{{skupno.stevilo.skupno}}</th>
+            <th class="skupno">{{skupno.cena.skupno}} $</th>
         </tr>
     </table>
 </div>

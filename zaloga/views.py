@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
-from .models import Baza, Zaloga
+from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Prodaja, Stranka
 import io
@@ -93,6 +93,7 @@ def pregled_prometa(request):
         sestavina = Sestavina.objects.get(pk=pk)
         spremembe = sestavina.sprememba_set.filter(tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
         zaporedna_stanja = sestavina.vrni_stanja(tip)[::-1]
+        cene_prodaje = Cena.objects.filter(sestavina=sestavina, prodaja__in = ['dnevna_prodaja','vele_prodaja'], tip=tip)
         danes = datetime.date.today().strftime('%Y-%m-%d')
         pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
         zacetek_sprememb = request.GET.get('zacetek_sprememb', pred_mescem)
@@ -107,6 +108,7 @@ def pregled_prometa(request):
             'zaporedna_stanja': zaporedna_stanja,
             'tip': tip,
             'sestavina': sestavina,
+            'cene_prodaje':cene_prodaje,
             'spremembe': spremembe,
             'zacetek_sprememb': zacetek_sprememb,
             'zacetek_dp': zacetek_dp,
@@ -121,6 +123,14 @@ def pregled_prometa(request):
         }
         print(slovar)
     return pokazi_stran(request, 'zaloga/pregled_prometa.html', slovar)
+
+@login_required
+def sprememba_cene(request, pk):
+    if request.method=="POST":
+        cena = Cena.objects.get(pk = pk )
+        cena.cena = float(request.POST.get('cena'))
+        cena.save()
+    return redirect('pregled_prometa')
 
 @login_required
 def dodaj_dimenzijo(request):

@@ -19,13 +19,17 @@
     }
 </style>
 
+<form id="filter" action="{% url 'pregled_prometa' %}" method="GET">
+    <input type="hidden" name="tip" value="{{tip}}">
+    <input type="number" hidden="hidden" name="pk" value={{sestavina.pk}}>
+</form>
+
 <h1>
     {{slovar|keyvalue:'Pregled prometa za'|keyvalue:jezik}}
      {{sestavina.dimenzija.dimenzija}}
      {{slovar|keyvalue:'tipa'|keyvalue:jezik}}
      {{tip}}
 </h1>
-
 
 <h2> {{slovar|keyvalue:'Spremembe'|keyvalue:jezik}}: </h2>
 <div class="filter">
@@ -70,50 +74,111 @@
     </table>
 </div>
 
-<h2> {{slovar|keyvalue:'Vele prodaja'|keyvalue:jezik}}: </h2>
-<div class="filter">
-    {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_vp}}" name="zacetek_vp">
-    c{{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_vp}}" name="konec_vp">
-    <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
+<div style="display:inline-block;width:45%">
+    <h2> {{slovar|keyvalue:'Vele prodaja'|keyvalue:jezik}}: </h2>
+    <div class="filter">
+        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_vp}}" name="zacetek_vp">
+        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_vp}}" name="konec_vp">
+        <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
+    </div>
+    <div class="table" style="width:90%">
+        <table class="tabela_vnosov">
+            <tr>
+                <td width="50%"> {{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}: </td>
+                <td width="50%"> {{vp_stevilo}}
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:    </td>
+                <td> {{vp_cena}} $ </td>
+            </tr>
+        </table>
+    </div>
 </div>
-<div class="table" style="width:40%">
-    <table class="tabela_vnosov">
-        <tr>
-            <td width="50%"> {{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}: </td>
-            <td width="50%"> {{vp_stevilo}}
-        </tr>
-        <tr>
-            <td> {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:    </td>
-            <td> {{vp_cena}} $ </td>
-        </tr>
-    </table>
+<div style="display:inline-block;width:45%"> 
+    <h2> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}: </h2>
+    <div class="filter">
+        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_dp}}" name="zacetek_dp">
+        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_dp}}" name="konec_dp">
+        <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
+    </div>
+    <div class="table" style="width:90%">
+        <table class="tabela_vnosov">
+            <tr>
+                <td width="50%"> {{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}: </td>
+                <td width="50%"> {{dp_stevilo}} </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}: </td>
+                <td> {{dp_cena}} $ </td>
+            </tr>
+        </table>
+    </div>
 </div>
 
-<h2> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}: </h2>
-<div class="filter">
-    {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input form="filter" type="date" value="{{zacetek_dp}}" name="zacetek_dp">
-    {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input  form="filter" type="date" value="{{konec_dp}}" name="konec_dp">
-    <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}" form="filter">
-</div>
-<div class="table" style="width:40%">
-    <table class="tabela_vnosov">
-        <tr>
-            <td width="50%"> {{slovar|keyvalue:'Stevilo prodanih'|keyvalue:jezik}}: </td>
-            <td width="50%"> {{dp_stevilo}} </td>
-        </tr>
-        <tr>
-            <td> "{{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}": </td>
-            <td> {{dp_cena}} $ </td>
-        </tr>
-    </table>
+<div style="display:inline-block;width:45%;vertical-align:top"> 
+    <h2> Cene prodaje: </h2>
+    <div class="table" style="width:90%">
+        <table class="tabela_vnosov">
+            <tr>
+                <th width="40%"> Tip prodaje: </th>
+                <th width="30%"> Cena: </th>
+                <th width="30%"> Spremeni: </th>
+            </tr>
+            {% for cena in cene_prodaje %}
+                <tr>
+                    <td> {{cena.prodaja}} </td>
+                    <td>
+                        <div class="c_{{cena.id}}"> {{cena.cena}} $ </div>
+                        <input form="f_{{cena.id}}" style="width:60%;text-align:center" class="e_{{cena.id}}" placeholder="({{cena.cena}} $)" type="text" hidden="hidden" name="cena" required pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
+                        <div hidden="hidden" class="e_{{cena.id}}"> $ </div>
+                    </td>
+                    <td>
+                        <form style="display:inline-block" id="f_{{cena.id}}" action="{% url 'sprememba_cene' cena.pk %}" method="POST">
+                            {% csrf_token %}
+                            <input class="e_{{cena.id}}" hidden="hidden" type="submit" value="Shrani">
+                        </form>
+                        <button class="c_{{cena.id}}" onclick="toggle('e_{{cena.id}}','inline-block');toggle('c_{{cena.id}}','none')"> Spremeni </button>
+                        <button hidden="hidden" class="e_{{cena.id}}" onclick="toggle('c_{{cena.id}}','inline-block');toggle('e_{{cena.id}}','none')"> X </button>
+                        
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
 
-<div style="height:3%">
+<div style="display:inline-block;width:45%"> 
+    <h2> Cene nakupa: </h2>
+    <div class="table" style="width:90%">
+        <table class="tabela_vnosov">
+            <tr>
+                <th> Drzava: </th>
+                <th> Cena: </th>
+                <th> Spremeni: </th>
+            </tr>
+            {% for cena in cene_nakupa %}
+                <tr>
+                    <td> {{cena.prodaja}} </td>
+                    <td>
+                        {{cena.cena}}
+                        <input type="text" hidden="hidden" name="cena" required>
+                    </td>
+                    <td>
+                        <button onclick="toggle('e_{{cena.id}}','inline-block');toggle('c_{{cena.id}}','none')"> Spremeni </button>
+                        <button onclick="toggle('c_{{cena.id}}','inline-block');toggle('e_{{cena.id}}','none')"> Preklici </button>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input hidden="hidden" type="submit" value="Shrani">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 </div>
-<form id="filter" action="{% url 'pregled_prometa' %}" method="GET">
-    <input type="hidden" name="tip" value="{{tip}}">
-    <input type="number" hidden="hidden" name="pk" value={{sestavina.pk}}>
-</form>
+
+<div style="height:5%">
+</div>
 
 
 {% endblock %}

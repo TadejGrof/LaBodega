@@ -44,6 +44,7 @@ porocilo_patterns = [
 urlpatterns = [
     path('', views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/', views.pregled_prometa, name='pregled_prometa'),
+    path('pregled_prometa/sprememba_cene/<int:pk>/', views.sprememba_cene, name='sprememba_cene'),
     path('pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
     path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),

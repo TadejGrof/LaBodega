@@ -14,7 +14,7 @@
 <h1 style="margin-top:3%"> Porocilo prometa </h1>
 
 <div class="filter" style="margin-top:3%">
-    <form action="{% url 'porocilo'%}" method="GET">
+    <form action="{% url 'porocilo_prometa' %}" method="GET">
         {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{od}}" name="od">
         {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{do}}" name="do">
         <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">

@@ -36,6 +36,11 @@ stroski_patterns = [
     path('',stroski_views.pregled, name='pregled_stroskov'),
 ]
 
+porocilo_patterns = [
+    path('porocilo_prometa',stroski_views.porocilo_prometa, name='porocilo_prometa'),
+    path('porocilo_prodaje',stroski_views.porocilo_prodaje, name='porocilo_prodaje'),
+]
+
 urlpatterns = [
     path('', views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/', views.pregled_prometa, name='pregled_prometa'),
@@ -44,6 +49,6 @@ urlpatterns = [
     path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
     path('pregled_stroskov/', include(stroski_patterns)),
     path('strosek/', include(strosek_patterns)),
-    path('porocilo/',stroski_views.porocilo,name='porocilo'),
+    path('porocilo/',include(porocilo_patterns)),
     path('<str:tip_baze>/', include(baza_patterns)),
 ]

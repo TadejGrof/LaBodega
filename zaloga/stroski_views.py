@@ -90,7 +90,7 @@ def nov_vnos(request, pk):
 ###################################################################################
 ###################################################################################
 
-def porocilo(request):
+def porocilo_prometa(request):
     danes = datetime.date.today().strftime('%Y-%m-%d')
     pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
     od = request.GET.get('od',pred_mescem)
@@ -133,6 +133,44 @@ def porocilo(request):
         'do':do,
     }
     return pokazi_stran(request,'porocilo/porocilo.html',slovar)
+
+def porocilo_prodaje(request):
+    danes = datetime.date.today().strftime('%Y-%m-%d')
+    pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+    od = request.GET.get('od',pred_mescem)
+    do = request.GET.get('do', danes)
+    vele_prodaje = Baza.objects.all().filter(tip="vele_prodaja",datum__gte=od,datum__lte=do,status="veljavno").order_by('-datum','-pk').prefetch_related('vnos_set')
+    dnevne_prodaje = Dnevna_prodaja.objects.all().filter(datum__gte=od,datum__lte=do).order_by('-datum','-pk')
+    sestavine = {}
+    for prodaja in vele_prodaje.iterator():
+        for vnos in prodaja.vnos_set.all().values('dimenzija__dimenzija','tip','stevilo','cena'):
+            dimenzija = vnos['dimenzija__dimenzija']
+            cena = float(vnos['cena'])
+            tip = vnos['tip']
+            if dimenzija in sestavine:
+                if tip in sestavine[dimenzija]:
+                    sestavine[dimenzija][tip]['stevilo'] += vnos['stevilo']
+                    sestavine[dimenzija][tip]['cena'] += cena 
+                else:
+                    sestavine[dimenzija].update({tip:{'stevilo':vnos['stevilo'],'cena':cena}})
+            else:
+                sestavine.update({dimenzija:{tip:{'stevilo':vnos['stevilo'],'cena':cena}}})
+
+    for prodaja in dnevne_prodaje.iterator():
+        for racun in prodaja.baza_set.all().filter(status="veljavno").prefetch_related('vnos_set'):
+            for vnos in racun.vnos_set.all():
+                dimenzija = vnos.dimenzija.dimenzija
+                cena = float(vnos.cena)
+                if dimenzija in sestavine:
+                    if tip in sestavine[dimenzija]:
+                        sestavine[dimenzija][tip]['stevilo'] += vnos.stevilo
+                        sestavine[dimenzija][tip]['cena'] += cena 
+                    else:
+                        sestavine[dimenzija].update({tip:{'stevilo':vnos.stevilo,'cena':cena}})
+                else:
+                    sestavine.update({dimenzija:{tip:{'stevilo':vnos.stevilo,'cena':cena}}})
+    print(sestavine.items())
+    return redirect('home_page')
 ###################################################################################
 ###################################################################################
 ###################################################################################

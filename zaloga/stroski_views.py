@@ -142,35 +142,65 @@ def porocilo_prodaje(request):
     vele_prodaje = Baza.objects.all().filter(tip="vele_prodaja",datum__gte=od,datum__lte=do,status="veljavno").order_by('-datum','-pk').prefetch_related('vnos_set')
     dnevne_prodaje = Dnevna_prodaja.objects.all().filter(datum__gte=od,datum__lte=do).order_by('-datum','-pk')
     sestavine = {}
+    skupno = {tip:{'skupno':0,'vele_prodaja':0,'dnevna_prodaja':0} for tip in ['stevilo','cena']}
     for prodaja in vele_prodaje.iterator():
         for vnos in prodaja.vnos_set.all().values('dimenzija__dimenzija','tip','stevilo','cena'):
             dimenzija = vnos['dimenzija__dimenzija']
+            stevilo = vnos['stevilo']
             cena = float(vnos['cena'])
             tip = vnos['tip']
-            if dimenzija in sestavine:
-                if tip in sestavine[dimenzija]:
-                    sestavine[dimenzija][tip]['stevilo'] += vnos['stevilo']
-                    sestavine[dimenzija][tip]['cena'] += cena 
-                else:
-                    sestavine[dimenzija].update({tip:{'stevilo':vnos['stevilo'],'cena':cena}})
+            ime = dimenzija + '-' + tip
+            if ime in sestavine:
+                    sestavine[ime]['stevilo'] += stevilo
+                    sestavine[ime]['cena'] += stevilo * cena 
+                    sestavine[ime]['stevilo_vele_prodaje'] += stevilo
+                    sestavine[ime]['cena_vele_prodaje'] += stevilo * cena
             else:
-                sestavine.update({dimenzija:{tip:{'stevilo':vnos['stevilo'],'cena':cena}}})
-
+                slovar = {ime:{
+                        'stevilo':stevilo,
+                        'cena':cena*stevilo,
+                        'stevilo_dnevne_prodaje':0,
+                        'cena_dnevne_prodaje':0,
+                        'cena_vele_prodaje':cena*stevilo,
+                        'stevilo_vele_prodaje':stevilo}}
+                sestavine.update(slovar)
+            for skupno_tip in ['skupno','vele_prodaja']:
+                skupno['stevilo'][skupno_tip] += stevilo
+                skupno['cena'][skupno_tip] += stevilo * cena
     for prodaja in dnevne_prodaje.iterator():
         for racun in prodaja.baza_set.all().filter(status="veljavno").prefetch_related('vnos_set'):
-            for vnos in racun.vnos_set.all():
-                dimenzija = vnos.dimenzija.dimenzija
-                cena = float(vnos.cena)
-                if dimenzija in sestavine:
-                    if tip in sestavine[dimenzija]:
-                        sestavine[dimenzija][tip]['stevilo'] += vnos.stevilo
-                        sestavine[dimenzija][tip]['cena'] += cena 
-                    else:
-                        sestavine[dimenzija].update({tip:{'stevilo':vnos.stevilo,'cena':cena}})
+            for vnos in racun.vnos_set.all().values('dimenzija__dimenzija','tip','stevilo','cena'):
+                dimenzija = vnos['dimenzija__dimenzija']
+                stevilo = vnos['stevilo']
+                cena = float(vnos['cena'])
+                tip = vnos['tip']
+                ime = dimenzija + '-' + tip
+                if ime in sestavine:
+                        sestavine[ime]['stevilo'] += stevilo
+                        sestavine[ime]['cena'] += stevilo * cena
+                        sestavine[ime]['stevilo_dnevne_prodaje'] += stevilo
+                        sestavine[ime]['cena_dnevne_prodaje'] += stevilo * cena 
                 else:
-                    sestavine.update({dimenzija:{tip:{'stevilo':vnos.stevilo,'cena':cena}}})
-    print(sestavine.items())
-    return redirect('home_page')
+                    slovar = {ime:{
+                        'stevilo':stevilo,
+                        'cena':cena*stevilo,
+                        'stevilo_dnevne_prodaje':stevilo,
+                        'cena_dnevne_prodaje':cena*stevilo,
+                        'cena_vele_prodaje':0,
+                        'stevilo_vele_prodaje':0}}
+                    sestavine.update(slovar)
+                for skupno_tip in ['skupno','dnevna_prodaja']:
+                    skupno['stevilo'][skupno_tip] += stevilo
+                    skupno['cena'][skupno_tip] += stevilo * cena
+    sestavine = sorted(sestavine.items(),key=lambda x: (x[1]['stevilo'],x[1]['cena']),reverse=True)
+    slovar = {
+        'sestavine':sestavine,
+        'skupno':skupno,
+        'od':od,
+        'do':do,
+    }
+    
+    return pokazi_stran(request,'porocilo/porocilo_prodaje.html', slovar)
 ###################################################################################
 ###################################################################################
 ###################################################################################

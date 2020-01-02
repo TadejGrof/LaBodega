@@ -554,6 +554,16 @@
             "ang": "Stock",
             "spa": "Inventario"
         },
+        "Porocilo prometa": {
+            "slo": "Porocilo prometa",
+            "ang": "Account's report",
+            "spa": "Reporte de cuentas"
+        },
+        "Porocilo prodaje": {
+            "slo": "Porocilo prodaje",
+            "ang": "Sale's report",
+            "spa": "Reporte de venta"
+        },
         "Strosek": {
             "slo": "Strosek",
             "ang": "Expense",

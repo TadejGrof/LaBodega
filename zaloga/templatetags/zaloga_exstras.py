@@ -59,6 +59,11 @@ def keyvalue(dict, key):
 def stringvalue(obj, string):   
     return getattr(obj,string)
 
+@register.filter
+def split(obj, split_value):   
+    return obj.split(split_value)
+
+
 @register.filter(name='tip')
 def tip(value, arg):
     if int(arg) == 0:

@@ -244,8 +244,8 @@
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{% url 'porocilo_prometa' %}"> {{slovar|keyvalue:'Porocilo'|keyvalue:jezik}}</a>
-            <a href="{% url 'porocilo_prodaje' %}"> {{slovar|keyvalue:'Porocilo'|keyvalue:jezik}}</a>
+            <a href="{% url 'porocilo_prometa' %}"> {{slovar|keyvalue:'Porocilo prometa'|keyvalue:jezik}}</a>
+            <a href="{% url 'porocilo_prodaje' %}"> {{slovar|keyvalue:'Porocilo prodaje'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
     {% if perms.admin.view_logentry %}

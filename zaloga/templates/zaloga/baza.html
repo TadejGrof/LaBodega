@@ -96,15 +96,15 @@
             {% csrf_token %}
             <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
         </form>
-        <form style="display:inline-block" action="{% url 'shrani_vse' tip baza.pk %}" method="POST" onsubmit="return Shrani_vse()">
+        <form style="display:inline-block" action="{% url 'shrani_vse' tip baza.pk %}" method="POST" >
             {% csrf_token %}
             {% for vnos in vnosi.values %}
             <input type="number" hidden="hidden" name="{{vnos.dimenzija}}_{{vnos.tip}}" value="" id="{{vnos.dimenzija}}_{{vnos.tip}}_form">
             {% endfor %}
             {% if tip == "inventura" %}
-                <input type="submit" class="pre_vnosi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}"> 
+                <input type="submit" class="pre_vnosi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}" onclick="this.disabled = true;Shrani_vse();this.form.submit();"> 
             {% else %}
-                <input type="submit" hidden="hidden" class="pre_vnosi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}"> 
+                <input type="submit" hidden="hidden" class="pre_vnosi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}" onclick="this.disabled = true;Shrani_vse();this.form.submit();"> 
             {% endif %}
         </form>
         <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' tip baza.pk %}" method="POST">

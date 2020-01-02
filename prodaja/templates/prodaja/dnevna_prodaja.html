@@ -296,7 +296,7 @@
                 </div>
                 <div class="gumbi" id="koncno">
                     <label style="width:70%;height:15%;display:inline-block;font-size:4vh" id="dimension_label"> Dimenzija </label>
-                    <input style="text-align:center;font-size:5vh;width:40%;height:30%;display:inline-block;margin:2%;margin-top:1%;margin-bottom:3%" name="stevilo" form="nov_vnos" type="number" autocomplete="off" autofocus min="1" max="100" required>
+                    <input style="text-align:center;font-size:5vh;width:40%;height:30%;display:inline-block;margin:2%;margin-top:1%;margin-bottom:3%" id="stevilo_input" name="stevilo" form="nov_vnos" type="number" autocomplete="off" autofocus min="1" max="100" required onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                     <label id="zaloga_div" style="width:30%;height:30%;text-align:center;font-size:5vh;display:inline-block"> Zaloga </label>
                     <div style="width:30%;height:15%;text-align:center;display:inline-block"> Tip: </div> 
                     <select style="width:40%;height:15%;display:inline-block" id="tip" name="tip" form="nov_vnos" onchange="Pokazi_zalogo()">
@@ -308,7 +308,7 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <input style="width:40%;height:15%;display:inline-block;margin:10%;margin-top:3%" type="submit" value="Nov vnos" form="nov_vnos" onclick="this.disabled=true;this.form.submit()">
+                    <input style="width:40%;height:15%;display:inline-block;margin:10%;margin-top:3%" type="submit" value="Nov vnos" form="nov_vnos" onclick="Nov_vnos(this)">
                 </div>
             </div>
             <div class="cena">
@@ -353,6 +353,14 @@
     function edit_vnos(pk){
         toggle(pk + '_preedit','none')
         toggle(pk + '_edit','block')
+    };
+    function Nov_vnos(gumb){
+        if (document.getElementById('stevilo_input').value != ""){
+            gumb.disabled = true;
+            gumb.form.submit();
+        }else{
+            return false
+        }
     };
     function Uveljavi(gumb){
         {% if aktivni_racun.stevilo_vnosov == 0 %}

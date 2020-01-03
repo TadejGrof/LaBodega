@@ -101,7 +101,7 @@
                     <input hidden="hidden" type="text" value="" id="drugo_input">
                 </td>
                 {% else %}
-                    <input type="text" name="tip" form="nov_vnos">
+                    <td>Tip: <input type="text" name="tip" form="nov_vnos" autocomplete="off" required></td>
                 {% endif %}
                 <td> <input type="text" name="znesek" form="nov_vnos" value="" autocomplete="off" required pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}"> $ </td>
                 <td>

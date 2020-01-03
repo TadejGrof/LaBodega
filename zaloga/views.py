@@ -86,10 +86,8 @@ def pregled_zaloge(request):
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 
 @login_required
-def pregled_prometa(request):
+def pregled_prometa(request,tip,pk):
     if request.method == "GET":
-        pk = request.GET.get('pk', Sestavina.objects.first().pk)
-        tip = request.GET.get('tip', zaloga.vrni_tipe[0][0])
         sestavina = Sestavina.objects.get(pk=pk)
         spremembe = sestavina.sprememba_set.filter(tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
         zaporedna_stanja = sestavina.vrni_stanja(tip)[::-1]
@@ -121,16 +119,15 @@ def pregled_prometa(request):
             'vp_stevilo': vp_stevilo,
             'vp_cena': vp_cena
         }
-        print(slovar)
     return pokazi_stran(request, 'zaloga/pregled_prometa.html', slovar)
 
 @login_required
-def sprememba_cene(request, pk):
+def sprememba_cene(request,tip,pk,cena):
     if request.method=="POST":
-        cena = Cena.objects.get(pk = pk )
+        cena = Cena.objects.get(pk = cena )
         cena.cena = float(request.POST.get('cena'))
         cena.save()
-    return redirect('pregled_prometa')
+    return redirect('pregled_prometa', tip=tip, pk=pk)
 
 @login_required
 def dodaj_dimenzijo(request):

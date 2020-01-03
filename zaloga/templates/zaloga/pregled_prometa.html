@@ -19,9 +19,8 @@
     }
 </style>
 
-<form id="filter" action="{% url 'pregled_prometa' %}" method="GET">
-    <input type="hidden" name="tip" value="{{tip}}">
-    <input type="number" hidden="hidden" name="pk" value={{sestavina.pk}}>
+<form id="filter" action="{% url 'pregled_prometa' tip sestavina.pk %}" method="GET">
+
 </form>
 
 <h1>
@@ -133,7 +132,7 @@
                         <div hidden="hidden" class="e_{{cena.id}}"> $ </div>
                     </td>
                     <td>
-                        <form style="display:inline-block" id="f_{{cena.id}}" action="{% url 'sprememba_cene' cena.pk %}" method="POST">
+                        <form style="display:inline-block" id="f_{{cena.id}}" action="{% url 'sprememba_cene' tip sestavina.pk cena.pk %}" method="POST">
                             {% csrf_token %}
                             <input class="e_{{cena.id}}" hidden="hidden" type="submit" value="Shrani">
                         </form>

@@ -115,9 +115,7 @@
                             <td> {{sestavina|keyvalue:tip.0}} </td>
                             <td> {{cene|keyvalue:sestavina.dimenzija__dimenzija|keyvalue:tip.0}}$</td>
                             <td>
-                                <form action="{% url 'pregled_prometa' %}" method="GET">
-                                    <input type="hidden" name="tip" value="{{tip.0}}">
-                                    <input type="number" hidden="hidden" name="pk" value={{sestavina.pk}}>
+                                <form action="{% url 'pregled_prometa' tip.0 sestavina.pk %}" method="GET">
                                     <input type="submit" value="{{slovar|keyvalue:'Pregled prometa'|keyvalue:jezik}}">
                                 </form>
                             </td>

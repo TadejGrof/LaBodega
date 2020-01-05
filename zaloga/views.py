@@ -322,13 +322,15 @@ def spremeni_vnos(request, tip_baze, pk):
         tip = request.POST.get('tip')
         vnos = Vnos.objects.get(pk = request.POST.get('pk'))
         if stevilo and stevilo != "":
-            vnos.stevilo = int(request.POST.get('stevilo'))
+            if tip_baze == "inventura":
+                vnos.inventurna_sprememba(stevilo)
+            else:
+                vnos.sprememba_stevila(stevilo)
         if tip:
             vnos.tip = request.POST.get('tip')
         if cena and cena != "" :
             vnos.cena = float(request.POST.get('cena'))
-        if tip_baze == "inventura":
-            vnos.inventurna_sprememba(stevilo)
+        
         vnos.save()
         return redirect('baza', tip_baze = tip_baze, pk = pk)
 

@@ -398,9 +398,7 @@
                     <td> {{ zaloga|dolgi_tip:vnos.tip }} </td>
                     <td > 
                         <div class="spremeni_{{vnos.pk}}"> {{vnos.stevilo}} </div>
-                        {% if tip == "inventura" %}
-                            <input class="potrdi_{{vnos.pk}}" type="number" name="stevilo" form="spremeni_vnos_{{vnos.pk}}" hidden="hidden" placeholder="({{vnos.stevilo}})" autocomplete="off" required>
-                        {% endif %}
+                        <input style="text-align:center;width:70%" class="potrdi_{{vnos.pk}}" type="number" name="stevilo" form="spremeni_vnos_{{vnos.pk}}" hidden="hidden" placeholder="({{vnos.stevilo}})" autocomplete="off" required>
                     </td>
                     {% if tip == "vele_prodaja" %}
                         <td> 

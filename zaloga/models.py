@@ -62,7 +62,7 @@ TIPI_STROSKOV = (
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
     tip = models.CharField(default="vele_prodaja", choices=TIPI_PRODAJE, max_length=20)
-    
+
     def __str__(self):
         return self.title
 
@@ -354,11 +354,16 @@ class Sestavina(models.Model):
 @receiver(post_save, sender=Dimenzija)
 def create_dimenzija(sender, instance, created, **kwargs):
     if created:
-        sestavina = Sestavina.objects.create(dimenzija = instance)
+        for zaloga in Zaloga.objects.all():
+            sestavina = Sestavina.objects.create(zaloga = zaloga, dimenzija = instance)
+    zacetna_stanja(sestavina.zaloga)
+
+@receiver(post_save, sender=Sestavina)
+def create_sestavina(sender, instance, created, **kwargs):
+    if created:
         for prodaja in TIPI_PRODAJE:
             for tip in TIPI_SESTAVINE:
-                Cena.objects.create(sestavina = sestavina, prodaja = prodaja[0], tip = tip[0])
-    zacetna_stanja(sestavina.zaloga)
+                Cena.objects.create(sestavina = instance, prodaja = prodaja[0], tip = tip[0])
 ###################################################################################################
 
 class Cena(models.Model):

@@ -762,10 +762,12 @@ class Vnos(models.Model):
         self.stevilo = stevilo
         sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
         sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
-        sprememba.stanje = stevilo
-        sprememba.save()
+        if sprememba != None:
+            sprememba.stanje = stevilo
+            sprememba.save()
+            sestavina.nastavi_iz_sprememb(self.tip)
         self.save()
-        sestavina.nastavi_iz_sprememb(self.tip)
+        
 
     def sprememba_stevila(self,stevilo):
         self.stevilo = stevilo

@@ -183,17 +183,17 @@ def vnosi_iz_datoteke(datoteka,zaloga):
     dimenzije = zaloga.vrni_slovar_dimenzij()
     for vrstica in datoteka.readlines():
         locitev = vrstica.decode().split(";")
-        print(locitev)
         dimenzija = locitev[0]
         tip = locitev[1]
         stevilo = int(locitev[2])
-        print(stevilo)
         if dimenzija in dimenzije:
             seznam.append({
                 'dimenzija_id':dimenzije[dimenzija],
                 'tip':tip,
                 'stevilo':stevilo
             })
+        else:
+            print(dimenzija)
     return seznam
 
 def dodaj_sestavine_iz_datoteke(datoteka):

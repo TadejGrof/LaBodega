@@ -9,6 +9,7 @@ class Prodaja(models.Model):
     title = models.CharField(default='prodaja',max_length=30)
     stevilo_faktur = models.IntegerField(default=0)
     stevilo_racunov = models.IntegerField(default=0)
+    
 
     def naslednja_faktura(self):
         self.stevilo_faktur += 1

@@ -61,7 +61,8 @@ TIPI_STROSKOV = (
 
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
-
+    tip = models.CharField(default="vele_prodaja", choices=TIPI_PRODAJE, max_length=20)
+    
     def __str__(self):
         return self.title
 

@@ -67,11 +67,21 @@ TIPI_STROSKOV = (
 
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
-    tip = models.CharField(default="vele_prodaja", choices=TIPI_PRODAJE, max_length=20)
+    tipi_prodaje = models.CharField(default='["vele_prodaja"]', max_length=50)
+    tipi_sestavine = models.CharField(default='["Y","W","JP","JP50","JP70"]', max_length=50)
+
 
     def __str__(self):
         return self.title
 
+    @property
+    def tipi_prodaj(self):
+        return json.loads(self.tipi_prodaje)
+
+    @property
+    def tipi_sestavin(self):
+        return json.loads(self.tipi_sestavine)
+           
     @property
     def danes(self):
         return datetime.today().strftime('%Y-%m-%d')
@@ -277,7 +287,7 @@ class Sestavina(models.Model):
     JP70 = models.IntegerField(default = 0)
 
     class Meta:
-        ordering = ['dimenzija']
+        ordering = ['zaloga','dimenzija']
 
     def cena(self,prodaja,tip):
         if prodaja == "vele_prodaja" or prodaja == "dnevna_prodaja":
@@ -356,6 +366,11 @@ class Sestavina(models.Model):
                 zaporedna_stanja.append(stanje)
         return zaporedna_stanja
 
+@receiver(post_save, sender=Zaloga)
+def create_zaloga(sender, instance, created, **kwargs):
+    if created:
+        for dimenzija in Dimenzija.objects.all():
+            Sestavina.objects.create(zaloga=instance,dimenzija=dimenzija)
 
 @receiver(post_save, sender=Dimenzija)
 def create_dimenzija(sender, instance, created, **kwargs):
@@ -367,10 +382,11 @@ def create_dimenzija(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Sestavina)
 def create_sestavina(sender, instance, created, **kwargs):
     if created:
-        for prodaja in TIPI_PRODAJE:
-            for tip in TIPI_SESTAVINE:
-                Cena.objects.create(sestavina = instance, prodaja = prodaja[0], tip = tip[0], nacin="prodaja")
-                
+        zaloga = instance.zaloga
+        for prodaja in zaloga.tipi_prodaj:
+            for tip in zaloga.tipi_sestavin:
+                Cena.objects.create(sestavina = instance, prodaja = prodaja, tip = tip, nacin="prodaja")
+
 ###################################################################################################
 
 class Cena(models.Model):

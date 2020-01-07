@@ -27,6 +27,12 @@ TIPI_PRODAJE = (
         ('vele_prodaja', 'Vele_prodaja')
     )
 
+TIPI_CEN = (
+        ('prodaja', 'Prodaja'),
+        ('nakup', 'Nakup')
+    )
+
+
 POSILJATELJI = (
     ('bozo', 'Bozo'),
     ('japan', 'Japan'),
@@ -263,7 +269,7 @@ class Dimenzija(models.Model):
 ##################################################################################################
 class Sestavina(models.Model):
     zaloga = models.ForeignKey(Zaloga,default=1, on_delete=models.CASCADE)
-    dimenzija = models.OneToOneField(Dimenzija, on_delete=models.CASCADE)
+    dimenzija = models.ForeignKey(Dimenzija, on_delete=models.CASCADE)
     Y = models.IntegerField(default = 0)
     W = models.IntegerField(default = 0)  
     JP = models.IntegerField(default = 0)
@@ -363,14 +369,17 @@ def create_sestavina(sender, instance, created, **kwargs):
     if created:
         for prodaja in TIPI_PRODAJE:
             for tip in TIPI_SESTAVINE:
-                Cena.objects.create(sestavina = instance, prodaja = prodaja[0], tip = tip[0])
+                Cena.objects.create(sestavina = instance, prodaja = prodaja[0], tip = tip[0], nacin="prodaja")
+                
 ###################################################################################################
 
 class Cena(models.Model):
     sestavina = models.ForeignKey(Sestavina, default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=0)
+    nacin = models.CharField(max_length=10, choices=TIPI_CEN, default="prodaja")
     tip = models.CharField(max_length=4, choices=TIPI_SESTAVINE, default="Y")
-    prodaja = models.CharField(max_length=15, choices=TIPI_PRODAJE, default="vele_prodaja")
+    prodaja = models.CharField(max_length=15, choices=TIPI_PRODAJE, null=True, blank=True, default=None)
+    drzava = models.CharField(max_length=15, choices=DRZAVE, null=True,blank=True,default=None)
     
 
 

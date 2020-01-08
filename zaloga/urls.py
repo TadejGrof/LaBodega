@@ -10,6 +10,7 @@ ogled_patterns = [
     path('shrani_vse/', views.shrani_vse, name='shrani_vse'),
     path('spremeni_vnos/', views.spremeni_vnos, name='baza_spremeni_vnos'),
     path('izbrisi_vnos/', views.izbrisi_vnos, name='baza_izbrisi_vnos'),
+    path('izbrisi_vse/',views.izbrisi_vse,name="baza_izbrisi_vse"),
     path('uveljavi/', views.uveljavi_bazo, name='uveljavi_bazo'),
     path('spremeni_popust/', views.spremeni_popust, name='spremeni_popust'),
     path('spremeni_prevoz/', views.spremeni_prevoz, name='spremeni_prevoz'),

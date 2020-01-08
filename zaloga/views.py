@@ -354,6 +354,14 @@ def izbrisi_vnos(request,zaloga, tip_baze, pk):
         return redirect('baza',zaloga=zaloga, tip_baze=tip_baze, pk = pk)
 
 @login_required
+def izbrisi_vse(request,zaloga, tip_baze, pk):
+    if request.method == "POST":
+        baza = Baza.objects.get(pk = pk)
+        for vnos in baza.vnos_set.all():
+            vnos.delete()
+        return redirect('baza',zaloga=zaloga, tip_baze=tip_baze, pk = pk)
+
+@login_required
 def spremeni_popust(request,zaloga,tip_baze, pk):
     if request.method == "POST":
         prodaja = Baza.objects.get(pk = pk)

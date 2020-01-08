@@ -87,6 +87,10 @@
             <button onclick="Vec_vnosov()" class="vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
             <button hidden="hidden" class="pre_vnosi" onclick="Preklici_veckratni_vnos()"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
         {% endif %} 
+        <form style="display:inline-block" action="{% url 'baza_izbrisi_vse' zaloga_pk tip baza.pk %}" onsubmit="return Confirm()" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Izbrisi vse vnose">
+        </form>
         <form enctype='multipart/form-data' style="display:inline-block;margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip baza.pk %}" method="POST">
             {% csrf_token %}
             <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>

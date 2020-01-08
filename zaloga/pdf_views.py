@@ -15,7 +15,8 @@ from django.http import HttpResponse
  
 zaloga = Zaloga.objects.first()
 
-def pdf_zaloge(request):
+def pdf_zaloge(request,zaloga):
+    zaloga = Zaloga.objects.get(pk = zaloga)
     radius = request.GET.get('radius')
     sestavine = zaloga.sestavina_set.all()
     nicelne = request.GET.get('nicelne','true')
@@ -78,7 +79,8 @@ def pdf_cenika(request,tip_prodaje):
     p.save()
     return response 
 
-def pdf_baze(request,tip_baze, pk):
+def pdf_baze(request,zaloga,tip_baze, pk):
+    zaloga = Zaloga.objects.get(pk = zaloga)
     baza = zaloga.baza_set.all().get(pk=pk)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="baza.pdf"'

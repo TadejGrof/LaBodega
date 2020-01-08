@@ -48,7 +48,7 @@ pregled_patterns = [
 urlpatterns = [
     path('<int:zaloga>/pregled_zaloge/', views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),
-    path('pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
+    path('<int:zaloga>/pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
     path('pregled_stroskov/', include(stroski_patterns)),
     path('strosek/', include(strosek_patterns)),

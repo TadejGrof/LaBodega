@@ -67,7 +67,7 @@
                     <option value="false" selected> No </option>
                 {% endif %}
             </select>
-            <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' %}" method="GET">
+            <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' zaloga_pk %}" method="GET">
                 <input type="hidden"  value="{{radius}}" name="radius">
                 {% for tip in tipi %}
                 <input type="hidden" value="True" name="{{tip.0}}">

@@ -646,6 +646,14 @@
         var width = widthbox.options[widthbox.selectedIndex].value
         return TvoriDimenzijo(radius,height,width)
     };
+    function Spremeni_prevoz(){
+        toggle('spremeni_prevoz','none')
+        toggle('potrdi_prevoz','inline-block')
+    };
+    function Preklici_spremembo_prevoza(){
+        toggle('spremeni_prevoz','inline-block')
+        toggle('potrdi_prevoz','none')
+    };
     function Filtriraj(){
         var tipbox = document.getElementById('tip_box')
         var radiusbox = document.getElementById('radius_box')

@@ -87,16 +87,16 @@
             <button onclick="Vec_vnosov()" class="vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
             <button hidden="hidden" class="pre_vnosi" onclick="Preklici_veckratni_vnos()"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
         {% endif %} 
-        <form enctype='multipart/form-data' style="display:inline-block;margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' tip baza.pk %}" method="POST">
+        <form enctype='multipart/form-data' style="display:inline-block;margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip baza.pk %}" method="POST">
             {% csrf_token %}
             <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
             <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
         </form>
-        <form style="display:inline-block" action="{% url 'uveljavi_bazo' tip baza.pk %}" method="POST">
+        <form style="display:inline-block" action="{% url 'uveljavi_bazo' zaloga_pk tip baza.pk %}" method="POST">
             {% csrf_token %}
             <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
         </form>
-        <form style="display:inline-block" action="{% url 'shrani_vse' tip baza.pk %}" method="POST" >
+        <form style="display:inline-block" action="{% url 'shrani_vse' zaloga_pk tip baza.pk %}" method="POST" >
             {% csrf_token %}
             {% for vnos in vnosi.values %}
             <input type="number" hidden="hidden" name="{{vnos.dimenzija}}_{{vnos.tip}}" value="" id="{{vnos.dimenzija}}_{{vnos.tip}}_form">
@@ -107,7 +107,7 @@
                 <input type="submit" hidden="hidden" class="pre_vnosi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}" onclick="this.disabled = true;Shrani_vse();this.form.submit();"> 
             {% endif %}
         </form>
-        <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' tip baza.pk %}" method="POST">
+        <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="POST">
             {% csrf_token %}
             <input hidden="hidden" type="number" value={{baza.pk}} name="pk">
             <input style="width:150px" type="submit" value="PDF">
@@ -138,7 +138,7 @@
         <div hidden="hidden" style="width:50%;margin-top:2%" class="gumbi">
             <div class="zgornja_vrstica">
                 <button onclick='Pocisti()'> {{slovar|keyvalue:'Pocisti'|keyvalue:jezik}} </button>
-                <form style="display:inline-block" id="nov_vnos" action="{% url 'baza_nov_vnos' tip baza.pk %}" method="POST">
+                <form style="display:inline-block" id="nov_vnos" action="{% url 'baza_nov_vnos' zaloga_pk tip baza.pk %}" method="POST">
                     {% csrf_token %}
                     {% include "program/dinamic_select.html" %}
                 </form> 
@@ -172,7 +172,7 @@
             {% if perms.zaloga.add_vnos %}
                 <button style="width:15%" class="pre_nov_vnos" onclick="Veljavno_nov_vnos()"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
                 <div hidden="hidden" class="nov_vnos">
-                    <form style="display:inline-block" action="{% url 'baza_nov_vnos' tip baza.pk %}" method="POST">
+                    <form style="display:inline-block" action="{% url 'baza_nov_vnos' zaloga_pk tip baza.pk %}" method="POST">
                         {% csrf_token %}
                         <select style="width:25%" name="dimenzija">
                             {% for dimenzija in zaloga.vrni_dimenzije %}
@@ -191,7 +191,7 @@
                 </div>
             {% endif %}
         {% endif %}
-        <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' tip baza.pk %}" method="POST">
+        <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="POST">
             {% csrf_token %}
             <input hidden="hidden" type="number" value={{baza.pk}} name="pk">
             <input style="width:150px" type="submit" value="PDF">
@@ -241,16 +241,16 @@
                             <input class="potrdi_{{vnos.pk}}" hidden="hidden" type="submit" form="spremeni_{{vnos.pk}}" value="OK">
                             <input class="potrdi_{{vnos.pk}}" hidden="hidden"  form="izbrisi_{{vnos.pk}}" type="submit" value="X">
                             <button class="potrdi_{{vnos.pk}}" hidden="hidden" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')"> <- </button>
-                            <form action="{% url 'baza_spremeni_vnos' tip baza.pk %}" method="POST" hidden="hidden" id="spremeni_{{vnos.pk}}">
+                            <form action="{% url 'baza_spremeni_vnos' zaloga_pk tip baza.pk %}" method="POST" hidden="hidden" id="spremeni_{{vnos.pk}}">
                                 {% csrf_token %}
                                 <input type="number" hidden="hidden" value={{vnos.pk_vnosa}} name="pk">
                             </form>
-                            <form action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST" hidden="hidden" id="izbrisi_{{vnos.pk}}">
+                            <form action="{% url 'baza_izbrisi_vnos' zaloga_pk tip baza.pk %}" method="POST" hidden="hidden" id="izbrisi_{{vnos.pk}}">
                                 {% csrf_token %}
                                 <input type="number" hidden="hidden" value={{vnos.pk_vnosa}} name="pk">
                             </form>
                         {% else %}
-                            <form action="{% url 'baza_nov_vnos' tip baza.pk %}" id="nov_vnos_{{vnos.pk}}" method="POST">
+                            <form action="{% url 'baza_nov_vnos' zaloga_pk tip baza.pk %}" id="nov_vnos_{{vnos.pk}}" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" value="{{vnos.dimenzija}}" name="dimenzija">
                                 <input type="hidden" value="{{vnos.tip}}" name="tip">
@@ -308,11 +308,11 @@
                             <input class="potrdi_{{vnos.pk}}" hidden="hidden" type="submit" form="spremeni_vnos_{{vnos.pk}}" value="OK">
                             <button class="potrdi_{{vnos.pk}}" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')" hidden="hidden"> X </button>
                         </td>
-                        <form id="spremeni_vnos_{{vnos.pk}}" action="{% url 'baza_spremeni_vnos' tip baza.pk %}" method="POST">
+                        <form id="spremeni_vnos_{{vnos.pk}}" action="{% url 'baza_spremeni_vnos' zaloga_pk tip baza.pk %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
-                        <form id="izbrisi_vnos_{{vnos.pk}}" action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST" onsubmit="return Confirm()">
+                        <form id="izbrisi_vnos_{{vnos.pk}}" action="{% url 'baza_izbrisi_vnos' zaloga_pk tip baza.pk %}" method="POST" onsubmit="return Confirm()">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
@@ -333,7 +333,7 @@
                             <input form="spremeni_popust" style="width:60%" type="text" hidden="hidden" class="potrdi_popust" value="" name="popust" required>
                             <div hidden="hidden" class="potrdi_popust">%</div>  
                         </td>
-                        <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' tip baza.pk %}" method="POST">
+                        <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' zaloga_pk tip baza.pk %}" method="POST">
                                 {% csrf_token %}  
                         </form>
                         <td>   
@@ -352,7 +352,7 @@
                             <input form="spremeni_popust" style="width:60%" type="text" hidden="hidden" class="potrdi_popust" value="" name="popust" required>
                             <div hidden="hidden" class="potrdi_popust">%</div>  
                         </td>
-                        <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' tip baza.pk %}" method="POST">
+                        <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' zaloga_pk tip baza.pk %}" method="POST">
                                 {% csrf_token %}  
                         </form>
                         <td>   
@@ -415,11 +415,11 @@
                         {% endif %}
                         <input class="potrdi_{{vnos.pk}}" hidden="hidden" type="submit" form="spremeni_vnos_{{vnos.pk}}" value="OK">
                         <button class="potrdi_{{vnos.pk}}" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')" hidden="hidden"> X </button>
-                        <form id="izbrisi_vnos_{{vnos.pk}}" hidden="hidden" action="{% url 'baza_izbrisi_vnos' tip baza.pk %}" method="POST" onsubmit="return Confirm()">
+                        <form id="izbrisi_vnos_{{vnos.pk}}" hidden="hidden" action="{% url 'baza_izbrisi_vnos' zaloga_pk tip baza.pk %}" method="POST" onsubmit="return Confirm()">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
-                        <form id="spremeni_vnos_{{vnos.pk}}" action="{% url 'baza_spremeni_vnos' tip baza.pk %}" method="POST">
+                        <form id="spremeni_vnos_{{vnos.pk}}" action="{% url 'baza_spremeni_vnos' zaloga_pk tip baza.pk %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" value="{{vnos.pk}}" name="pk">
                         </form>
@@ -443,7 +443,7 @@
                         <input form="spremeni_popust" style="width:60%" type="text" hidden="hidden" class="potrdi_popust" value="" name="popust" required>
                         <div hidden="hidden" class="potrdi_popust">%</div>  
                     </td>
-                    <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' tip baza.pk %}" method="POST">
+                    <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' zaloga_pk tip baza.pk %}" method="POST">
                         {% csrf_token %}  
                     </form>
                     <td>   
@@ -462,7 +462,7 @@
                         <input form="spremeni_prevoz" style="width:60%" type="text" hidden="hidden" class="potrdi_prevoz" value="" name="prevoz" required>
                         <div hidden="hidden" class="potrdi_prevoz">$</div>  
                     </td>
-                    <form display="inline-block" id="spremeni_prevoz" action="{% url 'spremeni_prevoz' tip baza.pk %}" method="POST">
+                    <form display="inline-block" id="spremeni_prevoz" action="{% url 'spremeni_prevoz' zaloga_pk tip baza.pk %}" method="POST">
                             {% csrf_token %}  
                     </form>
                     <td>   

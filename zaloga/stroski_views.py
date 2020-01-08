@@ -211,8 +211,11 @@ def vrni_slovar(request):
     return slovar
 
 def pokazi_stran(request, html, baze={}):
-    slovar = {'zaloga':zaloga,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
+    slovar = {'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
     slovar.update(baze)
+    if not 'zaloga' in baze:
+        slovar.update({'zaloga':zaloga})
+    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
     return render(request, html, slovar)
 
 def pregled_prometa(promet):

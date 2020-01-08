@@ -46,13 +46,12 @@ pregled_patterns = [
     path('sprememba_cene/<int:cena>/',views.sprememba_cene,name="sprememba_cene"),
 ]
 urlpatterns = [
-    path('', views.pregled_zaloge, name='pregled_zaloge'),
+    path('<int:zaloga>/pregled_zaloge/', views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),
     path('pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
-    path('iz_datoteke/', views.sestavine_iz_datoteke, name="sestavine_iz_datoteke"),
     path('pregled_stroskov/', include(stroski_patterns)),
     path('strosek/', include(strosek_patterns)),
     path('porocilo/',include(porocilo_patterns)),
-    path('<str:tip_baze>/', include(baza_patterns)),
+    path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
 ]

@@ -18,8 +18,9 @@ program = Program.objects.first()
 ##################################################################################################
 
 @login_required
-def pregled_zaloge(request):
+def pregled_zaloge(request,zaloga):
     if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk = zaloga)
         sestavine = zaloga.sestavina_set.all()
         radius = request.GET.get('radius','R12')
         height = request.GET.get('height','all')
@@ -73,6 +74,7 @@ def pregled_zaloge(request):
                 else:
                     cene.update({dimenzija:{tip[0]:stevilo * cena}})
         slovar = {
+            'zaloga':zaloga,
             'sestavine':sestavine,
             'tipi':tipi,
             'radius':radius,
@@ -147,31 +149,24 @@ def dodaj_dimenzijo(request):
             height = height,
             width = width,
             special = special)
-        return redirect('pregled_zaloge')
+        return redirect('nova_dimenzija')
     else:
         return pokazi_stran(request, 'zaloga/dodaj_dimenzijo.html')
 
-@login_required
-def sestavine_iz_datoteke(request):
-    seznam = dodaj_sestavine_iz_datoteke(request.FILES.get('datoteka'))
-    for dimenzija in seznam:
-        dim = Dimenzija.objects.create(dimenzija = dimenzija['dimenzija'],radius=dimenzija['radius'],width=dimenzija['width'],height=dimenzija['height'],special=dimenzija['special'])
-        Sestavina.objects.create(dimenzija=dim, zaloga=zaloga)
-    return redirect('pregled_zaloge')
-
 ###############################################################################################################
 ###############################################################################################################
 ###############################################################################################################
 
 @login_required
-def baze(request, tip_baze):
+def baze(request,zaloga,tip_baze):
     if request.method == "GET":
-        baze = Baza.objects.filter(tip=tip_baze,status='aktivno')
+        zaloga = Zaloga.objects.get(pk = zaloga)
+        baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno')
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
-        return pokazi_stran(request, 'zaloga/aktivne_baze.html', {'tip': tip_baze, 'baze':baze,'stranke':stranke})
+        return pokazi_stran(request, 'zaloga/aktivne_baze.html', {'zaloga': zaloga, 'tip': tip_baze, 'baze':baze,'stranke':stranke})
         
 @login_required
-def nova_baza(request, tip_baze):
+def nova_baza(request,zaloga,tip_baze):
     if request.method == "POST":
         if tip_baze == "narocilo":
             title = "narocilo"
@@ -186,6 +181,7 @@ def nova_baza(request, tip_baze):
                 posiljatelj=posiljatelj,
                 drzava=drzava)
             Baza.objects.create(
+                zaloga_id = zaloga,
                 title=title,
                 kontejner=kontejner,
                 author=request.user,
@@ -194,6 +190,7 @@ def nova_baza(request, tip_baze):
         elif tip_baze == "vele_prodaja" or tip_baze == "narocilo":
             stranka = Stranka.objects.get(pk = int(request.POST.get('stranka')))
             Baza.objects.create(
+                zaloga_id = zaloga,
                 stranka = stranka,
                 title = title,
                 popust = 0,
@@ -202,26 +199,29 @@ def nova_baza(request, tip_baze):
                 tip = tip_baze)
         elif tip_baze == 'inventura' or tip_baze == "odpis":
             Baza.objects.create(
+                zaloga_id = zaloga,
                 title=title,
                 author=request.user,
                 tip=tip_baze)
-        return redirect('baze', tip_baze=tip_baze)
+        return redirect('baze', zaloga=zaloga, tip_baze=tip_baze)
 
 @login_required
-def izbris_baze(request, tip_baze, pk):
+def izbris_baze(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         baza = Baza.objects.get(pk=pk)
         baza.delete()
-        return redirect('baze', tip_baze=tip_baze)
+        return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
 
 #######################################################################################################
 
 @login_required
-def baza(request, tip_baze, pk):
+def baza(request,zaloga, tip_baze, pk):
     if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk=zaloga)
         baza = Baza.objects.get(pk = pk)
         if baza.status == "aktivno":
             slovar = {
+                'zaloga': zaloga,
                 'baza':baza,
                 'vnosi':baza.inventurni_vnosi,
                 'tip':tip_baze,
@@ -232,12 +232,12 @@ def baza(request, tip_baze, pk):
                 'tipi': zaloga.vrni_tipe}
             return pokazi_stran(request, 'zaloga/baza.html',slovar)
         elif baza.status == "veljavno":
-            return pokazi_stran(request, 'zaloga/baza.html',{'baza':baza,'tip':tip_baze, 'status':"veljavno"})
+            return pokazi_stran(request, 'zaloga/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
         elif baza.status == "zaklenjeno":
-            return pokazi_stran(request, 'zaloga/baza.html',{'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
+            return pokazi_stran(request, 'zaloga/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
 
 @login_required
-def nov_vnos(request, tip_baze, pk):
+def nov_vnos(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         dimenzija = vrni_dimenzijo(request)
         stevilo = request.POST.get('stevilo')
@@ -248,7 +248,7 @@ def nov_vnos(request, tip_baze, pk):
                 dimenzija = dimenzija,
                 stevilo = stevilo,
                 tip = tip,
-                cena = Sestavina.objects.get(dimenzija=dimenzija).cena('vele_prodaja',tip),
+                cena = Sestavina.objects.get(zaloga=zaloga,dimenzija=dimenzija).cena('vele_prodaja',tip),
                 baza = baza)
         else:
             vnos = Vnos.objects.create(
@@ -257,14 +257,15 @@ def nov_vnos(request, tip_baze, pk):
                 tip = tip,
                 baza = baza)
         if baza.status == "veljavno":
-            sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
+            sestavina = Sestavina.objects.get(zaloga = zaloga,dimenzija = vnos.dimenzija)
             vnos.ustvari_spremembo(sestavina)
             sestavina.nastavi_iz_sprememb(vnos.tip)
-        return redirect('baza', tip_baze = tip_baze, pk = pk)
+        return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 
 @login_required
-def shrani_vse(request,tip_baze, pk):
+def shrani_vse(request,zaloga,tip_baze, pk):
     if request.method == "POST":
+        zaloga = Zaloga.objects.get(pk = zaloga)
         baza = Baza.objects.get(pk = pk)
         vnosi = []
         for sestavina in zaloga.vrni_zalogo:
@@ -286,10 +287,11 @@ def shrani_vse(request,tip_baze, pk):
                             stevilo = stevilo,
                             baza = baza))
         Vnos.objects.bulk_create(vnosi)
-        return redirect('baza', tip_baze=tip_baze, pk = pk)   
+        return redirect('baza',zaloga=zaloga.pk, tip_baze=tip_baze, pk = pk)   
 
 @login_required
-def vnosi_iz_datoteke(request, tip_baze, pk):
+def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
+    zaloga = Zaloga.objects.get(pk=zaloga)
     seznam = funkcije.vnosi_iz_datoteke(request.FILES.get('datoteka'),zaloga)
     vnosi = []
     baza = Baza.objects.get(pk = pk)
@@ -312,10 +314,10 @@ def vnosi_iz_datoteke(request, tip_baze, pk):
                 dimenzija_id=vnos['dimenzija_id']
             ))
     Vnos.objects.bulk_create(vnosi)
-    return redirect('baza', tip_baze = tip_baze, pk = pk)
+    return redirect('baza',zaloga=zaloga.pk, tip_baze = tip_baze, pk = pk)
 
 @login_required
-def spremeni_vnos(request, tip_baze, pk):
+def spremeni_vnos(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         stevilo = request.POST.get('stevilo')
         cena = request.POST.get('cena')
@@ -325,17 +327,17 @@ def spremeni_vnos(request, tip_baze, pk):
             if tip_baze == "inventura":
                 vnos.inventurna_sprememba(stevilo)
             else:
+                print('delam')
                 vnos.sprememba_stevila(stevilo)
         if tip:
-            vnos.tip = request.POST.get('tip')
+            vnos.tip = tip
         if cena and cena != "" :
-            vnos.cena = float(request.POST.get('cena'))
-        
+            vnos.cena = float(cena)
         vnos.save()
-        return redirect('baza', tip_baze = tip_baze, pk = pk)
+        return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 
 @login_required
-def izbrisi_vnos(request, tip_baze, pk):
+def izbrisi_vnos(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         vnos = Vnos.objects.get(pk = request.POST.get('pk'))
         baza = Baza.objects.get(pk = pk)
@@ -344,31 +346,31 @@ def izbrisi_vnos(request, tip_baze, pk):
                 vnos.inventurni_izbris()
             else:
                 tip = vnos.tip
-                sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
+                sestavina = Sestavina.objects.get(zaloga=zaloga,dimenzija = vnos.dimenzija)
                 vnos.sprememba.delete()
                 sestavina.nastavi_iz_sprememb(tip)
         elif baza.status == "aktivno":
             vnos.delete()
-        return redirect('baza', tip_baze=tip_baze, pk = pk)
+        return redirect('baza',zaloga=zaloga, tip_baze=tip_baze, pk = pk)
 
 @login_required
-def spremeni_popust(request,tip_baze, pk):
+def spremeni_popust(request,zaloga,tip_baze, pk):
     if request.method == "POST":
         prodaja = Baza.objects.get(pk = pk)
         prodaja.popust = request.POST.get('popust')
         prodaja.save()
-        return redirect('baza',tip_baze=tip_baze,pk=pk)
+        return redirect('baza',zaloga=zaloga,tip_baze=tip_baze,pk=pk)
 
 @login_required
-def spremeni_prevoz(request,tip_baze, pk):
+def spremeni_prevoz(request,zaloga,tip_baze, pk):
     if request.method == "POST":
         prodaja = Baza.objects.get(pk = pk)
         prodaja.prevoz = request.POST.get('prevoz')
         prodaja.save()
-        return redirect('baza',tip_baze=tip_baze,pk=pk)
+        return redirect('baza',zaloga=zaloga,tip_baze=tip_baze,pk=pk)
 
 @login_required
-def uveljavi_bazo(request, tip_baze, pk):
+def uveljavi_bazo(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         baza = Baza.objects.get(pk = pk)
         if baza.status == "aktivno":
@@ -376,14 +378,14 @@ def uveljavi_bazo(request, tip_baze, pk):
                 baza.uveljavi_inventuro()
             else:
                 baza.uveljavi()
-    return redirect('arhiv_baz', tip_baze = tip_baze)
+    return redirect('arhiv_baz',zaloga=zaloga, tip_baze = tip_baze)
 
 ############################################################################################
 ############################################################################################
 ############################################################################################
 
 @login_required
-def arhiv(request, tip_baze):
+def arhiv(request,zaloga, tip_baze):
     if request.method == "GET":
         danes = datetime.date.today().strftime('%Y-%m-%d')
         pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
@@ -392,14 +394,15 @@ def arhiv(request, tip_baze):
         stranke = Stranka.objects.all()
         stranka = None
         if tip_baze == "dnevna_prodaja":
-            baze = Dnevna_prodaja.objects.filter(datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
+            baze = Dnevna_prodaja.objects.filter(zaloga=zaloga,datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
         else:
-            baze = Baza.objects.filter(tip=tip_baze,status='veljavno',datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
+            baze = Baza.objects.filter(zaloga=zaloga,tip=tip_baze,status='veljavno',datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
             stranka = request.GET.get('stranka','all')
             if tip_baze == "vele_prodaja" and stranka != "all":
                 stranka = int(stranka)
                 baze = baze.filter(stranka__id = stranka)
-        return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})
+        zaloga = Zaloga.objects.get(pk =zaloga)
+        return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'zaloga':zaloga,'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})
 
 ###################################################################################
 ###################################################################################
@@ -424,6 +427,9 @@ def vrni_slovar(request):
     return slovar
 
 def pokazi_stran(request, html, baze={}):
-    slovar = {'prodaja':prodaja, 'zaloga':zaloga,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
+    slovar = {'prodaja':prodaja,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
     slovar.update(baze)
+    if not 'zaloga' in baze:
+        slovar.update({'zaloga':zaloga})
+    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
     return render(request, html, slovar)

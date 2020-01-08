@@ -145,7 +145,7 @@
             </tr>
         </table>
     {% endif %}
-    <form id="nova_baza" action="{% url 'nova_baza' tip %}" method="POST">
+    <form id="nova_baza" action="{% url 'nova_baza' zaloga_pk tip %}" method="POST">
         {% csrf_token %}
         <input type="submit" value="{{slovar|keyvalue:'Nova baza'|keyvalue:jezik}}"> 
     </form>
@@ -183,12 +183,12 @@
                 {% endif %}
                 <td> {{baza.datum}} </td>
                 <td class="ogled"> 
-                    <form action="{% url 'baza' tip baza.pk %}" method="GET">
+                    <form action="{% url 'baza' zaloga_pk tip baza.pk %}" method="GET">
                         <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>
                 <td class="izbris">
-                    <form action="{% url 'izbris_baze' baza.tip baza.pk %}" onsubmit="return Confirm()" method="POST">
+                    <form action="{% url 'izbris_baze' zaloga_pk baza.tip baza.pk %}" onsubmit="return Confirm()" method="POST">
                         {% csrf_token %}
                         <input type="submit" value="{{slovar|keyvalue:'Izbris'|keyvalue:jezik}}">
                     </form>

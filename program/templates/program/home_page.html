@@ -90,11 +90,11 @@
                     <td> {{stranka.mail}} </td>
                     <td> 
                         {% if stranka.ima_aktivno_prodajo %}
-                            <form action="{% url 'baza' 'vele_prodaja' stranka.aktivna_prodaja.pk %}" method="GET">
+                            <form action="{% url 'baza' zaloga_pk 'vele_prodaja' stranka.aktivna_prodaja.pk %}" method="GET">
                                 <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                             </form>
                         {% else %}
-                            <form action="{% url 'nova_baza' 'vele_prodaja' %}" method="POST" onsubmit="return Confirm()">
+                            <form action="{% url 'nova_baza' zaloga_pk 'vele_prodaja' %}" method="POST" onsubmit="return Confirm()">
                                 {% csrf_token %}
                                 <input type="hidden" name="stranka" value="{{stranka.pk}}">
                                 <input type="date" hidden="hidden" name="datum" value="{{danes}}">

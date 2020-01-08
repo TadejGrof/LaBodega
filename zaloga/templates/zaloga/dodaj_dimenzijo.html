@@ -57,17 +57,4 @@
             <input style="margin-top:2%;display:inline-block;width:30%;height:10%;"type="submit" value="{{slovar|keyvalue:'Dodaj'|keyvalue:jezik}}">
         </form>
     </div>
-
-    {%if perms.admin.view_logentry %}
-        <div style="margin-top:5%;text-align:center;font-size:4vh">
-            Dodaj iz datoteke:
-            <form enctype='multipart/form-data' action="{% url 'sestavine_iz_datoteke' %}" method="POST">
-                {% csrf_token %}
-                <input type="file" name="datoteka" value="brskaj">
-                <input type="submit" value="potrdi">
-            </form>
-        </div>
-    {% endif %}
-
-    </div>
 {% endblock %}

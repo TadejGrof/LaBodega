@@ -34,7 +34,7 @@
 {% endif %}
 </h1>
 <div class="filter" style="margin-top:3%">
-    <form action="{% url 'arhiv_baz' tip %}" method="GET">
+    <form action="{% url 'arhiv_baz' zaloga_pk tip %}" method="GET">
         {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{zacetek}}" name="zacetek">
         {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{konec}}" name="konec">
         {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:
@@ -71,7 +71,7 @@
                 <td> {{baza.datum}} </td>
                 <td> {{baza.skupna_cena}} $</td>
                 <td>
-                    <form action="{% url 'baza' 'vele_prodaja' baza.pk %}" method="GET">
+                    <form action="{% url 'baza' zaloga_pk 'vele_prodaja' baza.pk %}" method="GET">
                         <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>
@@ -125,7 +125,7 @@
             <td> {{baza|skupno:'all'}} </td>
             {% endif %}
             <td>
-                <form action="{% url 'baza' tip baza.pk %}" method="GET">
+                <form action="{% url 'baza' zaloga_pk tip baza.pk %}" method="GET">
                     <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                 </form>
             </td>  

@@ -118,7 +118,6 @@ class Zaloga(models.Model):
     def na_voljo(self):
         zaloga = self.zaloga
         rezervirane = self.rezervirane
-        print(rezervirane)
         for sestavina in rezervirane:
             tipi = rezervirane[sestavina]
             for tip in tipi:
@@ -309,7 +308,6 @@ class Sestavina(models.Model):
 
     def prodaja(self,tip_baze,tip,zacetek,konec):
         spremembe = self.sprememba_set.all().filter(baza__tip = tip_baze, tip=tip, baza__datum__gte = zacetek, baza__datum__lte = konec)
-        print(spremembe)
         cena = 0
         stevilo = 0
         for sprememba in spremembe:
@@ -664,8 +662,6 @@ class Baza(models.Model):
 
     @property
     def cena_popusta(self):
-        print(self.skupna_cena)
-        print(self.popust)
         return round(float(self.skupna_cena) * (self.popust / 100))
 
     @property
@@ -799,7 +795,8 @@ class Vnos(models.Model):
         sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
         sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
         if sprememba != None:
-            sprememba.stanje = stevilo
+            print('delam')
+            sprememba.stevilo = stevilo
             sprememba.save()
             sestavina.nastavi_iz_sprememb(self.tip)
         self.save()

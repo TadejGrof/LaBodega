@@ -39,7 +39,7 @@
     </div>
     <div class="filter">
         <div style="display:block">
-            <form id="filter" action="{% url 'pregled_zaloge' %}" method="GET">
+            <form id="filter" action="{% url 'pregled_zaloge' zaloga.pk %}" method="GET">
                 {% include "program/dinamic_select.html" %} 
                 <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
             </form>

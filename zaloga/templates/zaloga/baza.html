@@ -342,7 +342,7 @@
                         </form>
                         <td>   
                             <button class="spremeni_popust" onclick="Spremeni_popust()"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                            <input hidden="hidde" type="submit" form="spremeni_popust" value="potrdi" class="potrdi_popust">
+                            <input hidden="hidden" type="submit" form="spremeni_popust" value="potrdi" class="potrdi_popust">
                             <button hidden="hidden" class="potrdi_popust" onclick="Preklici_spremembo_popusta()"> X </button>
                         </td>
                         <td colspan="2"> {{slovar|keyvalue:'Znesek popusta'|keyvalue:jezik}}: </td>
@@ -350,22 +350,22 @@
                         <td colspan="2" > </td>
                     </tr>
                     <tr class="endrow">
-                        <td> : </td>
+                        <td> {{slovar|keyvalue:'Prevoz'|keyvalue:jezik}}: </td>
                         <td>  
-                            <div class="spremeni_popust"> {{baza.popust}} % </div>
-                            <input form="spremeni_popust" style="width:60%" type="text" hidden="hidden" class="potrdi_popust" value="" name="popust" required>
-                            <div hidden="hidden" class="potrdi_popust">%</div>  
+                            <div class="spremeni_prevoz"> {{baza.prevoz}} $ </div>
+                            <input form="spremeni_prevoz" style="width:60%" type="text" hidden="hidden" class="potrdi_prevoz" value="" name="prevoz" required>
+                            <div hidden="hidden" class="potrdi_prevoz">$</div>  
                         </td>
-                        <form display="inline-block" id="spremeni_popust" action="{% url 'spremeni_popust' zaloga_pk tip baza.pk %}" method="POST">
+                        <form display="inline-block" id="spremeni_prevoz" action="{% url 'spremeni_prevoz' zaloga_pk tip baza.pk %}" method="POST">
                                 {% csrf_token %}  
                         </form>
                         <td>   
-                            <button class="spremeni_popust" onclick="Spremeni_popust()"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                            <input hidden="hidden" type="submit" form="spremeni_popust" value="potrdi" class="potrdi_popust">
-                            <button hidden="hidden" class="potrdi_popust" onclick="Preklici_spremembo_popusta()"> X </button>
+                            <button class="spremeni_prevoz" onclick="Spremeni_prevoz()"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                            <input hidden="hidden" type="submit" form="spremeni_prevoz" value="potrdi" class="potrdi_prevoz">
+                            <button hidden="hidden" class="potrdi_prevoz" onclick="Preklici_spremembo_prevoza()"> X </button>
                         </td>
-                        <td colspan="2"> {{slovar|keyvalue:'Znesek popusta'|keyvalue:jezik}}: </td>
-                        <td> {{baza.cena_popusta}} $</td>
+                        <td colspan="2"> {{slovar|keyvalue:'Cena prevoza'|keyvalue:jezik}}: </td>
+                        <td> {{baza.cena_prevoza}} $</td>
                         <td colspan="2" > </td>
                     </tr>
                     <tr class="endrow">

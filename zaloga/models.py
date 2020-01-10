@@ -385,6 +385,7 @@ def create_sestavina(sender, instance, created, **kwargs):
             for tip in zaloga.tipi_sestavin:
                 Cena.objects.create(sestavina = instance, prodaja = prodaja, tip = tip, nacin="prodaja")
 
+
 ###################################################################################################
 
 class Cena(models.Model):
@@ -492,6 +493,12 @@ class Baza(models.Model):
     def __str__(self):
         return self.title
     
+    #def save(self, *args, **kwargs):
+    #    baza = Baza.objects.get(pk = self.pk)
+    #    print(baza.prevoz)
+    #    print(self.prevoz)
+    #    super(Baza, self).save(*args, **kwargs)
+
     def uveljavi_inventuro(self, datum = None, cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)
@@ -545,7 +552,18 @@ class Baza(models.Model):
             sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
             tip = vnos.tip
             sestavina.spremeni_stevilo(self.sprememba_zaloge * vnos.stevilo, vnos.tip)
-            vnos.ustvari_spremembo(sestavina)
+            sprememba = Sprememba.objects.filter(baza = self, sestavina = sestavina, tip = vnos.tip ).first()
+            if sprememba:
+                sprememba.stevilo += vnos.stevilo
+                sprememba.save()
+            else:
+                sprememba = Sprememba.objects.create(
+                    sestavina = sestavina,
+                    tip = vnos.tip,
+                    stevilo = vnos.stevilo,
+                    baza = self)
+            vnos.sprememba = sprememba
+            vnos.save()
 
     def storniraj_racun(self):
         self.status = "storno"

@@ -13,7 +13,7 @@ with open('slovar.json') as dat:
         slovar = json.load(dat)
 
 ZGORNJA_MEJA = 830
-SPODANJA_MEJA = 30
+SPODANJA_MEJA = 50
 LEVA_MEJA = 40
 VISINA_VRSTICE = 20
 
@@ -83,7 +83,7 @@ def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
         top = naslednja_vrstica(p, top)
 
 
-def tabela_baze(p, baza, top = 800, jezik = "spa"):
+def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
     if baza.tip == "prevzem":
         top = title_prevzema(p,baza)
     elif baza.tip == "vele_prodaja":
@@ -97,7 +97,10 @@ def tabela_baze(p, baza, top = 800, jezik = "spa"):
                         ])
     tabela(p,data,style)
     top = naslednja_vrstica(p,top)
-    for vnos in baza.vnos_set.all().order_by("dimenzija"):
+    vnosi = baza.vnos_set.all().order_by("dimenzija")
+    if tip != "all":
+        vnosi = vnosi.filter(tip=tip)
+    for vnos in vnosi:
         data = [[
             vnos.dimenzija,
             vnos.tip, 

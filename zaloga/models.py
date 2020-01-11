@@ -581,6 +581,13 @@ class Baza(models.Model):
         dnevna_prodaja.save()
         self.save()
 
+    def razlicni_tipi(self):
+        tipi = []
+        for vnos in self.vnos_set.all().values('tip'):
+            if not vnos['tip'] in tipi:
+                tipi.append(vnos['tip'])
+        return tipi
+
     def dodaj_vnos(self,dimenzija,tip,stevilo):
         vnos = Vnos.objects.create(dimenzija=dimenzija,tip=tip,stevilo=stevilo,baza=self)
         if self.status == 'veljavno':

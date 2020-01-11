@@ -81,12 +81,14 @@ def pdf_cenika(request,tip_prodaje):
 
 def pdf_baze(request,zaloga,tip_baze, pk):
     zaloga = Zaloga.objects.get(pk = zaloga)
+    tip = request.GET.get('tip')
+    print(tip)
     baza = zaloga.baza_set.all().get(pk=pk)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="baza.pdf"'
     p = canvas.Canvas(response)
     p.translate(40,850)
-    pdf.tabela_baze(p,baza,800)
+    pdf.tabela_baze(p,baza,tip,800)
     p.showPage()
     p.save()
     return response 

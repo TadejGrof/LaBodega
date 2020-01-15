@@ -97,7 +97,8 @@ def pregled_prometa(request,tip,pk):
         pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
         zacetek_sprememb = request.GET.get('zacetek_sprememb', pred_mescem)
         konec_sprememb = request.GET.get('konec_sprememb', danes)
-        spremembe = sestavina.sprememba_set.filter(baza__datum__gte = zacetek_sprememb, baza__datum__lte=konec_sprememb, tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
+        #spremembe = sestavina.sprememba_set.filter(baza__datum__gte = zacetek_sprememb, baza__datum__lte=konec_sprememb, tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
+        spremembe = sestavina.sprememba_set.filter(tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
         zaporedna_stanja = sestavina.vrni_stanja(tip)[::-1]
         zacetek_dp = request.GET.get('zacetek_dp', pred_mescem)
         konec_dp = request.GET.get('konec_dp', danes)

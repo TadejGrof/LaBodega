@@ -28,7 +28,7 @@ def sprememba_zaloge(request, pk):
         zaloga = Zaloga.objects.get(pk=pk)
         zaloga.title = title
         zaloga.save()
-    return redirect('pregled_zaloge', pk=pk)
+    return redirect('pregled_skladisca', pk=pk)
 
 ######################################################################
 

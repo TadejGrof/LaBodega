@@ -261,9 +261,14 @@ class Sestavina(models.Model):
     JP = models.IntegerField(default = 0)
     JP50 = models.IntegerField(default = 0)
     JP70 = models.IntegerField(default = 0)
+    zaklep_zaloge = models.DateField(default=datetime(year=2019,month=12,day=6))
+    stanja_zaklepa = models.CharField(default="{'Y':0,'W':0,'JP':0,'JP50':0,'JP70':0}", max_length=50)
 
     class Meta:
         ordering = ['zaloga','dimenzija']
+
+    def zacetna_stanja(self):
+        return json.loads(self.stanja_zaklepa)
 
     def cena(self,prodaja,tip):
         if prodaja == "vele_prodaja" or prodaja == "dnevna_prodaja":

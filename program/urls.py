@@ -4,7 +4,7 @@ from zaloga import pdf_views
 
 pregled_zalog_patterns = [
         path('',pregled_views.pregled_zalog, name="pregled_zalog"),
-        path('ogled/<int:pk>/',pregled_views.pregled_zaloge, name="pregled_zaloge"),
+        path('ogled/<int:pk>/',pregled_views.pregled_zaloge, name="pregled_skladisca"),
         path('ogled/<int:pk>/sprememba_zaloge/',pregled_views.sprememba_zaloge, name="sprememba_zaloge"),
 ]
 

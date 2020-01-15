@@ -18,7 +18,7 @@
                     <td> {{zaloga.title}} </td>
                     <td> {{zaloga.naslov}} </td>
                     <td>
-                        <form action="{% url 'pregled_zaloge' zaloga.pk %}" method="GET">
+                        <form action="{% url 'pregled_skladisca' zaloga.pk %}" method="GET">
                             <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                         </form> 
                     </td>

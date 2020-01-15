@@ -179,60 +179,6 @@ def spremeni_cene(request,baza):
 ###########################################################################################
 ###########################################################################################
 
-def pregled_strank(request):
-    stranke = Stranka.objects.all().filter(status = 'aktivno').order_by('skupna_cena_kupljenih')
-    return pokazi_stran(request, 'prodaja/pregled_strank.html', {'stranke': stranke})
-
-def izbris_stranke(request, pk):
-    stranka = Stranka.objects.get(pk = pk)
-    stranka.izbrisi()
-    return redirect('pregled_strank')
-
-def ogled_stranke(request, pk):
-    stranka = Stranka.objects.get(pk=pk)
-    return pokazi_stran(request,'prodaja/stranka.html',{'stranka':stranka})
-
-def spremembna_stranke(request, pk):
-    if request.method=="POST":
-        stranka = Stranka.objects.get(pk = pk)
-        stranka.ime = request.POST.get('ime')
-        stranka.naziv = request.POST.get('naziv')
-        stranka.telefon = request.POST.get('telefon')
-        stranka.mail = request.POST.get('mail')
-        stranka.davcna = request.POST.get('davcna')
-        stranka.naslov.drzava = request.POST.get('drzava')
-        stranka.naslov.mesto = request.POST.get('mesto')
-        stranka.naslov.naslov = request.POST.get('naslov')
-        stranka.save()
-    return redirect('ogled_stranke', pk = pk)
-
-def nova_stranka(request):
-    naziv = request.POST.get('naziv')
-    ime = request.POST.get('ime')
-    davcna = request.POST.get('davcna')
-    drzava = request.POST.get('drzava')
-    mesto = request.POST.get('mesto')
-    naslov = request.POST.get('naslov')
-    naslov = Naslov.objects.create(drzava = drzava, mesto = mesto, naslov = naslov)
-    telefon = request.POST.get('telefon')
-    mail = request.POST.get('mail')
-    if mail == "":
-        mail = "/"
-    if davcna == "":
-        davcna = "/"
-    if telefon == "":
-        telefon = "/"
-    Stranka.objects.create(
-        naziv = naziv,
-        ime = ime,
-        davcna = davcna,
-        telefon = telefon,
-        mail = mail,
-        naslov = naslov)
-    return redirect('pregled_strank')
-
-###########################################################################################
-
 def porocilo(request):
     danes = datetime.date.today().strftime('%Y-%m-%d')
     pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')

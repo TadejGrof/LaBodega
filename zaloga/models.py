@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import datetime
 import os
 from django.contrib.auth.models import User
-from prodaja.models import Prodaja, Stranka
+from prodaja.models import Prodaja, Stranka, Naslov
 import json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -232,8 +232,11 @@ class Zaloga(models.Model):
 class Zaposleni(models.Model):
     user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)
     zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
-    ime = models.CharField(default="",max_length=20)
-    priimek = models.CharField(default="",max_length=20)
+    ime = models.CharField(default="/",max_length=20)
+    priimek = models.CharField(default="/",max_length=20)
+    davcna = models.CharField(default="/", max_length=30)
+    naslov = models.OneToOneField(Naslov, default=None, on_delete=models.CASCADE, null=True, blank=True)
+    telefon = models.CharField(default="/", max_length=20)
 
 class Dimenzija(models.Model):
     dimenzija = models.CharField(default="", max_length=20)

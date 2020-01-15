@@ -554,6 +554,11 @@
             "ang": "Stock",
             "spa": "Inventario"
         },
+        "Priimek": {
+            "slo": "Priimek",
+            "ang": "Lastname",
+            "spa": "Apellido"
+        },
         "Porocilo prometa": {
             "slo": "Porocilo prometa",
             "ang": "Account's report",

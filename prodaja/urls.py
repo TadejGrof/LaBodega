@@ -3,14 +3,6 @@ from zaloga import views
 from . import pviews 
 from zaloga import pdf_views
 
-pregled_strank_patterns = [
-    path('', pviews.pregled_strank, name='pregled_strank'),
-    path('nova_stranka/', pviews.nova_stranka, name='nova_stranka'),
-    path('ogled_stranke/<int:pk>/',pviews.ogled_stranke, name="ogled_stranke"),
-    path('spremembna_stranke/<int:pk>/', pviews.spremembna_stranke, name='sprememba_stranke'),
-    path('izbris_stranke/<int:pk>/', pviews.izbris_stranke, name='izbris_stranke'),
-]
-
 dnevna_prodaja_patterns = [
     path('', pviews.dnevna_prodaja, name="dnevna_prodaja"),
     path('nova_prodaja/', pviews.nova_dnevna_prodaja, name="nova_dnevna_prodaja"),
@@ -27,7 +19,6 @@ dnevna_prodaja_patterns = [
 
 urlpatterns = [
     path('', pviews.pregled_prodaje, name='pregled_prodaje'),
-    path('pregled_strank/', include(pregled_strank_patterns)),
     path('dnevna_prodaja/', include(dnevna_prodaja_patterns)),
     path('cenik/<str:baza>/', pviews.cenik, name='cenik_prodaje'),
     path('cenik/<str:baza>/spremeni_ceno/', pviews.spremeni_ceno, name='spremeni_ceno'),

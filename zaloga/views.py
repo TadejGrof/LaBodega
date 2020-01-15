@@ -38,8 +38,8 @@ def pregled_zaloge(request,zaloga):
             else:
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = False)
         tipi = []
-        for tip in zaloga.vrni_tipe:
-            if request.GET.get(tip[0],"true") == "true":
+        for tip in zaloga.tipi_sestavin:
+            if request.GET.get(tip,"true") == "true":
                 tipi.append(tip)
         sestavine = sestavine.values(
             'dimenzija__dimenzija',
@@ -54,7 +54,7 @@ def pregled_zaloge(request,zaloga):
             ne_prazne = []
             for sestavina in sestavine:
                 for tip in tipi:
-                    if sestavina[tip[0]] != 0:
+                    if sestavina[tip] != 0:
                         ne_prazne.append(sestavina)
                         break
             sestavine = ne_prazne
@@ -64,15 +64,15 @@ def pregled_zaloge(request,zaloga):
         for sestavina in sestavine:
             dimenzija = sestavina['dimenzija__dimenzija']
             for tip in tipi:
-                stevilo = sestavina[tip[0]]
-                cena = cenik[dimenzija][tip[0]]
+                stevilo = sestavina[tip]
+                cena = cenik[dimenzija][tip]
                 skupno += stevilo
                 vrednost += cena * stevilo
                 if dimenzija in cene:
-                    if not tip[0] in cene[dimenzija]:
-                        cene[dimenzija].update({tip[0]:stevilo * cena})
+                    if not tip in cene[dimenzija]:
+                        cene[dimenzija].update({tip:stevilo * cena})
                 else:
-                    cene.update({dimenzija:{tip[0]:stevilo * cena}})
+                    cene.update({dimenzija:{tip:stevilo * cena}})
         slovar = {
             'zaloga':zaloga,
             'sestavine':sestavine,
@@ -85,6 +85,7 @@ def pregled_zaloge(request,zaloga):
             'cene':cene,
             'vrednost':vrednost
         }
+        
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 
 @login_required

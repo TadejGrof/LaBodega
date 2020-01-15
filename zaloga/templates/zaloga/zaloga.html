@@ -70,7 +70,7 @@
             <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' zaloga_pk %}" method="GET">
                 <input type="hidden"  value="{{radius}}" name="radius">
                 {% for tip in tipi %}
-                <input type="hidden" value="True" name="{{tip.0}}">
+                <input type="hidden" value="True" name="{{tip}}">
                 {% endfor %}
                 <input style="width:100%"type="submit" value="pdf">
                 <select hidden="hidden" name="nicelne" style="width:5%">
@@ -109,13 +109,13 @@
             </tr>
                 {% for sestavina in sestavine %}
                     {% for tip in tipi %}
-                        <tr class="vrstica vrstica_{{tip.0}}">
+                        <tr class="vrstica vrstica_{{tip}}">
                             <td> {{sestavina.dimenzija__dimenzija}} </td>
-                            <td> {{ tip.1 }} </td>
-                            <td> {{sestavina|keyvalue:tip.0}} </td>
-                            <td> {{cene|keyvalue:sestavina.dimenzija__dimenzija|keyvalue:tip.0}}$</td>
+                            <td> {{ tip }} </td>
+                            <td> {{sestavina|keyvalue:tip}} </td>
+                            <td> {{cene|keyvalue:sestavina.dimenzija__dimenzija|keyvalue:tip}}$</td>
                             <td>
-                                <form action="{% url 'pregled_prometa' tip.0 sestavina.pk %}" method="GET">
+                                <form action="{% url 'pregled_prometa' tip sestavina.pk %}" method="GET">
                                     <input type="submit" value="{{slovar|keyvalue:'Pregled prometa'|keyvalue:jezik}}">
                                 </form>
                             </td>

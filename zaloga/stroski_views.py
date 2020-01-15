@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Kontejner, Stroski_Group, Strosek
+from .models import Kontejner, Stroski_Group, Strosek, Zaposleni
 from .models import Baza, Zaloga, Dnevna_prodaja
 from django.shortcuts import redirect
 import datetime
@@ -36,7 +36,7 @@ def strosek(request):
     strosek = Stroski_Group.objects.all().filter(status = 'aktivno').first()
     kontejnerji = Kontejner.objects.all().order_by('-baza__datum')[:10].values('stevilka','pk')
     vnosi = strosek.strosek_set.all() if strosek != None else None
-    zaposleni = User.objects.filter(groups__name='Zaposleni')
+    zaposleni = Zaposleni.objects.all()
     return pokazi_stran(request,'stroski/nov_strosek.html',{'strosek':strosek,'kontejnerji':kontejnerji,'vnosi':vnosi,'zaposleni':zaposleni})
 
 @login_required
@@ -77,8 +77,8 @@ def nov_vnos(request, pk):
         delavec = None
         title = request.POST.get('tip')
         if strosek.tip == "placa":
-            delavec = User.objects.get(pk = int(request.POST.get('delavec')))
-            title = delavec.username
+            delavec = Zaposleni.objects.get(pk = int(request.POST.get('delavec')))
+            title = delavec.ime
         Strosek.objects.create(
             group = strosek,
             delavec = delavec,

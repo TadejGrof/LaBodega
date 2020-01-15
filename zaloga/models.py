@@ -828,6 +828,6 @@ class Stroski_Group(models.Model):
 class Strosek(models.Model):
     title = models.CharField(default="",max_length=20)
     group = models.ForeignKey(Stroski_Group,default=0,on_delete=models.CASCADE)
-    delavec = models.ForeignKey(User,default=None,null=True,blank=True,on_delete=models.CASCADE)
+    delavec = models.ForeignKey(Zaposleni,default=None,null=True,blank=True,on_delete=models.CASCADE)
     znesek = models.DecimalField(default=0,max_digits=8,decimal_places=2)
 

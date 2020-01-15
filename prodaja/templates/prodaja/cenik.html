@@ -46,10 +46,10 @@
             <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
         </form>
     </div>
-    {% for tip in zaloga.vrni_tipe %}
-        {{tip.0}}:
-        <select style="width:5%" form="filter" name="{{tip.0}}">
-            {% if tip.0 in tipi %}
+    {% for tip in zaloga.tipi_sestavin %}
+        {{tip}}:
+        <select style="width:5%" form="filter" name="{{tip}}">
+            {% if tip in tipi %}
                 <option value="true" selected> Yes </option>
                 <option value="false"> No </option>
             {% else %}

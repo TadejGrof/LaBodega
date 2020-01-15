@@ -1,0 +1,30 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+    <div class="title" style="font-size:5vh;margin:2%;">
+        Obstoječe zaloge:
+    </div>
+    <div style="display:inline-block;width:70%;text-align:center">
+        <table class="tabela_vnosov">
+            <tr>
+                <th width="30%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
+                <th width="50%"> {{slovar|keyvalue:'Naslov'|keyvalue:jezik}}: </th>
+                <th width="20%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
+            </tr>
+            {% for zaloga in zaloge %}
+                <tr>
+                    <td> {{zaloga.title}} </td>
+                    <td> {{zaloga.naslov}} </td>
+                    <td>
+                        <form action="{% url 'pregled_zaloge' zaloga.pk %}" method="GET">
+                            <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                        </form> 
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}

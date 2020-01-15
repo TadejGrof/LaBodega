@@ -8,11 +8,9 @@ from datetime import datetime
 import os
 from django.contrib.auth.models import User
 from prodaja.models import Prodaja, Stranka
-from program.models import Program
 import json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .funkcije import ustvari_zacetna_stanja, arhiv_baz, arhiv_prodaj, zacetna_stanja
 
 TIPI_SESTAVINE = (
         ('Y','Yellow'),
@@ -93,8 +91,8 @@ class Zaloga(models.Model):
         for sestavina in self.sestavina_set.all().values():
             dimenzija = dimenzije[sestavina['dimenzija_id']]
             zaloga.update({dimenzija:{}})
-            for tip in self.vrni_tipe:
-                zaloga[dimenzija].update({tip[0]:sestavina[tip[0]]})
+            for tip in self.tipi_sestavin:
+                zaloga[dimenzija].update({tip:sestavina[tip]})
         return zaloga
 
     @property            
@@ -132,14 +130,6 @@ class Zaloga(models.Model):
         return razlicni_radiusi
 
     @property
-    def vrni_dimenzije(self):
-        return Dimenzija.objects.all().values_list('dimenzija','radius','height','width','special')
-
-    def dodaj_sestavino(self,dimenzija,radius,height,width,special=False,white=0,yellow=0):
-        dimenzija = Dimenzija.objects.create(dimenzija=dimenzija,radius=radius,height=height,width=width,special=special)
-        Sestavina.objects.create(zaloga=self,dimenzija=dimenzija,white=white,yellow=yellow)
-
-    @property
     def zacetna_stanja(self):
         with open('zacetna_stanja.json') as dat:
             slovar = json.load(dat)
@@ -150,28 +140,6 @@ class Zaloga(models.Model):
             for tip in self.vrni_tipe:
                 setattr(sestavina,tip[0],0)
             sestavina.save()
-
-    def zakleni_zalogo(self,datum):
-        ustvari_zacetna_stanja(self,datum)
-        baze = self.baza_set.all().filter(datum__lte = datum, status="veljavno").exclude(tip = "racun")
-        arhiv_baz(baze)
-        prodaje = self.dnevna_prodaja_set.all().filter(datum__lte = datum)
-        arhiv_prodaj(prodaje)
-        baze.update(status="zaklenjeno") 
-        baze = self.baza_set.all().filter(status="zaklenjeno")
-        spremembe = Sprememba.objects.filter(baza__in = baze)
-        spremembe.delete()
-        for prodaja in prodaje:
-            racuni = prodaja.baza_set.all().filter(status="veljavno",tip="racun")
-            racuni.update(status="zaklenjeno") 
-            Sprememba.objects.filter(baza__dnevna_prodaja = prodaja).delete()
-        return 
-
-    def ustvari_cene(self):
-        for sestavina in self.sestavina_set.all():
-            for tip in TIPI_SESTAVINE:
-                for prodaja in TIPI_PRODAJE:
-                    Cena.objects.create(sestavina = sestavina, tip = tip[0], prodaja = prodaja[0])
 
     def cenik(self,tip='vele_prodaja'):
         cene = {}
@@ -247,7 +215,6 @@ class Zaloga(models.Model):
             width = width[:-1]
         return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
  
-
     @property
     def vrni_zalogo(self):
         sestavine = self.sestavina_set.all().values()
@@ -261,6 +228,12 @@ class Zaloga(models.Model):
     @property
     def vrni_sestavine(self):
         return self.sestavina_set.all()
+
+class Zaposleni(models.Model):
+    user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)
+    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
+    ime = models.CharField(default="",max_length=20)
+    priimek = models.CharField(default="",max_length=20)
 
 class Dimenzija(models.Model):
     dimenzija = models.CharField(default="", max_length=20)

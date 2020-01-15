@@ -1,0 +1,131 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<h2 style="margin-top:2%"> Podatki Zaloge: </h2>
+
+<div style="display:inline-block;width:70%;text-align:center;margin-left:10%;margin-right:10%">
+    <table style="padding:1%;border:1px solid black" class="tabela_podatkov">
+        <tr>
+            <th width="33%" colspan="2"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
+            <th width="33%" colspan="2"> {{slovar|keyvalue:'Naslov'|keyvalue:jezik}}: </th>
+            <th width="33%" colspan="2"> {{slovar|keyvalue:'Kontakt'|keyvalue:jezik}}: </th>
+        </tr>
+        <tr>
+            <td> Title: </td>
+            <td> <input form="sprememba_zaloge" type="text" name="title" value="{{zaloga.title}}">  </td>
+            <td> Drzava: </td>
+            <td> <input form="sprememba_zaloge" name="drzava" value="{{zaloga.naslov.drzava}}"> </td>
+            <td> Telefon: </td>
+            <td> <input form="sprememba_zaloge" type="text" value="{{zaloga.telefon}}">  </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td> Mesto: </td>
+            <td> <input form="sprememba_zaloge" name="mesto" value="{{zaloga.naslov.mesto}}"> </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td> Ulica: </td>
+            <td> <input form="sprememba_zaloge" name="ulica" value="{{zaloga.naslov.ulica}}"> </td>
+        </tr>
+    </table>
+    <form id="sprememba_zaloge" action="{% url 'sprememba_zaloge' zaloga.pk %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="{{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}">
+    </form>
+</div>
+
+<div style="display:inline-block;width:25%;vertical-align:top"> 
+    <h2> Tipi zaloge: </h2>
+    <div class="table" >
+        <table style="width:80%;margin-left:10%"   class="tabela_vnosov">
+            <tr>
+                <td width="60%"> Tip </td>
+                <td width="40%"> Izbris </td>
+            </tr>
+            {% for tip in zaloga.tipi_sestavin %}
+                <tr>
+                    <td> {{tip}} </td>
+                    <td> 
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Izbrisi">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div style="display:inline-block;width:25%;vertical-align:top"> 
+    <h2> Tipi prodaje: </h2>
+    <div class="table" >
+        <table  style="width:80%;margin-left:10%"  class="tabela_vnosov">
+            <tr>
+                <td width="60%"> Tip </td>
+                <td width="40%"> Izbris </td>
+            </tr>
+            {% for tip in zaloga.tipi_prodaj %}
+                <tr>
+                    <td> {{tip}} </td>
+                    <td> 
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="Izbrisi">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div style="display:inline-block;width:45%;vertical-align:top">
+    <h2> Zaposleni: </h2>
+    <div style="width:80%;display:inline-block"  class="table" >
+        <table  class="tabela_vnosov">
+            <tr>
+                <th width="40%"> Ime </th>
+                <th width="40%"> Priimek </th>
+                <th width="20%"> E </th>
+            </tr>
+            {% for tip in zaloga.zaposleni %}
+                <tr>
+                    <td> {{tip}} </td>
+                    <td> 
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="submit" value="X">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2">
+                    Dodaj: 
+                    <select style="width:60%" form="nov_zaposleni" name="zaposleni">
+                        {% for zaposleni in zaposleni_na_voljo %}
+                            <option value="{{zaposleni.pk}}"> {{zaposleni.ime}} {{zaposleni.priimek}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <form method="POST">
+                        <input type="submit" value="Dodaj">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<h2> Neuporabljene sestavine: </h2>
+
+<h2> Posebnosti: </h2>
+
+{% endblock %}

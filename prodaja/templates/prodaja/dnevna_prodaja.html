@@ -283,12 +283,12 @@
                 {% endif %}
             </div>
             <div class="gumbi_div">
-                <form hidden="hidden" id="nov_vnos" action="{% url 'racun_nov_vnos' aktivni_racun.pk %}" method="POST">
+                <form id="nov_vnos" action="{% url 'racun_nov_vnos' aktivni_racun.pk %}" method="POST">
                 {% csrf_token %}
-                </form>
-                <div class="select">
-                    {% include 'prodaja/dinamic_select.html' %}
+                <div style="margin-top:6%" class="select">
+                    {% include 'program/dinamic_select.html' %}
                 </div>
+                </form>
                 <div class="gumbi" id="gumbi">
                     {% for n in '00000000000000000000' %}
                         <button class="dimenzija" id="gumb_{{forloop.counter}}" onclick="KlikGumba({{forloop.counter}})" ></button>
@@ -428,9 +428,9 @@
         var tip = tipbox.options[tipbox.selectedIndex].value
         {% for sestavina in na_voljo %}
             if( "{{sestavina}}" == dimenzija ){
-                {% for tip in zaloga.vrni_tipe %}
-                    if( "{{tip.0}}" == tip ){
-                        document.getElementById('zaloga_div').innerHTML = '/ {{na_voljo|keyvalue:sestavina|keyvalue:tip.0}}'
+                {% for tip in zaloga.tipi_sestavin %}
+                    if( "{{tip}}" == tip ){
+                        document.getElementById('zaloga_div').innerHTML = '/ {{na_voljo|keyvalue:sestavina|keyvalue:tip}}'
                     }
                 {% endfor %}
             }

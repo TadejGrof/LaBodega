@@ -45,9 +45,9 @@
             </form>
         </div>
         <div style="display:block;margin-top:1%">
-            {% for tip in zaloga.vrni_tipe %}
-                {{tip.0}}:
-                <select style="width:5%" form="filter" name="{{tip.0}}">
+            {% for tip in zaloga.tipi_sestavin %}
+                {{tip}}:
+                <select style="width:5%" form="filter" name="{{tip}}">
                     {% if tip in tipi %}
                         <option value="true" selected> Yes </option>
                         <option value="false"> No </option>

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from zaloga.models import Dimenzija
 # Create your models here.
 
 JEZIKI = (
@@ -76,6 +77,33 @@ class Program(models.Model):
     @property
     def vrni_jezike(self):
         return JEZIKI
+
+    @property
+    def danes(self):
+        return datetime.today().strftime('%Y-%m-%d')
+
+    
+    def vrni_slovar_dimenzij(self, obratno = False):
+        slovar = {}
+        dimenzije = self.sestavina_set.values('dimenzija_id','dimenzija__dimenzija')
+        if obratno:
+            for dimenzija in dimenzije:
+                slovar.update({dimenzija['dimenzija_id']:dimenzija['dimenzija__dimenzija']})
+        else: 
+            for dimenzija in dimenzije:
+                slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
+        return slovar
+
+    def vrni_dimenzijo(self,radius,height,width):
+        special = False
+        if "C" in width:
+            special = True
+            width = width[:-1]
+        return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
+
+    @property
+    def vrni_dimenzije(self):
+        return Dimenzija.objects.all().values_list('dimenzija','radius','height','width','special')
 
 class Profil(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)

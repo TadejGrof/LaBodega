@@ -165,6 +165,16 @@
 
 <div id="sidenav" class="sidenav">
     <a style="margin-bottom:10%" onclick="zapri()"> X </a>
+    {% if perms.admin.view_logentry %}
+        <button class="dropdown-btn">{{slovar|keyvalue:'Pregled'|keyvalue:jezik}}
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a href="{% url 'pregled_zalog' %}" > Skladisca </a>
+            <a href="{% url 'nova_dimenzija' %}" > Zaposleni </a>
+            <a href="{% url 'pregled_strank' %}"> Stranke </a>
+        </div>
+    {% endif %}
     {% if perms.zaloga.view_zaloga %}
         <button class="dropdown-btn">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>

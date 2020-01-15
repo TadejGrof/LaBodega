@@ -24,7 +24,7 @@
         var Radiusvalue = radiusbox.options[radiusbox.selectedIndex].value;
         var dimenzije = [];
         var dimarray;
-        {% for dimenzija in zaloga.vrni_dimenzije %}
+        {% for dimenzija in program.vrni_dimenzije %}
             dimarray = [];
             dimarray.push("{{dimenzija.1}}");
             dimarray.push("{{dimenzija.2}}");
@@ -64,7 +64,7 @@
         var Heightvalue = heightbox.options[heightbox.selectedIndex].value;
         var dimenzije = [];
         var dimarray;
-        {% for dimenzija in zaloga.vrni_dimenzije %}
+        {% for dimenzija in program.vrni_dimenzije %}
             dimarray = [];
             dimarray.push("{{dimenzija.1}}");
             dimarray.push("{{dimenzija.2}}");

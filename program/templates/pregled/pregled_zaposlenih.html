@@ -35,6 +35,14 @@
                 <td> <input form="nova_stranka" name="davcna" type="text" autocomplete="off"> </td>
                 <td> {{slovar|keyvalue:'Ulica'|keyvalue:jezik}}: </td>
                 <td> <input form="nova_stranka" name="naslov" type="text" required autocomplete="off"> </td>
+                <td> Skladišče: </td>
+                <td>
+                    <select form="nova_stranka" name="zaloga">
+                        {% for zaloga in zaloge %}
+                            <option value="{{zaloga.pk}}"> {{zaloga.title}} </option> 
+                        {% endfor %}
+                    </select>
+                </td>
             </tr>
         </table>
         <form id="nova_stranka" action="{% url 'nov_zaposleni' %}" method="POST">

@@ -237,6 +237,7 @@ class Zaposleni(models.Model):
     davcna = models.CharField(default="/", max_length=30)
     naslov = models.OneToOneField(Naslov, default=None, on_delete=models.CASCADE, null=True, blank=True)
     telefon = models.CharField(default="/", max_length=20)
+    mail = models.CharField(default="/", max_length=40)
 
 class Dimenzija(models.Model):
     dimenzija = models.CharField(default="", max_length=20)

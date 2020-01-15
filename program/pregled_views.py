@@ -50,8 +50,12 @@ def nov_zaposleni(request):
         drzava = request.POST.get('drzava')
         mesto = request.POST.get('mesto')
         naslov = request.POST.get('naslov')
+        mail = request.POST.get('e-mail')
+        zaloga = Zaloga.objects.get(pk = int(request.POST.get('zaloga')))
         naslov = Naslov.objects.create(drzava = drzava, mesto = mesto, naslov = naslov)
         telefon = request.POST.get('telefon')
+        if mail == "":
+            mail = "/"
         if davcna == "":
             davcna = "/"
         if telefon == "":
@@ -61,7 +65,10 @@ def nov_zaposleni(request):
             priimek = priimek,
             davcna = davcna,
             telefon = telefon,
-            naslov = naslov)
+            mail = mail,
+            naslov = naslov,
+            zaloga = zaloga
+        )
     return redirect('pregled_zaposlenih')
 
 def pregled_zaposlenega(request, pk):

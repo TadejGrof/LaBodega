@@ -85,7 +85,6 @@ def pregled_zaloge(request,zaloga):
             'cene':cene,
             'vrednost':vrednost
         }
-        
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 
 @login_required

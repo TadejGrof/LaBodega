@@ -183,7 +183,7 @@
                     <form style="display:inline-block" action="{% url 'baza_nov_vnos' zaloga_pk tip baza.pk %}" method="POST">
                         {% csrf_token %}
                         <select style="width:25%" name="dimenzija">
-                            {% for dimenzija in zaloga.vrni_dimenzije %}
+                            {% for dimenzija in program.vrni_dimenzije %}
                                 <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
                             {% endfor %}
                         </select>

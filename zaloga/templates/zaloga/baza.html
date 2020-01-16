@@ -199,10 +199,14 @@
                 </div>
             {% endif %}
         {% endif %}
-        <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="POST">
-            {% csrf_token %}
-            <input hidden="hidden" type="number" value={{baza.pk}} name="pk">
+        <form style="display:inline-block" class="pre_nov_vnos" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="GET">
             <input style="width:150px" type="submit" value="PDF">
+            <select name="tip">
+                <option value="all"> All </option>
+                {% for tip in baza.razlicni_tipi %}
+                    <option value="{{tip}}"> {{tip}} </option>
+                {% endfor %}
+            </select>
         </form>
     </div>
 {% endif %}

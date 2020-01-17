@@ -430,17 +430,20 @@ class Dnevna_prodaja(models.Model):
         return self.baza_set.filter(tip="racun",status="veljavno").count()
     
     @property
+    def urejeni_vnosi(self):
+        return Vnos.objects.filter(baza__dnevna_prodaja = self, baza__status="veljavno").order_by('dimenzija')
+
+    @property
     def prodane(self):
         prodane = {}
-        for racun in self.racuni:
-            for vnos in racun.vnos_set.all():
-                dimenzija_vnos = str(vnos.dimenzija) + '-' + vnos.tip
-                if dimenzija_vnos in prodane:
-                    prodane[dimenzija_vnos]['stevilo'] += vnos.stevilo
-                    prodane[dimenzija_vnos]['cena'] += vnos.cena * vnos.stevilo
-                else:
-                    slovar = {'dimenzija':vnos.dimenzija.dimenzija, 'stevilo':vnos.stevilo,'tip':vnos.tip,'cena':vnos.cena * vnos.stevilo}
-                    prodane.update({dimenzija_vnos:slovar})
+        for vnos in self.urejeni_vnosi:
+            dimenzija_vnos = str(vnos.dimenzija) + '-' + vnos.tip
+            if dimenzija_vnos in prodane:
+                prodane[dimenzija_vnos]['stevilo'] += vnos.stevilo
+                prodane[dimenzija_vnos]['cena'] += vnos.cena * vnos.stevilo
+            else:
+                slovar = {'dimenzija':vnos.dimenzija.dimenzija, 'stevilo':vnos.stevilo,'tip':vnos.tip,'cena':vnos.cena * vnos.stevilo}
+                prodane.update({dimenzija_vnos:slovar})
         return prodane
 
     @property

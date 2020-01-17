@@ -21,16 +21,16 @@
     }
     div.racuni{
         display:inline-block;
-        width:40%;
+        width:45%;
         height:60%;
         margin-top:3%;
         vertical-align:top;
-        margin-left:3%;
+        margin-left:1.5%;
         border: 1px solid black
     }
     div.racun{
         display:inline-block;
-        width:50%;
+        width:45%;
         height:60%;
         margin-top:3%;
         vertical-align:top;
@@ -39,15 +39,15 @@
     }
 </style>
 
-<div class="title">
+<h1 style="margin-top:3%">
     {{slovar|keyvalue:'Ogled prodaje na dan'|keyvalue:jezik}} {{prodaja.title}}
-</div>
+</h1>
 
 <div class="racuni">
-    <div class="sub_title">
+    <h2 style="margin-top:2%">
         {{slovar|keyvalue:'Racuni'|keyvalue:jezik}}:
-    </div>
-    <div style="display:inline-block;width:90%;margin-top:4%;height:60%;overflow:auto" >
+    </h2>
+    <div style="display:inline-block;width:90%;height:60%;overflow:auto" >
         <table style="width:100%" class="tabela_vnosov">
             <tr class="header">
                 <th> St.: </th>
@@ -87,12 +87,10 @@
 
 <div class="racun">
     {% if racun == None %}
-        <div class="title">{{slovar|keyvalue:'Brez veljavnih racunov'|keyvalue:jezik}} </div>
+        <h1> {{slovar|keyvalue:'Brez veljavnih racunov'|keyvalue:jezik}} </h1>
     {% else %}
-        <div class="sub_title">
-            {{slovar|keyvalue:'Racun'|keyvalue:jezik}} {{racun.title}}
-        </div>
-        <div style="display:inline-block;width:80%;height:46%;margin-top:3.5%;overflow:auto">
+        <h2> {{slovar|keyvalue:'Racun'|keyvalue:jezik}} {{racun.title}} </h2>
+        <div style="display:inline-block;width:80%;height:46%;overflow:auto">
             <table style="width:100%" class="tabela_vnosov">
                 <tr class="header">
                     <th> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
@@ -139,12 +137,12 @@
 </div>
 
 <div class="sestavine">
-    <div class="sub_title">
+    <h2>
         {{slovar|keyvalue:'Prodane'|keyvalue:jezik}}:
         <form style="display:inline-block;width:10%;margin-left:1%;" action="{% url 'pdf_dnevne_prodaje' prodaja.pk 'prodane' %}" method="GET">
             <input type="submit" value="PDF" style="width:100%">
         </form>
-    </div>
+    </h2>
     <div style="display:inline-block;width:80%;margin-bottom:3%">
         <table  class="tabela_vnosov">
             <tr class="header">
@@ -168,12 +166,12 @@
 </div>
 
 <div class="sestavine">
-    <div class="sub_title">
+    <h2>
         Activity_log:
         <form style="display:inline-block;width:10%;margin-left:1%;" action="{% url 'pdf_dnevne_prodaje' prodaja.pk 'activity_log' %}" method="GET">
             <input type="submit" value="PDF" style="width:100%">
         </form>
-    </div>
+    </h2>
     <div style="display:inline-block;width:80%;margin-bottom:3%">
         <table  class="tabela_vnosov">
             <tr class="header">

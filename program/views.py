@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from .models import Program
 import json 
 import datetime
+from request_funkcije import pokazi_stran, vrni_slovar
 
 zaloga = Zaloga.objects.first()
 prodaja = Prodaja.objects.first()
@@ -48,21 +49,3 @@ def spremeni_jezik(request):
         request.user.save()
         return redirect('home_page')
 
-
-
-##########################################################################################
-##########################################################################################
-##########################################################################################
-
-def vrni_slovar(request):
-    with open('slovar.json') as dat:
-        slovar = json.load(dat)
-    return slovar
-
-def pokazi_stran(request, html, baze={}):
-    slovar = {'prodaja':prodaja,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
-    slovar.update(baze)
-    if not 'zaloga' in baze:
-        slovar.update({'zaloga':zaloga})
-    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
-    return render(request, html, slovar)

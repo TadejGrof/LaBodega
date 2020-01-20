@@ -6,6 +6,8 @@ import datetime
 from django.contrib.auth.decorators import login_required
 import json 
 from django.contrib.auth.models import User
+from django.shortcuts import render
+from request_funkcije import vrni_slovar, pokazi_stran
 
 zaloga = Zaloga.objects.all().first()
 
@@ -204,19 +206,6 @@ def porocilo_prodaje(request):
 ###################################################################################
 ###################################################################################
 ###################################################################################
-
-def vrni_slovar(request):
-    with open('slovar.json') as dat:
-        slovar = json.load(dat)
-    return slovar
-
-def pokazi_stran(request, html, baze={}):
-    slovar = {'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
-    slovar.update(baze)
-    if not 'zaloga' in baze:
-        slovar.update({'zaloga':zaloga})
-    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
-    return render(request, html, slovar)
 
 def pregled_prometa(promet):
     cene, skupno = [], 0

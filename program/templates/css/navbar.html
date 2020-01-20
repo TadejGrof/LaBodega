@@ -163,6 +163,7 @@
     </div>
 </div>
 
+{% if not stranka %}
 <div id="sidenav" class="sidenav">
     <a style="margin-bottom:10%" onclick="zapri()"> X </a>
     {% if perms.admin.view_logentry %}
@@ -267,7 +268,7 @@
         </div>
     {% endif %}
 </div>
-
+{% endif %}
 <script>
     function odpri() {
         document.getElementById('sidenav').style.display = "block"

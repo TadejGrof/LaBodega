@@ -2,17 +2,15 @@ from django.shortcuts import render
 from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
-from prodaja.models import Prodaja, Stranka
+from prodaja.models import Stranka
 import io
 import datetime
 from django.contrib.auth.decorators import login_required
 import json 
-from program.models import Program
 from . import funkcije
+from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 
-prodaja = Prodaja.objects.first()
 zaloga = Zaloga.objects.first()
-program = Program.objects.first()
 
 
 ##################################################################################################
@@ -414,32 +412,3 @@ def arhiv(request,zaloga, tip_baze):
         zaloga = Zaloga.objects.get(pk =zaloga)
         return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'zaloga':zaloga,'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})
 
-###################################################################################
-###################################################################################
-###################################################################################
-
-def vrni_dimenzijo(request):
-    if request.POST.get('dimenzija'):
-        return Dimenzija.objects.get(dimenzija=request.POST.get('dimenzija'))
-    else:
-        radius = request.POST.get('radius')
-        height = request.POST.get('height')
-        width = request.POST.get('width')
-        special = False
-        if 'C' in width:
-            width = width.replace('C','')
-            special = True
-        return Dimenzija.objects.get(radius=radius,height=height,width=width,special=special)
-
-def vrni_slovar(request):
-    with open('slovar.json') as dat:
-        slovar = json.load(dat)
-    return slovar
-
-def pokazi_stran(request, html, baze={}):
-    slovar = {'prodaja':prodaja,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
-    slovar.update(baze)
-    if not 'zaloga' in baze:
-        slovar.update({'zaloga':zaloga})
-    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
-    return render(request, html, slovar)

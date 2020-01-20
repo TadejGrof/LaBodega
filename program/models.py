@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from zaloga.models import Dimenzija
+from prodaja.models import Stranka
 # Create your models here.
 
 JEZIKI = (
@@ -108,6 +109,7 @@ class Program(models.Model):
 class Profil(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     jezik =  models.CharField(default="spa",max_length=3, choices=JEZIKI)
+    stranka = models.OneToOneField(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -117,3 +119,4 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profil.save()
+

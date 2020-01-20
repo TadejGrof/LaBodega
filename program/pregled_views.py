@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from .models import Program
 import json 
 import datetime
-
+from request_funkcije import vrni_slovar,pokazi_stran, vrni_dimenzijo
 @login_required
 def pregled_zalog(request):
     if request.method == "GET":
@@ -147,16 +147,3 @@ def nova_stranka(request):
 
 ###############################################################################################
 ###############################################################################################
-
-def vrni_slovar(request):
-    with open('slovar.json') as dat:
-        slovar = json.load(dat)
-    return slovar
-
-def pokazi_stran(request, html, baze={}):
-    slovar = {'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
-    slovar.update(baze)
-    if not 'zaloga' in baze:
-        slovar.update({'zaloga':Zaloga.objects.first()})
-    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
-    return render(request, html, slovar)

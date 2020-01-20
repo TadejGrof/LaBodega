@@ -6,6 +6,7 @@ import datetime
 from django.utils import timezone
 from program.models import Program
 import json 
+from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 
 program = Program.objects.first()
 prodaja = Prodaja.objects.first()
@@ -185,32 +186,3 @@ def porocilo(request):
     zacetek = request.GET.get('zacetek', pred_mescem)
     konec = request.GET.get('konec', danes)
     
-
-
-###########################################################################################
-###########################################################################################
-###########################################################################################
-
-def vrni_slovar(request):
-    with open('slovar.json') as dat:
-        slovar = json.load(dat)
-    return slovar
-
-def pokazi_stran(request, html, baze={}):
-    slovar = {'prodaja':prodaja,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
-    slovar.update(baze)
-    if not 'zaloga' in baze:
-        slovar.update({'zaloga':zaloga})
-    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
-
-    return render(request, html, slovar)
-
-def vrni_dimenzijo(request):
-    radius = request.POST.get('radius')
-    height = request.POST.get('height')
-    width = request.POST.get('width')
-    special = False
-    if 'C' in width:
-        width = width.replace('C','')
-        special = True
-    return Dimenzija.objects.get(radius=radius,height=height,width=width,special=special)

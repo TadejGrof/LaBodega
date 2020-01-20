@@ -72,15 +72,21 @@ def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     for sestavina in sestavine:
         cene = []
+        nicelne = True
         for cena in sestavina.cena_set.all().filter(prodaja = tip_prodaje, tip__in = kratki_tipi):
-            cene.append(str(cena.cena) + "$")
-        data= [[sestavina.dimenzija.dimenzija] + cene]
-        style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
-                            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
-                            ])
-        tabela(p,data,style)
-        top = naslednja_vrstica(p, top)
+            if cena.cena > 0:
+                cene.append(str(cena.cena) + "$") 
+                nicelne = False
+            else:
+                cene.append('/')
+        if not nicelne:
+            data= [[sestavina.dimenzija.dimenzija] + cene]
+            style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                                ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                                ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                                ])
+            tabela(p,data,style)
+            top = naslednja_vrstica(p, top)
 
 
 def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):

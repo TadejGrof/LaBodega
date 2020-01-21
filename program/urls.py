@@ -25,6 +25,7 @@ pregled_strank_patterns = [
 
 urlpatterns = [
     path('', views.home_page, name='home_page'),
+    path('profil/', views.profil, name="profil"),
     path('pregled_zalog/', include(pregled_zalog_patterns)),
     path('pregled_zaposlenih/', include(pregled_zaposlenih_patterns)),
     path('pregled_strank/', include(pregled_strank_patterns)),

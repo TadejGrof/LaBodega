@@ -1,0 +1,49 @@
+{% extends 'program/base.html' %}
+
+
+{% load zaloga_exstras %}
+
+{% block content %}
+    <h1> Pregled narocil </h1>
+
+    <h2> Novo narocilo </h2>
+
+    <div style="text-aling:center;display:inline-block;width:60%;height:20%;border: 1.5px solid black">
+        <form  style="width:100%;display:inline-block">
+            <div style="display:inline-block;width:64%;vertical-align:top">
+                <div style="margin-top:2%;height:40%;font-size:120%">Izberi pričakovani datum prejema: </div>
+                <div style="height:49%"> <input style="text-align:center;width:80%;height:80%" type="date" name="datum"> </div>
+            </div>
+            <div style="display:inline-block;width:34%;Height:90;vertical-align:top">
+                <input type="submit" style="width:80%;height:80%;margin-top:5%;" value="novo narocilo">
+            </div>
+        </form>
+    </div>
+    {% if narocila.count > 0 %}
+        <h2> Aktivna narocila: </h2>
+        <div style="text-align:center" >
+            <table style="display:inline-block;width:60%" class="tabela_vnosov">
+                <tr>
+                    <th> Narocilo </th>
+                    <th> Datum narocila </th>
+                    <th> Datum dostave </th>
+                    <th> Status </th>
+                    <th> Ogled </th>
+                </tr>
+                {% for narocilo in narocila %}
+                    <tr>
+                        <td>  {{narocilo.title}} </td>
+                        <td> {{narocilo.datum}} </td>
+                        <td> {{narocilo.datum_dostave}} </td>
+                        <td> {{narocilo.status}} </td>
+                        <td> 
+                            <form action="{% url 'stranka_ogled_narocila' narocilo.pk %}" method="GET" >
+                                <input type="submit" value="Ogled">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

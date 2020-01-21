@@ -1,0 +1,61 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<style>
+    div.table{
+        display:inline-block;
+        margin-top:3%;
+        width:80%;
+        overflow: auto
+    }
+    div.besedilo{
+        height:8%;
+        font-size:6vh;
+        display:block;
+        text-align:center;
+        margin-top:2%
+    }
+</style>
+
+<h1>
+    Zgodovina nakupov
+</h1>
+<div class="filter" style="margin-top:3%">
+    <form action="{% url 'stranka_zgodovina' %}" method="GET">
+        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{zacetek}}" name="zacetek">
+        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{konec}}" name="konec">
+        <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
+    </form>
+</div>
+
+<div class="table">
+    <table class="tabela_vnosov">
+        <tr class="header">
+            <th width="8%"> N. </th>
+            <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
+            <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+            <th width="15%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+            <th width="15%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+            <th width="13%"> {{slovar|keyvalue:'Vpogled'|keyvalue:jezik}}: </th>  
+        </tr>
+        {% for baza in baze %}
+        <tr>
+            <td> {{forloop.counter}}. </td>
+            <td> {{baza.title}} </td>
+            <td> {{baza.datum}} </td>
+            <td> {{baza.skupno_stevilo}} </td>
+            <td> {{baza.skupna_cena}} $</td>
+            <td>
+                <form  method="GET">
+                    <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                </form>
+            </td>  
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
+

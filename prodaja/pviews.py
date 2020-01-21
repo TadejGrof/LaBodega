@@ -12,6 +12,7 @@ program = Program.objects.first()
 prodaja = Prodaja.objects.first()
 zaloga = Zaloga.objects.first()
 
+
 # Create your views here.
 def pregled_prodaje(request):
     pass

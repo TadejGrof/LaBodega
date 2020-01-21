@@ -148,8 +148,14 @@
 </style>
 
 <div id="navbar" class="navbar">
-    <button onclick="odpri()" class="nav" style="width:15%"> ☰ </button>
-    <a style="width:20%" href="/">Home</a>
+    {% if stranka %}
+        <div style="display:inline-block;width:28%"><a href="{% url 'stranka_pregled_narocil' %}" style="width:100%"> Pregled narocil </a></div>
+        <div style="display:inline-block;width:22%"><a href="{% url 'stranka_zgodovina' %}" style="width:100%"> Zgodovina </a></div>
+        <a style="width:15%" href="/">Home</a>
+    {% else %}
+        <button onclick="odpri()" class="nav" style="width:15%"> ☰ </button>
+        <a style="width:20%" href="/">Home</a>
+    {% endif %}
     <div class="racun dropdown" id="racun">
         <button class="dropbtn" >{{ user.get_username }}
         <i class="fa fa-caret-down"></i>
@@ -158,6 +164,7 @@
             {% if perms.admin.view_logentry %}
                 <a href="{% url 'admin:index' %}"> Admin </a>
             {% endif %}
+            <a href="{% url 'profil' %}"> Profil </a>
             <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
         </div>
     </div>

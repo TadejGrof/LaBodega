@@ -42,6 +42,12 @@ def home_page(request):
     return pokazi_stran(request, 'program/home_page.html', slovar)
 
 @login_required
+def profil(request):
+    stranka = request.user.profil.stranka
+    je_stranka = True if stranka != None else False
+    return pokazi_stran(request,'program/profil.html',{'je_stranka':je_stranka,'stranka':stranka})
+
+@login_required
 def spremeni_jezik(request):
     if request.method == "POST":
         jezik = request.POST.get('jezik')

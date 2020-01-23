@@ -6,7 +6,6 @@ import datetime
 from django.contrib.auth.decorators import login_required
 import json 
 from django.contrib.auth.models import User
-from django.shortcuts import render
 from request_funkcije import vrni_slovar, pokazi_stran
 
 zaloga = Zaloga.objects.all().first()

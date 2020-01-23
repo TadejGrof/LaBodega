@@ -46,6 +46,7 @@ pregled_patterns = [
     path('', views.pregled_prometa,name="pregled_prometa"),
     path('sprememba_cene/<int:cena>/',views.sprememba_cene,name="sprememba_cene"),
 ]
+
 urlpatterns = [
     path('<int:zaloga>/pregled_zaloge/', views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),

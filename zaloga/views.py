@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 import json 
 from . import funkcije
 from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
+from program.models import Program
 
 zaloga = Zaloga.objects.first()
 
@@ -168,6 +169,7 @@ def baze(request,zaloga,tip_baze):
 @login_required
 def nova_baza(request,zaloga,tip_baze):
     if request.method == "POST":
+        program = Program.objects.first()
         if tip_baze == "narocilo":
             title = "narocilo"
         else:

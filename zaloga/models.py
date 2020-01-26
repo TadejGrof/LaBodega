@@ -393,8 +393,6 @@ class Dnevna_prodaja(models.Model):
     datum = models.DateField(default=timezone.now)
     title = models.CharField(default="", max_length=20)
     tip = 'dnevna_prodaja'
-    skupna_cena = models.DecimalField(decimal_places=2,max_digits=6,default=0)
-    skupno_stevilo = models.IntegerField(default = 0)
 
     @property
     def stevilo_racunov(self):
@@ -433,6 +431,18 @@ class Dnevna_prodaja(models.Model):
     def urejeni_vnosi(self):
         return Vnos.objects.filter(baza__dnevna_prodaja = self, baza__status="veljavno").order_by('dimenzija')
 
+    @property 
+    def skupna_cena(self):
+        cena = 0
+        for vnos in Vnos.objects.filter(baza__dnevna_prodaja=self,baza__status="veljavno"):
+            cena += vnos.cena * vnos.stevilo
+
+    @property 
+    def skupno_stevilo(self):
+        stevilo = 0
+        for vnos in Vnos.objects.filter(baza__dnevna_prodaja=self,baza__status="veljavno"):
+            stevilo += vnos.stevilo
+    
     @property
     def prodane(self):
         prodane = {}
@@ -523,10 +533,6 @@ class Baza(models.Model):
                     baza = self)
             vnos.sprememba = sprememba
             vnos.save()
-        dnevna_prodaja = self.dnevna_prodaja
-        dnevna_prodaja.skupno_stevilo += self.skupno_stevilo
-        dnevna_prodaja.skupna_cena += self.koncna_cena
-        dnevna_prodaja.save()
         self.save()
 
     def uveljavi(self,datum=None,cas = None):

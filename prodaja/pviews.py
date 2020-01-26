@@ -45,6 +45,7 @@ def nova_dnevna_prodaja(request):
 
 def nov_racun(request):
     if request.method == "POST":
+        program = Program.objects.first()
         prodaja = Dnevna_prodaja.objects.filter(datum = datetime.date.today()).first()
         Baza.objects.create(
             title= program.naslednji_racun(delaj=True),
@@ -90,6 +91,7 @@ def racun_spremeni_popust(request):
 
 def uveljavi_racun(request,pk):
     if request.method == "POST":
+        program = Program.objects.first()
         racun = Baza.objects.get(pk = pk)
         racun.uveljavi_racun()
         Baza.objects.create(

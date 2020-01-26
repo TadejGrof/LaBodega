@@ -3,7 +3,7 @@ from .models import Kontejner, Stroski_Group, Strosek, Zaposleni
 from .models import Baza, Zaloga, Dnevna_prodaja
 from django.shortcuts import redirect
 import datetime
-from django.contrib.auth.decorators import login_requircded
+from django.contrib.auth.decorators import login_required
 import json 
 from django.contrib.auth.models import User
 from request_funkcije import vrni_slovar, pokazi_stran

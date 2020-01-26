@@ -436,13 +436,15 @@ class Dnevna_prodaja(models.Model):
         cena = 0
         for vnos in Vnos.objects.filter(baza__dnevna_prodaja=self,baza__status="veljavno"):
             cena += vnos.cena * vnos.stevilo
+        return cena
 
     @property 
     def skupno_stevilo(self):
         stevilo = 0
         for vnos in Vnos.objects.filter(baza__dnevna_prodaja=self,baza__status="veljavno"):
             stevilo += vnos.stevilo
-    
+        return stevilo
+        
     @property
     def prodane(self):
         prodane = {}
@@ -566,10 +568,6 @@ class Baza(models.Model):
             tip = sprememba.tip
             sprememba.stevilo_iz_vnosov()
             sestavina.nastavi_iz_sprememb(tip)
-        dnevna_prodaja = self.dnevna_prodaja
-        dnevna_prodaja.skupno_stevilo -= self.skupno_stevilo
-        dnevna_prodaja.skupna_cena -= self.koncna_cena
-        dnevna_prodaja.save()
         self.save()
 
     def razlicni_tipi(self):

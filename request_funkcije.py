@@ -22,12 +22,12 @@ def vrni_slovar(request):
     return slovar
 
 def pokazi_stran(request, html, baze={}):
-    stranka = False
+    je_stranka = False
     program = Program.objects.first()
     zaloga = Zaloga.objects.first()
     if request.user.profil.stranka != None:
-        stranka = True
-    slovar = {'stranka':stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
+        je_stranka = True
+    slovar = {'je_stranka':je_stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
     slovar.update(baze)
     if not 'zaloga' in baze:
         slovar.update({'zaloga':zaloga})

@@ -148,7 +148,7 @@
 </style>
 
 <div id="navbar" class="navbar">
-    {% if stranka %}
+    {% if je_stranka %}
         <div style="display:inline-block;width:28%"><a href="{% url 'stranka_pregled_narocil' %}" style="width:100%"> Pregled narocil </a></div>
         <div style="display:inline-block;width:22%"><a href="{% url 'stranka_zgodovina' %}" style="width:100%"> Zgodovina </a></div>
         <a style="width:15%" href="/">Home</a>
@@ -170,7 +170,7 @@
     </div>
 </div>
 
-{% if not stranka %}
+{% if not je_stranka %}
 <div id="sidenav" class="sidenav">
     <a style="margin-bottom:10%" onclick="zapri()"> X </a>
     {% if perms.admin.view_logentry %}

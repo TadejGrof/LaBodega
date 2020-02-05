@@ -13,7 +13,7 @@ with open('slovar.json') as dat:
         slovar = json.load(dat)
 
 ZGORNJA_MEJA = 830
-SPODANJA_MEJA = 50
+SPODANJA_MEJA = 100
 LEVA_MEJA = 40
 VISINA_VRSTICE = 20
 

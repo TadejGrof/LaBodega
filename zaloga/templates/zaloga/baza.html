@@ -80,8 +80,8 @@
 {% if status == "aktivno" %}
     <div class="delovno_okno">
         {% if tip == "inventura" %}
-            <button onclick="toggle('vneseno','none')"> Samo nevnesene </button>
-            <button onclick="toggle('vneseno','inline-block')"> {{slovar|keyvalue:'Pokazi vse'|keyvalue:jezik}} </button>
+            <button onclick="toggle('vrstica','none');toggle('razlika','inline-block')"> Razlika </button>
+            <button onclick="Filtriraj()"> Preklici razliko </button>
         {% else %}
             <button onclick="Nov_vnos()" class="vnosi"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
             <button onclick="Vec_vnosov()" class="vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
@@ -222,12 +222,15 @@
                     <th width="15%"> {{slovar|keyvalue:'Na voljo'|keyvalue:jezik}}: </th>
                 {% elif tip == "inventura" %}
                     <th width="15%"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
+                    <th width="15%"> Razlika: </th>
                 {% endif %}
                 <th id="razlika_header" hidden="hidden"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
                 <th width="20%" class="vpogled"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}: </th>  
             </tr>
             {% for vnos in vnosi.values %}
-                {% if vnos.vneseno %}
+                {% if vnos.vneseno and vnos.stevilo != vnos.zaloga %}
+                    <tr class="vrstica {{vnos.radius}} {{vnos.tip}} vneseno razlika">
+                {% elif vnos.vneseno and vnos.stevilo != vnos.zaloga %}
                     <tr class="vrstica {{vnos.radius}} {{vnos.tip}} vneseno">
                 {% else %}
                     <tr class="vrstica {{vnos.radius}} {{vnos.tip}} nevneseno">
@@ -246,6 +249,7 @@
                 <td> {{vnos.na_voljo}} </td>
                 {% elif tip == "inventura" %}
                 <td> {{vnos.zaloga}} </td>
+                <td> {{vnos.stevilo|razlika:vnos.zaloga}} </td>
                 {% endif %}
                 <td>
                     {% if vnos.vneseno %}

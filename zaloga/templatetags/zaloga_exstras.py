@@ -24,7 +24,7 @@ def dolgi_tip(zaloga, tip):
 @register.filter(name='razlika')
 def razlika(value, arg):
     if value == None:
-        value = 0
+        return "/"
     return value - arg 
 
 @register.filter(name='dimenzija')

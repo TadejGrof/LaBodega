@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from zaloga.models import Dimenzija
+from zaloga.models import Dimenzija,Sestavina
 from prodaja.models import Stranka
 # Create your models here.
 
@@ -86,7 +86,7 @@ class Program(models.Model):
     
     def vrni_slovar_dimenzij(self, obratno = False):
         slovar = {}
-        dimenzije = self.sestavina_set.values('dimenzija_id','dimenzija__dimenzija')
+        dimenzije = Sestavina.objects.all().values('dimenzija_id','dimenzija__dimenzija')
         if obratno:
             for dimenzija in dimenzije:
                 slovar.update({dimenzija['dimenzija_id']:dimenzija['dimenzija__dimenzija']})

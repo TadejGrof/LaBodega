@@ -214,6 +214,32 @@ def izbris_baze(request,zaloga, tip_baze, pk):
         baza.delete()
         return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
 
+@login_required
+def skupen_pregled_narocil(request, zaloga, tip_baze):
+    zaloga = Zaloga.objects.get(pk = zaloga)
+    baze = Baza.objects.filter(status="aktivno", tip="vele_prodaja")
+    narocila = baze.values('stranka__ime','stranka__pk')
+    vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('dimenzija__dimenzija','tip','stevilo','pk','baza__stranka__pk')
+    razlicne_dimenzije = {}
+    for vnos in vnosi:
+        dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
+        stranka = vnos['baza__stranka__pk']
+        stevilo = vnos['stevilo']
+        vnos = vnos['pk']
+        if not dimenzija_tip in razlicne_dimenzije:
+            razlicne_dimenzije.update({dimenzija_tip:{stranka:{vnos:stevilo}}})
+        elif not stranka in razlicne_dimenzije[dimenzija_tip]:
+            razlicne_dimenzija[dimenzija_tip].update({stranka:{vnos:stevilo}})
+        else:
+            razlicne_dimenzije[dimenzija_tip][stranka].update({vnos:stevilo})
+    skupno = {}
+    for dimenzija in razlicne_dimenzije:
+        skupno.update({dimenzija:0})
+        for stranka in razlicne_dimenzije[dimenzija]:
+            for vnos in razlicne_dimenzije[dimenzija][stranka]:
+                skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
+    return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html',{'narocila':narocila,'razlicne_dimenzije':razlicne_dimenzije,'zaloga':zaloga,'skupno':skupno})
+
 #######################################################################################################
 
 @login_required
@@ -336,7 +362,10 @@ def spremeni_vnos(request,zaloga, tip_baze, pk):
         if cena and cena != "" :
             vnos.cena = float(cena)
         vnos.save()
-        return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
+        if pk == 0:
+            return redirect('skupen_pregled_narocil',zaloga=zaloga,tip_baze=tip_baze)
+        else:
+            return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 
 @login_required
 def izbrisi_vnos(request,zaloga, tip_baze, pk):

@@ -37,6 +37,7 @@
     {{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}
 {% endif %}
 </h1>
+
 <div class="okno">
     {% if tip == "prevzem" %}
         <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
@@ -160,6 +161,11 @@
         {{slovar|keyvalue:'Ni aktivnih baz'|keyvalue:jezik}}
     </h2>
 {% else %}
+    {% if tip == "vele_prodaja" %}
+        <form action="{% url 'skupen_pregled_narocil' zaloga.pk tip %}" method="GET">
+            <input type="submit" value="Skupen pregled naročil"> 
+        </form>
+    {% endif %}
     <div style="width:70%;display:inline-block;margin-top:2%" >
         <table class="tabela_vnosov">
             <tr class="header">

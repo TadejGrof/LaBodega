@@ -85,6 +85,15 @@ class Zaloga(models.Model):
         return datetime.today().strftime('%Y-%m-%d')
 
     @property
+    def dimenzija_tip_zaloga(self):
+        zaloga = self.zaloga
+        dimenzija_tip = {}
+        for dimenzija in zaloga:
+            for tip in zaloga[dimenzija]:
+                dimenzija_tip.update({dimenzija + '_' + tip : zaloga[dimenzija][tip]})
+        return dimenzija_tip
+
+    @property
     def zaloga(self):
         dimenzije = self.vrni_slovar_dimenzij(True)
         zaloga = {}
@@ -632,6 +641,17 @@ class Baza(models.Model):
             dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
             if not dimenzija_tip in vnosi:
                 vnosi.update({dimenzija_tip: True})
+        return vnosi
+
+    @property 
+    def dimenzija_tip_vnosi(self):
+        vnosi = {}
+        for vnos in self.vnosi_values:
+            dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
+            if not dimenzija_tip in vnosi:
+                vnosi.update({dimenzija_tip: vnos['stevilo']})
+            else:
+                vnosi[dimenzija_tip] += vnos['stevilo']
         return vnosi
 
     @property

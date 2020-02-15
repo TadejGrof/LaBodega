@@ -1,0 +1,68 @@
+{% extends 'program/base.html' %}
+
+
+{% load zaloga_exstras %}
+
+{% block content %}
+<h2> Skupen pregled naročil  </h2>
+
+<div style="width:80%;display:inline-block;text-aling:center">
+    <table class="tabela_vnosov">
+        <tr>
+            <th> Dimenzija/Tip </th>
+            {% for narocilo in narocila %}
+                <th> {{narocilo.stranka__ime}} </th>
+            {% endfor %}
+            <th> Skupno </th>
+            <th> Zaloga </th>
+        </tr>
+        {% with zaloga=zaloga.dimenzija_tip_zaloga %}
+            {% for dimenzija in razlicne_dimenzije %}
+                <tr>
+                    <td> {{dimenzija}} </td>
+                    {% for narocilo in narocila %}
+                        {% with stranka=narocilo.stranka__pk stranke=razlicne_dimenzije|keyvalue:dimenzija %}
+                            {% if stranka in stranke %}
+                                {% with vnosi=stranke|keyvalue:stranka %}
+                                <td> 
+                                    {% for vnos in vnosi %}
+                                        <button onclick="Spremeni_vnos(-1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> - </button>
+                                        {{vnosi|keyvalue:vnos}}
+                                        <button onclick="Spremeni_vnos(1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> + </button>
+                                        <form style="display:none" action="{% url 'baza_spremeni_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" >
+                                            {% csrf_token %}
+                                            <input type="number" value="0" id="stevilo_{{vnos}}" name="stevilo">
+                                            <input type="number" value={{vnos}} name="pk">
+                                            <input type="submit" value="Potrdi" id="submit_{{vnos}}">
+                                        </form>
+                                    {% endfor %}
+                                </td>
+                                {% endwith %}
+                            {% else %}
+                                    <td> <button> Dodaj vnos </button> </td>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                    <td> {{skupno|keyvalue:dimenzija }} </td>
+                    <td> {{zaloga|keyvalue:dimenzija}} </td>
+                </tr>
+            {% endfor %}
+        {% endwith %}
+        <tr>
+            <td> Skupno: </td>
+            {% for narocilo in narocila %}
+                <td> {{narocilo.skupno}} </td>
+            {% endfor %}
+            <td> Skupno: </td>
+            <td> {{skupno.stevilo}} </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    function Spremeni_vnos(predznak, pk, stevilo){
+        document.getElementById('stevilo_' + pk).value = stevilo + predznak * 1
+        document.getElementById('submit_' + pk).click()
+    }
+</script>
+{% endblock %}

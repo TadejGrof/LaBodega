@@ -238,7 +238,7 @@ def skupen_pregled_narocil(request, zaloga, tip_baze):
         for stranka in razlicne_dimenzije[dimenzija]:
             for vnos in razlicne_dimenzije[dimenzija][stranka]:
                 skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
-    return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html',{'narocila':narocila,'razlicne_dimenzije':razlicne_dimenzije,'zaloga':zaloga,'skupno':skupno})
+    return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html',{'narocila':narocila,'razlicne_dimenzije':razlicne_dimenzije,'zaloga':zaloga,'skupno':skupno, 'stevilo_narocil':baze.count()})
 
 #######################################################################################################
 

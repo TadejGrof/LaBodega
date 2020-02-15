@@ -16,6 +16,13 @@ def skupna_cena(vnos):
     return vnos['stevilo'] * vnos['cena']
 
 @register.filter
+def divide(value, arg):
+    try:
+        return int(value) / int(arg)
+    except (ValueError, ZeroDivisionError):
+        return None
+
+@register.filter
 def dolgi_tip(zaloga, tip):
     for seznam_tipa in zaloga.vrni_tipe:
         if seznam_tipa[0] == tip:

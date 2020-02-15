@@ -6,15 +6,15 @@
 {% block content %}
 <h2> Skupen pregled naročil  </h2>
 
-<div style="width:80%;display:inline-block;text-aling:center">
+<div style="width:95%;display:inline-block;text-aling:center">
     <table class="tabela_vnosov">
         <tr>
-            <th> Dimenzija/Tip </th>
+            <th style="width:7%"> Dimenzija/Tip </th>
             {% for narocilo in narocila %}
-                <th> {{narocilo.stranka__ime}} </th>
+                <th style="width:{{85|divide:stevilo_narocil}}%"> {{narocilo.stranka__ime}} </th>
             {% endfor %}
-            <th> Skupno </th>
-            <th> Zaloga </th>
+            <th style="width:4%"> Skupno </th>
+            <th style="width:4%"> Zaloga </th>
         </tr>
         {% with zaloga=zaloga.dimenzija_tip_zaloga %}
             {% for dimenzija in razlicne_dimenzije %}
@@ -39,7 +39,7 @@
                                 </td>
                                 {% endwith %}
                             {% else %}
-                                    <td> <button> Dodaj vnos </button> </td>
+                                    <td> 0 <button> + </button> </td>
                             {% endif %}
                         {% endwith %}
                     {% endfor %}

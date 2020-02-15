@@ -34,12 +34,13 @@
                                             <input type="number" value="0" id="stevilo_{{vnos}}" name="stevilo">
                                             <input type="number" value={{vnos}} name="pk">
                                             <input type="submit" value="Potrdi" id="submit_{{vnos}}">
+                                            <input type="number" value="" id="top_{{vnos}}" name="top">
                                         </form>
                                     {% endfor %}
                                 </td>
                                 {% endwith %}
                             {% else %}
-                                    <td> 0 <button> + </button> </td>
+                                    <td> 0 <button onclick="Scroll()"> + </button> </td>
                             {% endif %}
                         {% endwith %}
                     {% endfor %}
@@ -62,7 +63,9 @@
 <script>
     function Spremeni_vnos(predznak, pk, stevilo){
         document.getElementById('stevilo_' + pk).value = stevilo + predznak * 1
+        document.getElementById('top_' + pk).value = document.getElementById('body').scrollTop
         document.getElementById('submit_' + pk).click()
     }
+    document.getElementById('body').scrollTop = {{top}}
 </script>
 {% endblock %}

@@ -215,7 +215,7 @@ def izbris_baze(request,zaloga, tip_baze, pk):
         return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
 
 @login_required
-def skupen_pregled_narocil(request, zaloga, tip_baze):
+def skupen_pregled_narocil(request, zaloga, tip_baze, top = 0):
     zaloga = Zaloga.objects.get(pk = zaloga)
     baze = Baza.objects.filter(status="aktivno", tip="vele_prodaja")
     narocila = baze.values('stranka__ime','stranka__pk')
@@ -238,7 +238,15 @@ def skupen_pregled_narocil(request, zaloga, tip_baze):
         for stranka in razlicne_dimenzije[dimenzija]:
             for vnos in razlicne_dimenzije[dimenzija][stranka]:
                 skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
-    return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html',{'narocila':narocila,'razlicne_dimenzije':razlicne_dimenzije,'zaloga':zaloga,'skupno':skupno, 'stevilo_narocil':baze.count()})
+    slovar = {
+        'narocila':narocila,
+        'razlicne_dimenzije':razlicne_dimenzije,
+        'zaloga':zaloga,
+        'skupno':skupno,
+        'stevilo_narocil':baze.count(),
+        'top':top
+        }
+    return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html', slovar ) 
 
 #######################################################################################################
 
@@ -363,7 +371,8 @@ def spremeni_vnos(request,zaloga, tip_baze, pk):
             vnos.cena = float(cena)
         vnos.save()
         if pk == 0:
-            return redirect('skupen_pregled_narocil',zaloga=zaloga,tip_baze=tip_baze)
+            top = request.POST.get('top')
+            return skupen_pregled_narocil(request,zaloga,tip_baze,top)
         else:
             return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 

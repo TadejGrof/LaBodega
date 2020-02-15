@@ -229,7 +229,7 @@ def skupen_pregled_narocil(request, zaloga, tip_baze):
         if not dimenzija_tip in razlicne_dimenzije:
             razlicne_dimenzije.update({dimenzija_tip:{stranka:{vnos:stevilo}}})
         elif not stranka in razlicne_dimenzije[dimenzija_tip]:
-            razlicne_dimenzija[dimenzija_tip].update({stranka:{vnos:stevilo}})
+            razlicne_dimenzije[dimenzija_tip].update({stranka:{vnos:stevilo}})
         else:
             razlicne_dimenzije[dimenzija_tip][stranka].update({vnos:stevilo})
     skupno = {}

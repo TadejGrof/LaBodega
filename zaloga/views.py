@@ -10,6 +10,7 @@ import json
 from . import funkcije
 from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
+from django.urls import reverse
 
 zaloga = Zaloga.objects.first()
 
@@ -215,36 +216,63 @@ def izbris_baze(request,zaloga, tip_baze, pk):
         return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
 
 @login_required
-def skupen_pregled_narocil(request, zaloga, tip_baze, top = 0):
+def skupen_pregled_narocil(request, zaloga, tip_baze):
     zaloga = Zaloga.objects.get(pk = zaloga)
     baze = Baza.objects.filter(status="aktivno", tip="vele_prodaja")
-    narocila = baze.values('stranka__ime','stranka__pk')
-    vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('dimenzija__dimenzija','tip','stevilo','pk','baza__stranka__pk')
+    gledane = request.GET.get('gledane','all')
+    ostalo = False
+    try:
+        gledane = json.loads(gledane)
+        if len(gledane) != baze.count():
+            ostalo = True
+    except:
+        gledane = [baza['pk'] for baza in baze.values('pk')]    
+    ostala_narocila = baze.exclude(pk__in = gledane).values('pk','stranka__ime')
+    narocila = baze.filter(pk__in = gledane).values('pk','stranka__ime','stranka__pk')
+    vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','tip','stevilo','pk','baza__stranka__pk')
     razlicne_dimenzije = {}
     for vnos in vnosi:
         dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
-        stranka = vnos['baza__stranka__pk']
+        if not vnos['baza__pk'] in gledane:
+            stranka = 'ostalo'
+        else:
+            stranka = vnos['baza__stranka__pk']
         stevilo = vnos['stevilo']
         vnos = vnos['pk']
         if not dimenzija_tip in razlicne_dimenzije:
-            razlicne_dimenzije.update({dimenzija_tip:{stranka:{vnos:stevilo}}})
+            if stranka =='ostalo':
+                razlicne_dimenzije.update({dimenzija_tip:{stranka:stevilo}})
+            else:
+                razlicne_dimenzije.update({dimenzija_tip:{stranka:{vnos:stevilo}}})
         elif not stranka in razlicne_dimenzije[dimenzija_tip]:
-            razlicne_dimenzije[dimenzija_tip].update({stranka:{vnos:stevilo}})
+            if stranka == 'ostalo':
+                razlicne_dimenzije[dimenzija_tip].update({stranka:stevilo})
+            else:
+                razlicne_dimenzije[dimenzija_tip].update({stranka:{vnos:stevilo}})
         else:
-            razlicne_dimenzije[dimenzija_tip][stranka].update({vnos:stevilo})
+            if stranka == "ostalo":
+                razlicne_dimenzije[dimenzija_tip][stranka] += stevilo
+            else:
+                razlicne_dimenzije[dimenzija_tip][stranka].update({vnos:stevilo})
     skupno = {}
     for dimenzija in razlicne_dimenzije:
         skupno.update({dimenzija:0})
         for stranka in razlicne_dimenzije[dimenzija]:
-            for vnos in razlicne_dimenzije[dimenzija][stranka]:
-                skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
+            if stranka != 'ostalo':
+                for vnos in razlicne_dimenzije[dimenzija][stranka]:
+                    skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
+            else:
+                skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka]
     slovar = {
         'narocila':narocila,
+        'ostala_narocila':ostala_narocila,
         'razlicne_dimenzije':razlicne_dimenzije,
         'zaloga':zaloga,
         'skupno':skupno,
         'stevilo_narocil':baze.count(),
-        'top':top
+        'top': int(request.GET.get('top',0)),
+        'ostalo':ostalo,
+        'gledane':json.dumps(gledane),
         }
     return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html', slovar ) 
 
@@ -278,7 +306,10 @@ def nov_vnos(request,zaloga, tip_baze, pk):
         dimenzija = vrni_dimenzijo(request)
         stevilo = request.POST.get('stevilo')
         tip = request.POST.get('tip')
-        baza = Baza.objects.get(pk = pk)
+        if pk == 0:
+            baza = Baza.objects.get( pk = int(request.POST.get('pk')))
+        else:
+            baza = Baza.objects.get(pk = pk)
         if tip_baze == "vele_prodaja":
             vnos = Vnos.objects.create(
                 dimenzija = dimenzija,
@@ -296,7 +327,11 @@ def nov_vnos(request,zaloga, tip_baze, pk):
             sestavina = Sestavina.objects.get(zaloga = zaloga,dimenzija = vnos.dimenzija)
             vnos.ustvari_spremembo(sestavina)
             sestavina.nastavi_iz_sprememb(vnos.tip)
-        return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
+        if pk == 0:
+            gledane = request.POST.get('gledane','all')
+            return redirect(reverse('skupen_pregled_narocil', kwargs={'zaloga':zaloga,'tip_baze':tip_baze}) + "?gledane=" + gledane)
+        else:
+            return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 
 @login_required
 def shrani_vse(request,zaloga,tip_baze, pk):
@@ -372,7 +407,8 @@ def spremeni_vnos(request,zaloga, tip_baze, pk):
         vnos.save()
         if pk == 0:
             top = request.POST.get('top')
-            return skupen_pregled_narocil(request,zaloga,tip_baze,top)
+            gledane = request.POST.get('gledane','all')
+            return redirect(reverse('skupen_pregled_narocil', kwargs={'zaloga':zaloga,'tip_baze':tip_baze}) + "?top=" + str(top) + '&gledane=' + gledane)
         else:
             return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 
@@ -380,17 +416,22 @@ def spremeni_vnos(request,zaloga, tip_baze, pk):
 def izbrisi_vnos(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         vnos = Vnos.objects.get(pk = request.POST.get('pk'))
-        baza = Baza.objects.get(pk = pk)
-        if baza.status == "veljavno":
-            if tip_baze == "inventura":
-                vnos.inventurni_izbris()
-            else:
-                tip = vnos.tip
-                sestavina = Sestavina.objects.get(zaloga=zaloga,dimenzija = vnos.dimenzija)
-                vnos.sprememba.delete()
-                sestavina.nastavi_iz_sprememb(tip)
-        elif baza.status == "aktivno":
+        if pk == 0:
             vnos.delete()
+            gledane = request.POST.get('gledane','all')
+            return redirect(reverse('skupen_pregled_narocil', kwargs={'zaloga':zaloga,'tip_baze':tip_baze}) + "?gledane=" + gledane)
+        else:
+            baza = Baza.objects.get(pk = pk)
+            if baza.status == "veljavno":
+                if tip_baze == "inventura":
+                    vnos.inventurni_izbris()
+                else:
+                    tip = vnos.tip
+                    sestavina = Sestavina.objects.get(zaloga=zaloga,dimenzija = vnos.dimenzija)
+                    vnos.sprememba.delete()
+                    sestavina.nastavi_iz_sprememb(tip)
+            elif baza.status == "aktivno":
+                vnos.delete()
         return redirect('baza',zaloga=zaloga, tip_baze=tip_baze, pk = pk)
 
 @login_required

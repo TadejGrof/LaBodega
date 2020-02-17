@@ -4,48 +4,106 @@
 {% load zaloga_exstras %}
 
 {% block content %}
-<h2> Skupen pregled naročil  </h2>
+<div style="width:100%;display:table;margin-bottom:2%">
+    <div style="width:60%;text-align:center;display:table-cell;vertical-align:middle">
+        <h1> Skupen pregled narocil <h1>
+    </div>
+    <div style="width:39%;text-align:center;display:table-cell">
+        <h3> Ostala naročila: </h3>
+        <table class="tabela_vnosov" style="width:80%;margin-left:10%">
+            {% for narocilo in ostala_narocila %}
+                <tr>
+                    <td> {{narocilo.stranka__ime}}</td>
+                    <td>
+                        <form action="{% url 'skupen_pregled_narocil' zaloga_pk 'vele_prodaja' %}" method="GET">
+                            <input type="submit" value="Dodaj">
+                            <input type="hidden" name="gledane" value="{{gledane|dodaj:narocilo.pk}}">
+                        </form>
+                    </td>
+                </td>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 
 <div style="width:95%;display:inline-block;text-aling:center">
     <table class="tabela_vnosov">
         <tr>
             <th style="width:7%"> Dimenzija/Tip </th>
             {% for narocilo in narocila %}
-                <th style="width:{{85|divide:stevilo_narocil}}%"> {{narocilo.stranka__ime}} </th>
+                <th style="width:{{85|divide:stevilo_narocil}}%" onclick="barva('td','white');barva('{{narocilo.stranka__ime}}','#ffe6e6')"> 
+                    <form action="{% url 'skupen_pregled_narocil' zaloga_pk 'vele_prodaja' %}" method="GET">
+                        <input type="submit" value="-" id="submit_{{narocilo.pk}}" onclick="Nastavi_top('{{narocilo.pk}}')">
+                        <input type="hidden" value="{{gledane|odstrani:narocilo.pk}}" name="gledane">
+                        <input type="number" hidden="hidden" value="" id="top_{{narocilo.pk}}" name="top">
+                    </form>
+                    <div style="width:100%;height:40%;overflow:hidden">{{narocilo.stranka__ime}}</div>
+                </th>
             {% endfor %}
+            {% if ostalo %}
+                <th style="width:4%"> Ostalo </th>
+            {% endif %} 
             <th style="width:4%"> Skupno </th>
             <th style="width:4%"> Zaloga </th>
         </tr>
         {% with zaloga=zaloga.dimenzija_tip_zaloga %}
             {% for dimenzija in razlicne_dimenzije %}
-                <tr>
-                    <td> {{dimenzija}} </td>
+                <tr onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
+                    <td class="td {{dimenzija}}"> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
                         {% with stranka=narocilo.stranka__pk stranke=razlicne_dimenzije|keyvalue:dimenzija %}
-                            {% if stranka in stranke %}
-                                {% with vnosi=stranke|keyvalue:stranka %}
-                                <td> 
-                                    {% for vnos in vnosi %}
-                                        <button onclick="Spremeni_vnos(-1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> - </button>
-                                        {{vnosi|keyvalue:vnos}}
-                                        <button onclick="Spremeni_vnos(1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> + </button>
-                                        <form style="display:none" action="{% url 'baza_spremeni_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" >
-                                            {% csrf_token %}
-                                            <input type="number" value="0" id="stevilo_{{vnos}}" name="stevilo">
-                                            <input type="number" value={{vnos}} name="pk">
-                                            <input type="submit" value="Potrdi" id="submit_{{vnos}}">
-                                            <input type="number" value="" id="top_{{vnos}}" name="top">
-                                        </form>
-                                    {% endfor %}
-                                </td>
-                                {% endwith %}
-                            {% else %}
-                                    <td> 0 <button onclick="Scroll()"> + </button> </td>
-                            {% endif %}
+                            <td class="td {{dimenzija}} {{narocilo.stranka__ime}}"> 
+                                {% if stranka in stranke %}
+                                    {% with vnosi=stranke|keyvalue:stranka %}
+                                        {% for vnos in vnosi %}
+                                            {% if vnosi|keyvalue:vnos > 1 %}
+                                            <button onclick="Spremeni_vnos(-1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> - </button>
+                                            {% else %}
+                                                <form action="{% url 'baza_izbrisi_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" style="display:inline-block"> 
+                                                    {% csrf_token %}
+                                                    <input type="number" hidden="hidden" value={{vnos}} name="pk">
+                                                    <input type="submit" value="-">
+                                                    <input type="hidden" value="{{gledane}}" name="gledane">
+                                                </form>
+                                            {% endif %}
+                                            {{vnosi|keyvalue:vnos}}
+                                            <button onclick="Spremeni_vnos(1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> + </button>
+                                            <form style="display:none" action="{% url 'baza_spremeni_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" >
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{gledane}}" name="gledane">
+                                                <input type="number" value="0" id="stevilo_{{vnos}}" name="stevilo">
+                                                <input type="number" value={{vnos}} name="pk">
+                                                <input type="submit" value="Potrdi" id="submit_{{vnos}}">
+                                                <input type="number" value="" id="top_{{vnos}}" name="top">
+                                            </form>
+                                        {% endfor %}
+                                    {% endwith %}
+                                {% else %}
+                                    0
+                                    <form action="{% url 'baza_nov_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" style="display:inline-block">
+                                        {% csrf_token %}
+                                        <input name="pk" type="hidden" value="{{narocilo.pk}}">
+                                        <input name="dimenzija" type="hidden" value="{{dimenzija|split:'_'|keyvalue:0}}">
+                                        <input name="tip" type="hidden" value="{{dimenzija|split:'_'|keyvalue:1}}" >
+                                        <input name="stevilo" type="number" hidden="hidden" value=1>
+                                        <input type="submit"  value="+">
+                                        <input type="hidden" value="{{gledane}}" name="gledane">
+                                    </form>
+                                {% endif %}
+                            </td>
                         {% endwith %}
                     {% endfor %}
-                    <td> {{skupno|keyvalue:dimenzija }} </td>
-                    <td> {{zaloga|keyvalue:dimenzija}} </td>
+                    {% if ostalo %}
+                        <td class="td {{dimenzija}}">
+                            {% if 'ostalo' in razlicne_dimenzije|keyvalue:dimenzija %}
+                                {{razlicne_dimenzije|keyvalue:dimenzija|keyvalue:'ostalo'}}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                    <td class="td {{dimenzija}}"> {{skupno|keyvalue:dimenzija }} </td>
+                    <td class="td {{dimenzija}}"> {{zaloga|keyvalue:dimenzija}} </td>
                 </tr>
             {% endfor %}
         {% endwith %}
@@ -60,12 +118,45 @@
     </table>
 </div>
 
+<h2> Dodaj vnos </h2>
+
+<form action="{% url 'baza_nov_vnos' zaloga.pk 'vele_prodaja' 0 %}" method="POST" style="margin-bottom:3%">
+    {% csrf_token %}
+    Stranka: 
+    <select name="pk">
+        {% for narocilo in narocila %}
+            <option value="{{narocilo.pk}}"> {{narocilo.stranka__ime}} </option>
+        {% endfor%}
+    </select>
+    Dimenzija: 
+    <select name="dimenzija">
+        {% for dimenzija in program.vrni_dimenzije %}
+            <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
+        {% endfor %}
+    </select>
+    Tip: 
+    <select name="tip">
+        {% for tip in zaloga.tipi_sestavin %}
+            <option  value="{{tip}}"> {{tip}} </option>
+        {% endfor %}
+    </select>
+    Stevilo: <input name="stevilo" type="number" required>
+    <input type="submit"  value="Nov vnos">
+    <input type="hidden" value="{{gledane}}" name="gledane">
+<form>
 <script>
     function Spremeni_vnos(predznak, pk, stevilo){
         document.getElementById('stevilo_' + pk).value = stevilo + predznak * 1
+        Nastavi_top(pk)
+    }
+    document.getElementById('body').scrollTop = {{top}}
+    function Poskus(vrstica){
+        barva('vrstica','white')
+        vrstica.style.backgroundColor = "#ffe6e6"
+    }
+    function Nastavi_top(pk){
         document.getElementById('top_' + pk).value = document.getElementById('body').scrollTop
         document.getElementById('submit_' + pk).click()
     }
-    document.getElementById('body').scrollTop = {{top}}
 </script>
 {% endblock %}

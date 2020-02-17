@@ -1,5 +1,5 @@
 from django import template
-
+import json
 register = template.Library()
 
 @register.filter(name='index')
@@ -14,6 +14,30 @@ def zadnji(list):
 @register.filter
 def skupna_cena(vnos):
     return vnos['stevilo'] * vnos['cena']
+
+@register.filter
+def split(string,locilo):
+    return string.split(locilo)
+
+@register.filter
+def odstrani(seznam, element):
+    if isinstance(seznam,str):
+        seznam = json.loads(seznam)
+    else:
+        seznam = seznam
+    for x in seznam:
+        if x == element:
+            seznam.remove(element)
+    return json.dumps(seznam)
+
+@register.filter
+def dodaj(seznam, element):
+    if isinstance(seznam,str):
+        seznam = json.loads(seznam)
+    else:
+        seznam = seznam
+    seznam.append(element)
+    return json.dumps(seznam)
 
 @register.filter
 def divide(value, arg):

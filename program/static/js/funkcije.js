@@ -4,6 +4,12 @@ function toggle(className, displayState){
         elements[i].style.display = displayState;
     }
 }; 
+function barva(className, color){
+    var elements = document.getElementsByClassName(className)
+    for (var i = 0; i < elements.length; i++){
+        elements[i].style.backgroundColor = color
+    }
+}
 function je_veljavno_stevilo(stevilo){
     if (! stevilo == ""){
         return true

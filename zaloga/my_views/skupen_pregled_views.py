@@ -98,7 +98,7 @@ def nov_vnos(request,zaloga):
 
 def izbrisi_vnos(request,zaloga):
     if request.method=="POST":
-        pk = int(reque  st.POST.get('pk'))
+        pk = int(request.POST.get('pk'))
         vnos = Vnos.objects.get(pk = pk)
         pk = vnos.baza.pk
         vnos.delete()

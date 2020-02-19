@@ -162,7 +162,7 @@
     </h2>
 {% else %}
     {% if tip == "vele_prodaja" %}
-        <form action="{% url 'skupen_pregled_narocil' zaloga.pk tip %}" method="GET">
+        <form action="{% url 'skupen_pregled_narocil' zaloga.pk %}" method="GET">
             <input type="submit" value="Skupen pregled naročil"> 
         </form>
     {% endif %}

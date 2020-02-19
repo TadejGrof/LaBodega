@@ -1,4 +1,4 @@
-from zaloga.models import Zaloga, Dimenzija, Sestavina
+from zaloga.models import Zaloga, Dimenzija, Sestavina, Vnos
 from program.models import Program
 import json
 from django.shortcuts import render

@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Kontejner, Stroski_Group, Strosek, Zaposleni
-from .models import Baza, Zaloga, Dnevna_prodaja
+from ..models import Kontejner, Stroski_Group, Strosek, Zaposleni
+from ..models import Baza, Zaloga, Dnevna_prodaja
 from django.shortcuts import redirect
 import datetime
 from django.contrib.auth.decorators import login_required

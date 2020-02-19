@@ -15,7 +15,7 @@
                 <tr>
                     <td> {{narocilo.stranka__ime}}</td>
                     <td>
-                        <form action="{% url 'skupen_pregled_narocil' zaloga_pk 'vele_prodaja' %}" method="GET">
+                        <form action="{% url 'skupen_pregled_narocil' zaloga_pk %}" method="GET">
                             <input type="submit" value="Dodaj">
                             <input type="hidden" name="gledane" value="{{gledane|dodaj:narocilo.pk}}">
                         </form>
@@ -26,13 +26,14 @@
     </div>
 </div>
 
+
 <div style="width:95%;display:inline-block;text-aling:center">
     <table class="tabela_vnosov">
         <tr>
             <th style="width:7%"> Dimenzija/Tip </th>
             {% for narocilo in narocila %}
                 <th style="width:{{85|divide:stevilo_narocil}}%" onclick="barva('td','white');barva('{{narocilo.stranka__ime}}','#ffe6e6')"> 
-                    <form action="{% url 'skupen_pregled_narocil' zaloga_pk 'vele_prodaja' %}" method="GET">
+                    <form action="{% url 'skupen_pregled_narocil' zaloga_pk %}" method="GET">
                         <input type="submit" value="-" id="submit_{{narocilo.pk}}" onclick="Nastavi_top('{{narocilo.pk}}')">
                         <input type="hidden" value="{{gledane|odstrani:narocilo.pk}}" name="gledane">
                         <input type="number" hidden="hidden" value="" id="top_{{narocilo.pk}}" name="top">
@@ -51,47 +52,32 @@
                 <tr onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
                     <td class="td {{dimenzija}}"> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
-                        {% with stranka=narocilo.stranka__pk stranke=razlicne_dimenzije|keyvalue:dimenzija %}
+                        {% if narocilo.stranka__pk in razlicne_dimenzije|keyvalue:dimenzija %}
                             <td class="td {{dimenzija}} {{narocilo.stranka__ime}}"> 
-                                {% if stranka in stranke %}
-                                    {% with vnosi=stranke|keyvalue:stranka %}
-                                        {% for vnos in vnosi %}
-                                            {% if vnosi|keyvalue:vnos > 1 %}
-                                            <button onclick="Spremeni_vnos(-1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> - </button>
-                                            {% else %}
-                                                <form action="{% url 'baza_izbrisi_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" style="display:inline-block"> 
-                                                    {% csrf_token %}
-                                                    <input type="number" hidden="hidden" value={{vnos}} name="pk">
-                                                    <input type="submit" value="-">
-                                                    <input type="hidden" value="{{gledane}}" name="gledane">
-                                                </form>
-                                            {% endif %}
-                                            {{vnosi|keyvalue:vnos}}
-                                            <button onclick="Spremeni_vnos(1,'{{vnos}}', {{vnosi|keyvalue:vnos}})"> + </button>
-                                            <form style="display:none" action="{% url 'baza_spremeni_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" >
-                                                {% csrf_token %}
-                                                <input type="hidden" value="{{gledane}}" name="gledane">
-                                                <input type="number" value="0" id="stevilo_{{vnos}}" name="stevilo">
-                                                <input type="number" value={{vnos}} name="pk">
-                                                <input type="submit" value="Potrdi" id="submit_{{vnos}}">
-                                                <input type="number" value="" id="top_{{vnos}}" name="top">
-                                            </form>
-                                        {% endfor %}
+                                {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.stranka__pk %}    
+                                    {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.stranka__pk|keyvalue:vnos %}
+                                        {% if stevilo == 1 %}
+                                            <button id="izbrisi_{{vnos}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
+                                            <button style="display:none" id="odstej_{{vnos}}" onclick="Spremeni_vnos(-1,'{{vnos}}','{{dimenzija}}')"> - </button>
+                                        {% else %}
+                                            <button style="display:none" id="izbrisi_{{vnos}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
+                                            <button id="odstej_{{vnos}}" onclick="Spremeni_vnos(-1,'{{vnos}}','{{dimenzija}}')"> - </button>
+                                        {% endif %}
+                                    <div id="stevilo_{{vnos}}" style="display:inline-block"> {{stevilo}} </div>
+                                    <button id="pristej_{{vnos}}" onclick="Spremeni_vnos(1,'{{vnos}}','{{dimenzija}}')"> + </button>
+                                    <button style="display:none" id="{{dimenzija}}_novo_{{narocilo.pk}}" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
                                     {% endwith %}
-                                {% else %}
-                                    0
-                                    <form action="{% url 'baza_nov_vnos' zaloga_pk 'vele_prodaja' 0 %}" method="POST" style="display:inline-block">
-                                        {% csrf_token %}
-                                        <input name="pk" type="hidden" value="{{narocilo.pk}}">
-                                        <input name="dimenzija" type="hidden" value="{{dimenzija|split:'_'|keyvalue:0}}">
-                                        <input name="tip" type="hidden" value="{{dimenzija|split:'_'|keyvalue:1}}" >
-                                        <input name="stevilo" type="number" hidden="hidden" value=1>
-                                        <input type="submit"  value="+">
-                                        <input type="hidden" value="{{gledane}}" name="gledane">
-                                    </form>
-                                {% endif %}
+                                {% endfor %}
                             </td>
-                        {% endwith %}
+                        {% else %}
+                            <td class="td {{dimenzija}} {{narocilo.stranka__ime}}"> 
+                                <button style="display:none" id="{{dimenzija}}_izbrisi_{{narocilo.pk}}"> - </button>
+                                <button style="display:none" id="{{dimenzija}}_odstej_{{narocilo.pk}}"> - </button>
+                                <div id="{{dimenzija}}_stevilo_{{narocilo.pk}}" style="display:inline-block"> 0 </div>
+                                <button id="{{dimenzija}}_novo_{{narocilo.pk}}" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
+                                <button style="display:none" id="{{dimenzija}}_pristej_{{narocilo.pk}}"> + </button>
+                            </td>
+                        {% endif %}
                     {% endfor %}
                     {% if ostalo %}
                         <td class="td {{dimenzija}}">
@@ -102,7 +88,7 @@
                             {% endif %}
                         </td>
                     {% endif %}
-                    <td class="td {{dimenzija}}"> {{skupno|keyvalue:dimenzija }} </td>
+                    <td class="td {{dimenzija}}" id="skupno_{{dimenzija}}"> {{skupno|keyvalue:dimenzija }} </td>
                     <td class="td {{dimenzija}}"> {{zaloga|keyvalue:dimenzija}} </td>
                 </tr>
             {% endfor %}
@@ -144,25 +130,90 @@
     <input type="submit"  value="Nov vnos">
     <input type="hidden" value="{{gledane}}" name="gledane">
 <form>
-<script>
-    function Spremeni_vnos(predznak, pk, stevilo){
-        document.getElementById('stevilo_' + pk).value = stevilo + predznak * 1
-        Nastavi_top(pk)
-    }
-    document.getElementById('body').scrollTop = {{top}}
-    function Poskus(vrstica){
-        barva('vrstica','white')
-        vrstica.style.backgroundColor = "#ffe6e6"
-    }
-    function Nastavi_top(pk){
-        document.getElementById('top_' + pk).value = document.getElementById('body').scrollTop
-        document.getElementById('submit_' + pk).click()
-    }
-    function barva(className, color){
-        var elements = document.getElementsByClassName(className)
-        for (var i = 0; i < elements.length; i++){
-            elements[i].style.backgroundColor = color
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    function Spremeni_vnos(predznak, pk, dimenzija) {
+      var stevilo = parseInt(get_innerHtml('stevilo_' + pk)) + predznak
+      var skupno = parseInt(get_innerHtml('skupno_' + dimenzija)) + predznak
+      $.ajax({
+        url: '{% url "skupen_pregled_spremeni_vnos" zaloga_pk %}',
+        method: 'POST',
+        data: {
+          'csrfmiddlewaretoken': '{{csrf_token}}',
+          'stevilo': stevilo,
+          'pk': pk,
+        },
+        dataType: 'json',
+        success: function (data) {
+          set_innerHtml('stevilo_' + pk, stevilo);
+          set_innerHtml('skupno_' + dimenzija, skupno);
+          if(stevilo == 1){
+              document.getElementById('pristej_' + pk).style.display ="inline-block"
+              document.getElementById('izbrisi_' + pk).style.display ="inline-block"
+              document.getElementById('odstej_' + pk).style.display ="none"
+          } else{
+              document.getElementById('pristej_' + pk).style.display ="inline-block"
+              document.getElementById('izbrisi_' + pk).style.display ="none"
+              document.getElementById('odstej_' + pk).style.display ="inline-block"
+          }
         }
-}
-</script>
+      }); 
+    }
+    function Ustvari_vnos(pk, dimenzija_tip) {
+      var skupno = parseInt(get_innerHtml('skupno_' + dimenzija_tip)) + 1
+      var dimenzija = dimenzija_tip.split('_')[0]
+      var tip = dimenzija_tip.split('_')[1]
+      $.ajax({
+        url: '{% url "skupen_pregled_nov_vnos" zaloga_pk %}',
+        method: 'POST',
+        data: {
+          'csrfmiddlewaretoken': '{{csrf_token}}',
+          'pk': pk,
+          'stevilo': 1,
+          'dimenzija':dimenzija,
+          'tip':tip,
+        },
+        dataType: 'json',
+        success: function (data) {
+          set_id(dimenzija_tip + '_stevilo_' + pk, 'stevilo_' + data.pk) 
+          set_id(dimenzija_tip + '_pristej_' + pk, 'pristej_' + data.pk)
+          set_id(dimenzija_tip + '_odstej_' + pk, 'odstej_' + data.pk)
+          set_id(dimenzija_tip + '_izbrisi_' + pk, 'izbrisi_' + data.pk)
+          set_innerHtml('skupno_' + dimenzija_tip, skupno);
+          set_innerHtml('stevilo_' + data.pk, 1);
+          document.getElementById(dimenzija_tip +'_novo_' + pk).style.display = "none"
+          document.getElementById('pristej_' + data.pk).style.display = "inline-block"
+          document.getElementById('izbrisi_' + data.pk).style.display = "inline-block"
+          document.getElementById('pristej_' + data.pk).onclick = function() { Spremeni_vnos(1,data.pk,dimenzija_tip); }
+          document.getElementById('odstej_' + data.pk).onclick = function() { Spremeni_vnos(-1,data.pk,dimenzija_tip); }
+          document.getElementById('izbrisi_' + data.pk).onclick = function() { Izbrisi_vnos(data.pk,dimenzija_tip); }
+        }
+      }); 
+    }
+    function Izbrisi_vnos(pk, dimenzija) {
+      var skupno = parseInt(get_innerHtml('skupno_' + dimenzija)) - 1
+      $.ajax({
+        url: '{% url "skupen_pregled_izbrisi_vnos" zaloga_pk %}',
+        method: 'POST',
+        data: {
+          'csrfmiddlewaretoken': '{{csrf_token}}',
+          'pk': pk,
+        },
+        dataType: 'json',
+        success: function (data) {
+          set_id('stevilo_' + pk,dimenzija + '_stevilo_' + data.pk) 
+          set_id('pristej_' + pk,dimenzija + '_pristej_' + data.pk)
+          set_id('odstej_' + pk,dimenzija + '_odstej_' + data.pk)
+          set_id('izbrisi_' + pk,dimenzija + '_izbrisi_' + data.pk)
+          set_innerHtml('skupno_' + dimenzija, skupno);
+          set_innerHtml(dimenzija + '_stevilo_' + data.pk, 0);
+          document.getElementById(dimenzija +'_novo_' + data.pk).style.display = "inline-block"
+          document.getElementById(dimenzija + '_pristej_' + data.pk).style.display = "none"
+          document.getElementById(dimenzija + '_izbrisi_' + data.pk).style.display = "none"
+        }
+      }); 
+    }
+  </script>
 {% endblock %}

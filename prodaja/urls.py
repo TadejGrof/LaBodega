@@ -1,7 +1,7 @@
 from django.urls import include,path
 from zaloga import views
 from . import pviews 
-from zaloga import pdf_views
+from zaloga.my_views import pdf_views
 
 dnevna_prodaja_patterns = [
     path('', pviews.dnevna_prodaja, name="dnevna_prodaja"),

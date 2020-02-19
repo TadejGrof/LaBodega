@@ -14,29 +14,15 @@ from django.urls import reverse
 
 zaloga = Zaloga.objects.first()
 
-
 ##################################################################################################
 
 @login_required
 def pregled_zaloge(request,zaloga):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk = zaloga)
-        sestavine = zaloga.sestavina_set.all()
-        radius = request.GET.get('radius','R12')
-        height = request.GET.get('height','all')
-        width = request.GET.get('width', 'all')
-        nicelne = request.GET.get('nicelne','true')
         cenik = zaloga.cenik('vele_prodaja')
-        if radius != "all":
-            sestavine = sestavine.filter(dimenzija__radius=radius)
-        if height != "all":
-            sestavine = sestavine.filter(dimenzija__height=height)
-        if width != "all":
-            if "C" in width:
-                width = width.replace('C','')
-                sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = True)
-            else:
-                sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = False)
+        sestavine = filtriraj_sestavine(request, zaloga)
+        nicelne = request.GET.get('nicelne','true')
         tipi = []
         for tip in zaloga.tipi_sestavin:
             if request.GET.get(tip,"true") == "true":
@@ -214,67 +200,6 @@ def izbris_baze(request,zaloga, tip_baze, pk):
         baza = Baza.objects.get(pk=pk)
         baza.delete()
         return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
-
-@login_required
-def skupen_pregled_narocil(request, zaloga, tip_baze):
-    zaloga = Zaloga.objects.get(pk = zaloga)
-    baze = Baza.objects.filter(status="aktivno", tip="vele_prodaja")
-    gledane = request.GET.get('gledane','all')
-    ostalo = False
-    try:
-        gledane = json.loads(gledane)
-        if len(gledane) != baze.count():
-            ostalo = True
-    except:
-        gledane = [baza['pk'] for baza in baze.values('pk')]    
-    ostala_narocila = baze.exclude(pk__in = gledane).values('pk','stranka__ime')
-    narocila = baze.filter(pk__in = gledane).values('pk','stranka__ime','stranka__pk')
-    vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','tip','stevilo','pk','baza__stranka__pk')
-    razlicne_dimenzije = {}
-    for vnos in vnosi:
-        dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
-        if not vnos['baza__pk'] in gledane:
-            stranka = 'ostalo'
-        else:
-            stranka = vnos['baza__stranka__pk']
-        stevilo = vnos['stevilo']
-        vnos = vnos['pk']
-        if not dimenzija_tip in razlicne_dimenzije:
-            if stranka =='ostalo':
-                razlicne_dimenzije.update({dimenzija_tip:{stranka:stevilo}})
-            else:
-                razlicne_dimenzije.update({dimenzija_tip:{stranka:{vnos:stevilo}}})
-        elif not stranka in razlicne_dimenzije[dimenzija_tip]:
-            if stranka == 'ostalo':
-                razlicne_dimenzije[dimenzija_tip].update({stranka:stevilo})
-            else:
-                razlicne_dimenzije[dimenzija_tip].update({stranka:{vnos:stevilo}})
-        else:
-            if stranka == "ostalo":
-                razlicne_dimenzije[dimenzija_tip][stranka] += stevilo
-            else:
-                razlicne_dimenzije[dimenzija_tip][stranka].update({vnos:stevilo})
-    skupno = {}
-    for dimenzija in razlicne_dimenzije:
-        skupno.update({dimenzija:0})
-        for stranka in razlicne_dimenzije[dimenzija]:
-            if stranka != 'ostalo':
-                for vnos in razlicne_dimenzije[dimenzija][stranka]:
-                    skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
-            else:
-                skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka]
-    slovar = {
-        'narocila':narocila,
-        'ostala_narocila':ostala_narocila,
-        'razlicne_dimenzije':razlicne_dimenzije,
-        'zaloga':zaloga,
-        'skupno':skupno,
-        'stevilo_narocil':baze.count(),
-        'top': int(request.GET.get('top',0)),
-        'ostalo':ostalo,
-        'gledane':json.dumps(gledane),
-        }
-    return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html', slovar ) 
 
 #######################################################################################################
 

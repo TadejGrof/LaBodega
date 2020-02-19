@@ -10,6 +10,21 @@ function barva(className, color){
         elements[i].style.backgroundColor = color
     }
 }
+function set_id(id1,id2){
+    document.getElementById(id1).id = id2
+}
+function get_value(id){
+    return document.getElementById(id).value
+}
+function set_value(id, value){
+    document.getElementById(id).value = value
+}
+function get_innerHtml(id){
+    return document.getElementById(id).innerHTML
+}
+function set_innerHtml(id, html){
+    document.getElementById(id).innerHTML = html
+}
 function je_veljavno_stevilo(stevilo){
     if (! stevilo == ""){
         return true

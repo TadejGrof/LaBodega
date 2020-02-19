@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Dimenzija, Sestavina, Vnos, Dnevna_prodaja
-from .models import Baza, Zaloga
+from ..models import Dimenzija, Sestavina, Vnos, Dnevna_prodaja
+from ..models import Baza, Zaloga
 from django.shortcuts import redirect
 import zaloga.pdf as pdf
 import io

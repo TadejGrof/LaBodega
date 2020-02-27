@@ -49,19 +49,21 @@
 
 
 <script>
-    {% if tip != "inventura" %}
-        ToggleClass('.inventurna_tabela', 'skrit')
-    {% endif %}
-    {% for sestavina in sestavine %}
-        {% if sestavina in vnosi %}
-            var stevilo = "{{vnosi|keyvalue:sestavina|keyvalue:'stevilo'}}"
-            var pk = "{{vnosi|keyvalue:sestavina|keyvalue:'pk'}}"
-            set_innerHtml('stevilo_{{sestavina|replace}}',stevilo)
-            set_value('pk_{{sestavina|replace}}', pk)
-            ToggleClass('.{{sestavina|replace}}','skrit')
-            ToggleClass('.{{sestavina|replace}}.sprememba','skrit')
+    $(document).ready(function() {
+        {% if tip != "inventura" %}
+            ToggleClass('.inventurna_tabela', 'skrit')
         {% endif %}
-    {% endfor %}
+        {% for sestavina in sestavine %}
+            {% if sestavina in vnosi %}
+                var stevilo = "{{vnosi|keyvalue:sestavina|keyvalue:'stevilo'}}"
+                var pk = "{{vnosi|keyvalue:sestavina|keyvalue:'pk'}}"
+                set_innerHtml('stevilo_{{sestavina|replace}}',stevilo)
+                set_value('pk_{{sestavina|replace}}', pk)
+                ToggleClass('.{{sestavina|replace}}','skrit')
+                ToggleClass('.{{sestavina|replace}}.sprememba','skrit')
+            {% endif %}
+        {% endfor %}
+    });
     function SpremeniVnos(dimenzija_tip){
         var pk = get_value('pk_' + dimenzija_tip)
         var stevilo = get_value('stevilo_value_' + dimenzija_tip)

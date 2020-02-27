@@ -1,0 +1,55 @@
+{% load zaloga_exstras %}
+
+<style>
+    div.filter{
+        font-size:4vmin;
+        text-align:center;
+        margin-top:2%
+    }
+</style>
+
+<div class="filter">
+    <button onclick="Pocisti()"> Počisti </button>
+    Radius:
+    <select id="radius_box">
+        <option value="all"> All </option>
+        {% for radius in radiusi %}
+            <option value="{{radius}}"> {{radius}} </option>
+        {% endfor %}
+    </select>
+    Tip:
+    <select id="tip_box">
+        <option value="all"> All </option>
+        {% for tip in tipi %}
+            <option value="{{tip.0}}"> {{tip.1}} </option>
+        {% endfor %}
+    </select>
+    <button onclick="Filtriraj()"> {{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}} </button>
+</div>
+
+<script>
+    function Pocisti(){
+        set_selected('tip_box', 0)
+        set_selected('radius_box', 0)
+        Filtriraj()
+    }
+    function Filtriraj(){
+        var tip = get_selected('tip_box')
+        var radius = get_selected('radius_box')
+        $('.vrstica').removeClass('skrit')
+        if( tip != 'all' && radius != 'all'){
+            ToggleClass('.vrstica','skrit')
+            ToggleClass('.' + tip + '.' + radius, 'skrit')
+        } else{
+            if( tip != 'all'){
+                ToggleClass('.vrstica','skrit')
+                ToggleClass('.' + tip, 'skrit')
+            }
+            if( radius != 'all'){
+                ToggleClass('.vrstica','skrit')
+                ToggleClass('.' + radius, 'skrit')
+            }
+        }
+        
+    }
+</script>

@@ -72,6 +72,10 @@ def razlika(sestavina, tip):
 def kj_none(value):
     return value.replace('/','-')
 
+@register.filter(name='replace')
+def replace(value):
+    return value.replace('/','-')
+    
 @register.filter(name='skupno')
 def skupno(baza,tip):
     skupno = 0

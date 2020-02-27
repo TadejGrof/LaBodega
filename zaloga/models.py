@@ -9,7 +9,7 @@ import os
 from django.contrib.auth.models import User
 from prodaja.models import Prodaja, Stranka, Naslov
 import json
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 
 TIPI_SESTAVINE = (
@@ -624,6 +624,7 @@ class Baza(models.Model):
     def vnosi_values(self):
         return self.vnos_set.all().order_by('dimenzija').values(
             'dimenzija__dimenzija',
+            'dimenzija__radius',
             'pk',
             'stevilo',
             'tip',
@@ -640,7 +641,13 @@ class Baza(models.Model):
         for vnos in self.vnosi_values:
             dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
             if not dimenzija_tip in vnosi:
-                vnosi.update({dimenzija_tip: True})
+                slovar = {
+                    'stevilo': vnos['stevilo'],
+                    'tip': vnos['tip'],
+                    'dimenzija': vnos['dimenzija__dimenzija'],
+                    'pk': vnos['pk']
+                }
+                vnosi.update({dimenzija_tip: slovar})
         return vnosi
 
     @property 
@@ -689,27 +696,35 @@ class Baza(models.Model):
 
     @property
     def skupna_cena(self):
-        cena = 0
-        for vnos in self.vnos_set.all():
-            cena += vnos.skupna_cena
-        return cena
+        try:
+            cena = 0
+            for vnos in self.vnos_set.all():
+                cena += vnos.skupna_cena
+            return cena
+        except:
+            return None
 
     @property
     def cena_popusta(self):
-        return round(float(self.skupna_cena) * (self.popust / 100))
+        try:
+            return round(float(self.skupna_cena) * (self.popust / 100))
+        except:
+            return None
 
     @property
     def cena_prevoza(self):
         if self.prevoz != None:
-            return self.skupno_stevilo * self.prevoz
+            return round(float(self.skupno_stevilo * self.prevoz))
     
     @property
     def koncna_cena(self):
-        if self.prevoz != None:
-            return self.skupna_cena - self.cena_popusta + self.cena_prevoza
-        else:
-            return self.skupna_cena - self.cena_popusta
-
+        try:
+            if self.prevoz != None:
+                return self.skupna_cena - self.cena_popusta + self.cena_prevoza
+            else:
+                return self.skupna_cena - self.cena_popusta
+        except:
+            return None
 ###################################################################################################
 
 class Sprememba(models.Model):
@@ -727,26 +742,19 @@ class Sprememba(models.Model):
         self.datum_spremembe = self.baza.datum
         self.save()
 
-    def je_prazno(self):
-        if self.vnos_set.all().count() == 0:
-            return True
-        
-    def stevilo_iz_vnosov(self):
+    def nastavi_iz_vnosov(self):
         stevilo = 0
-        if self.je_prazno():
-            self.delete()
+        if self.baza.tip == "inventura":
+            stevilo = self.vnos_set.all().first().stevilo
+            if not self.stanje == stevilo:
+                self.stanje = stevilo
+                self.save()
         else:
-            for vnos in self.vnos_set.all():
-                stevilo += vnos.stevilo
-            self.stevilo = stevilo
-            self.save()
-
-    def doloci_stevilo(self):
-        stevilo = 0
-        for vnos in self.vnos_set.all().values('stevilo'):
-            stevilo += vnos['stevilo']
-        self.stevilo = stevilo
-        self.save()
+            for vnos in self.vnos_set.all().values('stevilo'):
+                stevilo += vnos['stevilo']
+            if not self.stevilo == stevilo:
+                self.stevilo = stevilo
+                self.save()
 
     @property
     def datum_baze(self):
@@ -778,8 +786,11 @@ class Vnos(models.Model):
     
     @property
     def skupna_cena(self):
-        return self.stevilo * self.cena
-
+        try:
+            return self.stevilo * self.cena
+        except:
+            return None
+            
     def doloci_ceno(self,cena = None):
         if cena == None:
             cena = float(self.vrni_sestavino().cena(self.baza.tip,self.tip))
@@ -813,35 +824,42 @@ class Vnos(models.Model):
             )
         self.save()
 
-    def inventurna_sprememba(self,stevilo):
-        self.stevilo = stevilo
-        sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
-        sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
-        if sprememba != None:
-            sprememba.stanje = stevilo
-            sprememba.save()
-            sestavina.nastavi_iz_sprememb(self.tip)
-        self.save()
-        
+@receiver(post_save, sender=Vnos)
+def create_vnos(sender, instance, created, **kwargs):
+    if created:
+        if instance.baza.status == "veljavno":
+            sestavina = Sestavina.objects.get(zaloga = instance.baza.zaloga,dimenzija = instance.dimenzija)
+            instance.ustvari_spremembo(sestavina)
+            print('nov_veljaven_vnos')
 
-    def sprememba_stevila(self,stevilo):
-        self.stevilo = stevilo
-        sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
-        sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
-        if sprememba != None:
-            print('delam')
-            sprememba.stevilo = stevilo
-            sprememba.save()
-            sestavina.nastavi_iz_sprememb(self.tip)
-        self.save()
-        
+@receiver(post_save, sender=Vnos)
+def change_vnos(sender,instance,created,**kwargs):
+    if not created:
+        if instance.baza.status=="veljavno":
+           print('spreminjam_veljaven_vnos')
+           instance.sprememba.nastavi_iz_vnosov() 
+    
+@receiver(post_delete, sender=Vnos)
+def delete_vnos(sender,instance,**kwargs):
+    baza = instance.baza
+    if baza.status == "veljavno":
+        sestavina = Sestavina.objects.get(zaloga=baza.zaloga,dimenzija = instance.dimenzija)
+        sprememba = sestavina.sprememba_set.all().filter(baza=baza, tip=instance.tip).first()
+        if sprememba.vnos_set.all().count() == 0:
+            sprememba.delete()
+        else:
+            sprememba.nastavi_iz_vnosov()
+        print('brisem_vnos')
 
-    def inventurni_izbris(self):
-        sestavina = self.baza.zaloga.sestavina_set.all().get(dimenzija = self.dimenzija)
-        sprememba = sestavina.sprememba_set.all().filter(baza=self.baza,tip=self.tip).first()
-        sprememba.delete()
-        sestavina.nastavi_iz_sprememb(self.tip)
-        self.delete()
+@receiver(post_save, sender=Sprememba)
+def change_sprememba(sender,instance,**kwargs):
+    instance.sestavina.nastavi_iz_sprememb(instance.tip)
+    print('spreminjam_spremembo')
+
+@receiver(post_delete, sender=Sprememba)
+def delete_sprememba(sender,instance,**kwargs):
+    instance.sestavina.nastavi_iz_sprememb(instance.tip)
+    print('brisem_spremembo')
 
 class Stroski_Group(models.Model):
     title = models.CharField(default="",max_length=20)

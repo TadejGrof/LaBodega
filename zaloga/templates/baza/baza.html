@@ -1,0 +1,254 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+<style>
+    div.okno{
+        margin-top:2%;
+        display:inline-block;
+        width:90%;
+        border: 1px solid black;
+        font-size:5vmin;
+    }
+    div.delovno_okno{
+        margin-top:1%;
+        display:inline-block;
+        width:80%;
+        height:6%;
+        border: 1px solid black;
+        font-size:3vmin;
+        padding-top: 10px;
+        text-align:center
+    }
+    div.table{
+        display:block;
+        text-align:center;
+        margin-top:1%
+    }
+    div.delovno{
+        position:relative;
+        display:none;
+        width:90%;
+        left:5%;
+        height:10%;
+        text-align:center;
+        margin-top:2%
+    }
+</style>
+
+{% include 'baza/bazno_okno.html' with baza=baza %}
+
+<div class="delovno_okno">
+    {% if tip == "inventura" %}
+        <button onclick="toggle('vrstica','none');toggle('razlika','inline-block')"> Razlika </button>
+        <button onclick="Filtriraj()"> Preklici razliko </button>
+    {% else %}
+        {% if perms.zaloga.add_vnos %}
+            <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+            <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
+                {% for dimenzija in program.vrni_dimenzije %}
+                    <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
+                {% endfor %}
+            </select>
+            <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
+            <select id="tip" class="nov_vnos skrit">
+                {% for tip in zaloga.vrni_tipe %}
+                    <option value="{{tip.0}}"> {{tip.1}} </option>
+                {% endfor %}
+            </select>
+            <button class="nov_vnos skrit" onclick="nov_vnos()"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+            <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+        {% endif %}
+        <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+    {% endif %} 
+    {% if status == "aktivno" %}
+        <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
+        <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip baza.pk %}" method="POST">
+            {% csrf_token %}
+            <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
+            <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
+        </form>
+        <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip baza.pk %}" method="POST">
+            {% csrf_token %}
+            <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
+        </form>
+        <button class="vnosi skrit" onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+        <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
+    {% endif %}
+    <form class="nov_vnos inline vnosi" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="GET">
+        <input style="width:150px" type="submit" value="PDF">
+        <select name="tip">
+            <option value="all"> All </option>
+            {% for tip in baza.razlicni_tipi %}
+                <option value="{{tip}}"> {{tip}} </option>
+            {% endfor %}
+        </select>
+    
+    
+    </form>
+</div>
+    
+{% if status == "aktivno" %}
+    {% include 'baza/filter.html' with tipi=tipi radiusi=razlicni_radiusi slovar=slovar %}
+{% endif %}
+
+{% if status == "aktivno" %}
+    {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
+{% endif %}
+
+{% include 'baza/tabela_vnosov.html' with tip=tip status=status baza=baza slovar=slovar %}
+
+{% endblock %} 
+
+{% block javascript %}
+    <script>
+        function Uveljavi_bazo(gumb){
+            {% if baza.stevilo_vnosov == 0 %}
+                alert('baza mora vsebovati vsaj en vnos');
+                return false;
+            {% else %}
+                if( Confirm() ){
+                    gumb.disabled = true;
+                    gumb.form.submit();
+                } else{
+                    return false
+                }
+            {% endif %}
+        };
+        function Izbrisi_vse(){
+            if(Confirm()){
+                var table = document.getElementById("tabela_vnosov");
+                for(var i = 1; i < table.rows.length; i++) {
+                var row = table.rows[i]
+                var cell = row.cells[row.cells.length - 1]
+                if ( row.cells[0].classList.contains('index')){
+                        cell.getElementsByTagName('button')[1].click()
+                }
+                }
+            }
+        }
+        function Refresh_tabela_vnosov(data){
+            set_innerHtml('stevilo_' + data.pk, data.stevilo)
+            set_innerHtml('tip_' + data.pk, data.dolgi_tip)
+            set_innerHtml('skupno_stevilo',data.skupno_stevilo)
+            set_innerHtml('stevilo_' + data.dimenzija + '_' + data.tip, data.stevilo)
+            set_innerHtml('cena_' + data.pk, data.cena + ' $')
+            set_innerHtml('cena_vnosa_' + data.pk, data.cena_vnosa + ' $')
+            set_innerHtml('skupna_cena', data.skupna_cena + ' $')
+            set_innerHtml('koncna_cena', data.koncna_cena + ' $')
+            set_innerHtml('cena_popusta', data.cena_popusta + ' $')
+            set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')
+        }
+        function Refresh_inventurna_tabela(data){
+            var dimenzija_tip = data.varna_dimenzija + '_' + data.tip
+            set_value('stevilo_value_'+ dimenzija_tip , '')
+            if ( data.action == "izbris" ){
+                set_value('pk_' + dimenzija_tip, "")
+                ToggleClass('.' + dimenzija_tip, 'skrit')
+                ToggleClass('.' + dimenzija_tip + '.sprememba', 'skrit')
+            } else if ( data.action == "novo" ) {
+                set_value('pk_' + dimenzija_tip, data.pk)
+                set_innerHtml('stevilo_' + dimenzija_tip, data.stevilo)
+                ToggleClass('.' + dimenzija_tip, 'skrit')
+                ToggleClass('.' + dimenzija_tip + '.sprememba', 'skrit')
+            } else{
+                set_value('pk_' + dimenzija_tip, data.pk)
+                set_innerHtml('stevilo_' + dimenzija_tip, data.stevilo)
+            }       
+        }
+        function Izbrisi_vnos(pk){
+            $.ajax({
+                url: '{% url "izbrisi_vnos" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'pk': pk,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var row = document.getElementById('vrstica_' + pk);
+                    row.parentNode.removeChild(row);
+                    Refresh_inventurna_tabela(data);
+                    Refresh_tabela_vnosov(data);
+                    Nastavi_vrstice();
+                }
+            }); 
+        }
+        function Spremeni_vnos(pk, stevilo, cena){
+            $.ajax({
+                url: '{% url "spremeni_vnos" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'pk': pk,
+                'stevilo': stevilo,
+                'cena':cena,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    Refresh_inventurna_tabela(data)
+                    Refresh_tabela_vnosov(data)
+                }
+            }); 
+        }
+        function Nov_vnos(dimenzija,tip,stevilo){
+            $.ajax({
+                url: '{% url "nov_vnos" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'dimenzija': dimenzija,
+                'tip':tip,
+                'stevilo':stevilo,
+                'pk': '{{baza.pk}}'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    Vstavi_vrstico(data);
+                    Refresh_tabela_vnosov(data);
+                    Refresh_inventurna_tabela(data);
+                    Nastavi_vrstice()
+                }
+            }); 
+        }
+        function Spremeni_popust(){
+            var popust = get_value('popust_value')
+            $.ajax({
+                url: '{% url "spremeni_popust" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'popust': popust,
+                'pk': '{{baza.pk}}',
+                },
+                dataType: 'json',
+                success: function (data) {
+                    set_innerHtml('popust', data.popust + ' $')
+                    set_innerHtml('cena_popusta', data.cena_popusta + ' $')
+                    set_innerHtml('koncna_cena', data.koncna_cena + ' $')
+                    ToggleClass('.popust','skrit')
+                }
+            });  
+        }
+        function Spremeni_prevoz(){
+            var prevoz = get_value('prevoz_value')
+            $.ajax({
+                url: '{% url "spremeni_prevoz" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'prevoz': prevoz,
+                'pk': '{{baza.pk}}',
+                },
+                dataType: 'json',
+                success: function (data) {
+                    set_innerHtml('prevoz', data.prevoz + ' $')
+                    set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')
+                    set_innerHtml('koncna_cena', data.koncna_cena + ' $')
+                    ToggleClass('.prevoz','skrit')
+                }
+            }); 
+        }
+    </script>
+{% endblock %}

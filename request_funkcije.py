@@ -5,7 +5,9 @@ from django.shortcuts import render
 
 def vrni_dimenzijo(request):
     if request.POST.get('dimenzija'):
-        return Dimenzija.objects.get(dimenzija=request.POST.get('dimenzija'))
+        dimenzija = request.POST.get('dimenzija')
+        dimenzija = dimenzija.replace('-','/')
+        return Dimenzija.objects.get(dimenzija = dimenzija)
     else:
         radius = request.POST.get('radius')
         height = request.POST.get('height')

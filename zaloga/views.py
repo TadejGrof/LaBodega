@@ -209,21 +209,23 @@ def baza(request,zaloga, tip_baze, pk):
         zaloga = Zaloga.objects.get(pk=zaloga)
         baza = Baza.objects.get(pk = pk)
         if baza.status == "aktivno":
+            print(baza.uveljavljeni_vnosi)
             slovar = {
                 'zaloga': zaloga,
                 'baza':baza,
                 'vnosi':baza.inventurni_vnosi,
                 'tip':tip_baze,
                 'status':"aktivno",
+                'uveljavljeni_vnosi': baza.uveljavljeni_vnosi,
                 'na_voljo':zaloga.na_voljo,
                 'razlicni_radiusi':zaloga.vrni_razlicne_radiuse,
                 'sestavine':zaloga.vrni_zalogo,
                 'tipi': zaloga.vrni_tipe}
-            return pokazi_stran(request, 'zaloga/baza.html',slovar)
+            return pokazi_stran(request, 'baza/baza.html',slovar)
         elif baza.status == "veljavno":
-            return pokazi_stran(request, 'zaloga/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
+            return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
         elif baza.status == "zaklenjeno":
-            return pokazi_stran(request, 'zaloga/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
+            return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
 
 @login_required
 def nov_vnos(request,zaloga, tip_baze, pk):
@@ -231,10 +233,7 @@ def nov_vnos(request,zaloga, tip_baze, pk):
         dimenzija = vrni_dimenzijo(request)
         stevilo = request.POST.get('stevilo')
         tip = request.POST.get('tip')
-        if pk == 0:
-            baza = Baza.objects.get( pk = int(request.POST.get('pk')))
-        else:
-            baza = Baza.objects.get(pk = pk)
+        baza = Baza.objects.get(pk = pk)
         if tip_baze == "vele_prodaja":
             vnos = Vnos.objects.create(
                 dimenzija = dimenzija,
@@ -248,15 +247,7 @@ def nov_vnos(request,zaloga, tip_baze, pk):
                 stevilo = stevilo,
                 tip = tip,
                 baza = baza)
-        if baza.status == "veljavno":
-            sestavina = Sestavina.objects.get(zaloga = zaloga,dimenzija = vnos.dimenzija)
-            vnos.ustvari_spremembo(sestavina)
-            sestavina.nastavi_iz_sprememb(vnos.tip)
-        if pk == 0:
-            gledane = request.POST.get('gledane','all')
-            return redirect(reverse('skupen_pregled_narocil', kwargs={'zaloga':zaloga,'tip_baze':tip_baze}) + "?gledane=" + gledane)
-        else:
-            return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
+        return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
 
 @login_required
 def shrani_vse(request,zaloga,tip_baze, pk):
@@ -311,77 +302,6 @@ def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
             ))
     Vnos.objects.bulk_create(vnosi)
     return redirect('baza',zaloga=zaloga.pk, tip_baze = tip_baze, pk = pk)
-
-@login_required
-def spremeni_vnos(request,zaloga, tip_baze, pk):
-    if request.method == "POST":
-        stevilo = request.POST.get('stevilo')
-        cena = request.POST.get('cena')
-        tip = request.POST.get('tip')
-        vnos = Vnos.objects.get(pk = request.POST.get('pk'))
-        if stevilo and stevilo != "":
-            if tip_baze == "inventura":
-                vnos.inventurna_sprememba(stevilo)
-            else:
-                print('delam')
-                vnos.sprememba_stevila(stevilo)
-        if tip:
-            vnos.tip = tip
-        if cena and cena != "" :
-            vnos.cena = float(cena)
-        vnos.save()
-        if pk == 0:
-            top = request.POST.get('top')
-            gledane = request.POST.get('gledane','all')
-            return redirect(reverse('skupen_pregled_narocil', kwargs={'zaloga':zaloga,'tip_baze':tip_baze}) + "?top=" + str(top) + '&gledane=' + gledane)
-        else:
-            return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
-
-@login_required
-def izbrisi_vnos(request,zaloga, tip_baze, pk):
-    if request.method == "POST":
-        vnos = Vnos.objects.get(pk = request.POST.get('pk'))
-        if pk == 0:
-            vnos.delete()
-            gledane = request.POST.get('gledane','all')
-            return redirect(reverse('skupen_pregled_narocil', kwargs={'zaloga':zaloga,'tip_baze':tip_baze}) + "?gledane=" + gledane)
-        else:
-            baza = Baza.objects.get(pk = pk)
-            if baza.status == "veljavno":
-                if tip_baze == "inventura":
-                    vnos.inventurni_izbris()
-                else:
-                    tip = vnos.tip
-                    sestavina = Sestavina.objects.get(zaloga=zaloga,dimenzija = vnos.dimenzija)
-                    vnos.sprememba.delete()
-                    sestavina.nastavi_iz_sprememb(tip)
-            elif baza.status == "aktivno":
-                vnos.delete()
-        return redirect('baza',zaloga=zaloga, tip_baze=tip_baze, pk = pk)
-
-@login_required
-def izbrisi_vse(request,zaloga, tip_baze, pk):
-    if request.method == "POST":
-        baza = Baza.objects.get(pk = pk)
-        for vnos in baza.vnos_set.all():
-            vnos.delete()
-        return redirect('baza',zaloga=zaloga, tip_baze=tip_baze, pk = pk)
-
-@login_required
-def spremeni_popust(request,zaloga,tip_baze, pk):
-    if request.method == "POST":
-        prodaja = Baza.objects.get(pk = pk)
-        prodaja.popust = request.POST.get('popust')
-        prodaja.save()
-        return redirect('baza',zaloga=zaloga,tip_baze=tip_baze,pk=pk)
-
-@login_required
-def spremeni_prevoz(request,zaloga,tip_baze, pk):
-    if request.method == "POST":
-        prodaja = Baza.objects.get(pk = pk)
-        prodaja.prevoz = request.POST.get('prevoz')
-        prodaja.save()
-        return redirect('baza',zaloga=zaloga,tip_baze=tip_baze,pk=pk)
 
 @login_required
 def uveljavi_bazo(request,zaloga, tip_baze, pk):

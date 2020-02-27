@@ -1,0 +1,212 @@
+{% load zaloga_exstras %}
+
+<style>
+    input.input{
+        text-align:center;
+        width:60%
+    }
+</style>
+<div class="vnosi inline" style="width:80%;margin-top:2%">
+    {% if tip != "inventura" or status == "veljavno" %}
+        <table id="tabela_vnosov" style="vertical-align:top;" class="tabela_vnosov">
+            <tr class="header">
+                <th width="8%"> N. </th>
+                <th width="20%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+                <th width="12%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                <th width="12%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+                {% if tip == "vele_prodaja" %}
+                    <th width="14%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                    <th width="14%"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
+                {% endif %}
+                <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
+            </tr>
+            {% for vnos in baza.vnosi_values %}
+                <tr class="vrstica {{vnos.dimenzija__radius}} {{vnos.tip}}" id="vrstica_{{vnos.pk}}">
+                    <td class="index"> {{forloop.counter}}. </td>
+                    <td > {{ vnos.dimenzija__dimenzija }} </td>
+                    <td class="tip">
+                        {{ zaloga|dolgi_tip:vnos.tip }}
+                    </td>
+                    <td class="stevilo">
+                        <div id="stevilo_{{vnos.pk}}" class="{{vnos.pk}}">{{vnos.stevilo}}</div>
+                        <input class="{{vnos.pk}} skrit input" type="number" min=1 max="999" id="stevilo_value_{{vnos.pk}}" placeholder="({{vnos.stevilo}})" autocomplete="off">
+                    </td>
+                    {% if tip == "vele_prodaja" %}
+                        <td class="cena"> 
+                            <div id="cena_{{vnos.pk}}" class="{{vnos.pk}}">{{vnos.cena}} $</div>
+                            <input class="{{vnos.pk}} skrit input" type="text" name="cena" id="cena_value_{{vnos.pk}}" placeholder="({{vnos.cena}} $)" autocomplete="off" pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
+                            <div class="{{vnos.pk}} skrit inline"> $ </div>
+                        </td>
+                        <td id="cena_vnosa_{{vnos.pk}}"> {{vnos|skupna_cena}} $ </td>
+                    {% endif %}
+                    <td>
+                        <button class="{{vnos.pk}}" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> E </button>
+                        <button class="{{vnos.pk}}" onclick="Izbrisi_vnos('{{vnos.pk}}')"> X </button>
+                        <button class="{{vnos.pk}} skrit"  onclick="spremeni_vnos('{{vnos.pk}}')"> Ok </button>
+                        <button class="{{vnos.pk}} skrit" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> X </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            {% if tip == "vele_prodaja" %}
+                <tr class="endrow">
+                    <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}:</td>
+                    <td id="skupno_stevilo"> {{baza.skupno_stevilo}} </td>
+                    <td> {{slovar|keyvalue:'Znesek'|keyvalue:jezik}}: </td>
+                    <td id="skupna_cena"> {{baza.skupna_cena}} $ </td>
+                    <td colspan="2"> </td>
+                </tr>
+                <tr class="endrow">
+                    <td> {{slovar|keyvalue:'Popust'|keyvalue:jezik}}: </td>
+                    <td>  
+                        <div id="popust" class="popust"> {{baza.popust}} % </div>
+                        <input style="width:60%" type="text" class="popust skrit" id="popust_value" value="">
+                        <div class="popust skrit inline">%</div>  
+                    </td>
+                    <td>   
+                        <button class="popust" onclick="ToggleClass('.popust','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                        <button class="popust skrit" onclick="Spremeni_popust()"> Ok </button>
+                        <button class="popust skrit" onclick="ToggleClass('.popust','skrit')"> X </button>
+                    </td>
+                    <td colspan="2"> {{slovar|keyvalue:'Znesek popusta'|keyvalue:jezik}}: </td>
+                    <td id="cena_popusta"> {{baza.cena_popusta}} $</td>
+                    <td colspan="2" > </td>
+                </tr>
+                <tr class="endrow">
+                    <td> {{slovar|keyvalue:'Prevoz'|keyvalue:jezik}}: </td>
+                    <td>  
+                        <div class="prevoz" id="prevoz"> {{baza.prevoz}} $ </div>
+                        <input class="prevoz skrit inline" style="width:60%" type="text" id="prevoz_value" value="">
+                        <div class="prevoz skrit inline">$</div>  
+                    </td>
+                    <td>   
+                        <button class="prevoz" onclick="ToggleClass('.prevoz','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                        <button class="prevoz skrit" onclick="Spremeni_prevoz()"> Ok </button>
+                        <button class="prevoz skrit" onclick="ToggleClass('.prevoz','skrit')"> X </button>
+                    </td>
+                    <td colspan="2"> {{slovar|keyvalue:'Cena prevoza'|keyvalue:jezik}}: </td>
+                    <td id="cena_prevoza"> {{baza.cena_prevoza}} $</td>
+                    <td colspan="2" > </td>
+                </tr>
+                <tr class="endrow">
+                    <td colspan="5"> {{slovar|keyvalue:'Koncna cena'|keyvalue:jezik}}: </td>
+                    <td id="koncna_cena"> {{baza.koncna_cena}} $ </td>
+                    <td colspan="2" > </td>
+                </tr>
+            {% else %}
+                <tr class="skrit">
+                    <td colspan="3"> Delno število: </td>
+                    <td id="delno_stevilo"> </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
+                    <td id="skupno_stevilo"> {{baza|skupno:"all"}} </td>
+                    <td> </td>
+                </tr>
+            {% endif %}
+        </table>
+    {% endif %}
+</div>
+
+<script>
+        function spremeni_vnos(pk){
+            var stevilo = get_value('stevilo_value_' + pk)
+            var cena = ""
+            {% if tip == "vele_prodaja" %}
+                cena = get_value('cena_value_' + pk)
+            {% endif %}
+            Spremeni_vnos(pk,stevilo,cena)
+            ToggleClass('.' + pk, 'skrit')
+        }
+        function nov_vnos(){
+            var dimenzija = get_selected('dimenzija')
+            var stevilo = get_value('stevilo')
+            var tip = get_selected('tip')
+            Nov_vnos(dimenzija,tip,stevilo)
+        }
+        function Nastavi_vrstice(){
+            var table = document.getElementById("tabela_vnosov");
+            for(var i = 1; i < table.rows.length; i++) {
+            var cell = table.rows[i].cells[0]
+            if(cell.classList.contains('index')){
+                table.rows[i].cells[0].innerHTML = (i).toString() + '.'
+            }
+            }
+        }
+        function Vstavi_vrstico(data){
+            var table = document.getElementById('tabela_vnosov')
+            var row = table.insertRow(data.index + 1)
+            row.id = "vrstica_" + data.pk 
+            var cell = row.insertCell(0)
+            cell.classList.add("index");
+            var cell = row.insertCell(1)
+            cell.innerHTML = data.dimenzija
+            var cell = row.insertCell(2)
+            cell.innerHTML = data.dolgi_tip
+            var cell = row.insertCell(3)
+            var input = document.createElement('input')
+            input.classList.add(data.pk)
+            input.classList.add('skrit')
+            input.classList.add('input')
+            input.id = "stevilo_value_" + data.pk
+            input.type = "text"
+            cell.appendChild(input);
+            var div = document.createElement('div')
+            div.innerHTML = data.stevilo
+            div.id = "stevilo_" + data.pk
+            div.classList.add(data.pk)      
+            cell.appendChild(div)
+            if(data.tip_baze == "vele_prodaja"){
+                var cell = row.insertCell(4)
+                var input = document.createElement('input')
+                input.classList.add(data.pk)
+                input.classList.add('skrit')
+                input.classList.add('input')
+                input.id = "cena_value_" + data.pk
+                input.type = "text"
+                cell.appendChild(input);
+                var div = document.createElement('div')
+                div.innerHTML = ' $'
+                div.classList.add(data.pk)
+                div.classList.add('skrit')  
+                div.classList.add('inline')        
+                cell.appendChild(div)
+                var div = document.createElement('div')
+                div.innerHTML = data.cena + ' $'
+                div.id = "cena_" + data.pk
+                div.classList.add(data.pk)      
+                cell.appendChild(div)
+                var cell = row.insertCell(5)
+                cell.innerHTML = data.cena_vnosa + ' $'
+                cell.id = "cena_vnosa_" + data.pk
+                var cell = row.insertCell(6)
+            } else{
+                var cell = row.insertCell(4)
+            }
+            var button = document.createElement('button')
+            button.onclick = function(){ToggleClass('.' + data.pk,'skrit')}
+            button.classList.add(data.pk)
+            button.innerHTML = "E"
+            cell.appendChild(button);
+            cell.appendChild (document.createTextNode(" "));
+            var button = document.createElement('button');
+            button.onclick = function(){Izbrisi_vnos(data.pk)}
+            button.innerHTML = "X"
+            button.classList.add(data.pk);
+            cell.appendChild(button);
+            var button = document.createElement('button')
+            button.onclick = function(){spremeni_vnos(data.pk)}
+            button.classList.add(data.pk)
+            button.classList.add('skrit')
+            button.innerHTML = "Ok"
+            cell.appendChild(button);
+            cell.appendChild (document.createTextNode(" "));
+            var button = document.createElement('button')
+            button.onclick = function(){ToggleClass('.' + data.pk,'skrit')}
+            button.classList.add(data.pk)
+            button.classList.add('skrit')
+            button.innerHTML = "X"
+            cell.appendChild(button);
+        }
+        Nastavi_vrstice()
+</script>

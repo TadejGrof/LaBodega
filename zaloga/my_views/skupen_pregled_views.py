@@ -71,37 +71,3 @@ def skupen_pregled_narocil(request, zaloga):
     return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html', slovar ) 
 
 
-def spremeni_vnos(request, zaloga):
-    if request.method=="POST":
-        pk = int(request.POST.get('pk'))
-        stevilo = int(request.POST.get('stevilo'))
-        vnos = Vnos.objects.get(pk = pk)
-        vnos.stevilo = stevilo
-        vnos.save()
-    return JsonResponse({})
-
-def nov_vnos(request,zaloga):
-    if request.method == "POST":
-        dimenzija = request.POST.get('dimenzija')
-        stevilo = int(request.POST.get('stevilo'))
-        tip = request.POST.get('tip')
-        pk = int(request.POST.get('pk'))
-        baza = Baza.objects.get(pk = pk)
-        vnos = Vnos.objects.create(
-            dimenzija = Dimenzija.objects.get(dimenzija=dimenzija),
-            stevilo = stevilo,
-            tip = tip,
-            cena = Sestavina.objects.get(zaloga=zaloga,dimenzija__dimenzija=dimenzija).cena('vele_prodaja',tip),
-            baza = baza)
-        pk = vnos.pk
-        return JsonResponse({'pk':str(pk)})
-
-def izbrisi_vnos(request,zaloga):
-    if request.method=="POST":
-        pk = int(request.POST.get('pk'))
-        vnos = Vnos.objects.get(pk = pk)
-        pk = vnos.baza.pk
-        vnos.delete()
-        data = {'pk':pk}
-    return JsonResponse(data)
-    

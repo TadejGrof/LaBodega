@@ -1,9 +1,19 @@
+function Confirm() {
+    if (!confirm('are you sure?')){
+        return false
+    } else{
+        return true
+    }
+}
 function toggle(className, displayState){
     var elements = document.getElementsByClassName(className)
     for (var i = 0; i < elements.length; i++){
         elements[i].style.display = displayState;
     }
 }; 
+function ToggleClass(selector, className){
+    $(selector).toggleClass(className)
+}
 function barva(className, color){
     var elements = document.getElementsByClassName(className)
     for (var i = 0; i < elements.length; i++){
@@ -14,16 +24,42 @@ function set_id(id1,id2){
     document.getElementById(id1).id = id2
 }
 function get_value(id){
-    return document.getElementById(id).value
+    var element = document.getElementById(id)
+    if (element){
+        return element.value
+    }
+    return null
 }
 function set_value(id, value){
-    document.getElementById(id).value = value
+    var element = document.getElementById(id)
+    if (element){
+        element.value = value
+    }
 }
 function get_innerHtml(id){
-    return document.getElementById(id).innerHTML
+    var element = document.getElementById(id)
+    if (element){
+        return element.innerHTML
+    }
 }
 function set_innerHtml(id, html){
-    document.getElementById(id).innerHTML = html
+    var element = document.getElementById(id)
+    if (element){
+        element.innerHTML = html
+    }
+}
+function get_selected(id){
+    var box = document.getElementById(id)
+    if (box){
+        return box.options[box.selectedIndex].value
+    }
+    return null
+}
+function set_selected(id, index){
+    var box = document.getElementById(id)
+    if (box){
+        box.selectedIndex = index
+    }
 }
 function je_veljavno_stevilo(stevilo){
     if (! stevilo == ""){

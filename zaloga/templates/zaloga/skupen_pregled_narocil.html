@@ -138,7 +138,7 @@
       var stevilo = parseInt(get_innerHtml('stevilo_' + pk)) + predznak
       var skupno = parseInt(get_innerHtml('skupno_' + dimenzija)) + predznak
       $.ajax({
-        url: '{% url "skupen_pregled_spremeni_vnos" zaloga_pk %}',
+        url: '{% url "spremeni_vnos" %}',
         method: 'POST',
         data: {
           'csrfmiddlewaretoken': '{{csrf_token}}',
@@ -166,7 +166,7 @@
       var dimenzija = dimenzija_tip.split('_')[0]
       var tip = dimenzija_tip.split('_')[1]
       $.ajax({
-        url: '{% url "skupen_pregled_nov_vnos" zaloga_pk %}',
+        url: '{% url "nov_vnos" %}',
         method: 'POST',
         data: {
           'csrfmiddlewaretoken': '{{csrf_token}}',
@@ -195,7 +195,7 @@
     function Izbrisi_vnos(pk, dimenzija) {
       var skupno = parseInt(get_innerHtml('skupno_' + dimenzija)) - 1
       $.ajax({
-        url: '{% url "skupen_pregled_izbrisi_vnos" zaloga_pk %}',
+        url: '{% url "izbrisi_vnos" %}',
         method: 'POST',
         data: {
           'csrfmiddlewaretoken': '{{csrf_token}}',

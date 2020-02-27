@@ -43,6 +43,7 @@
     {% if tip == "inventura" %}
         <button onclick="toggle('vrstica','none');toggle('razlika','inline-block')"> Razlika </button>
         <button onclick="Filtriraj()"> Preklici razliko </button>
+        <button onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
     {% else %}
         {% if perms.zaloga.add_vnos %}
             <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
@@ -61,6 +62,7 @@
             <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
         {% endif %}
         <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+        <button class="vnosi skrit" onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
     {% endif %} 
     {% if status == "aktivno" %}
         <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
@@ -73,7 +75,6 @@
             {% csrf_token %}
             <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
         </form>
-        <button class="vnosi skrit" onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
     {% endif %}
     <form class="nov_vnos inline vnosi" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="GET">

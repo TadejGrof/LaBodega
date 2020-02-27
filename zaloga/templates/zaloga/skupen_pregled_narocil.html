@@ -104,32 +104,6 @@
     </table>
 </div>
 
-<h2> Dodaj vnos </h2>
-
-<form action="{% url 'baza_nov_vnos' zaloga.pk 'vele_prodaja' 0 %}" method="POST" style="margin-bottom:3%">
-    {% csrf_token %}
-    Stranka: 
-    <select name="pk">
-        {% for narocilo in narocila %}
-            <option value="{{narocilo.pk}}"> {{narocilo.stranka__ime}} </option>
-        {% endfor%}
-    </select>
-    Dimenzija: 
-    <select name="dimenzija">
-        {% for dimenzija in program.vrni_dimenzije %}
-            <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
-        {% endfor %}
-    </select>
-    Tip: 
-    <select name="tip">
-        {% for tip in zaloga.tipi_sestavin %}
-            <option  value="{{tip}}"> {{tip}} </option>
-        {% endfor %}
-    </select>
-    Stevilo: <input name="stevilo" type="number" required>
-    <input type="submit"  value="Nov vnos">
-    <input type="hidden" value="{{gledane}}" name="gledane">
-<form>
 {% endblock %}
 
 {% block javascript %}

@@ -23,22 +23,9 @@ def spremeni_vnos(request):
             vnos.cena = float(cena)
         vnos.save()
         baza = vnos.baza
-        data = {
-            'action': 'sprememba',
-            'pk': str(vnos.pk),
-            'stevilo':str(vnos.stevilo),
-            'tip': str(vnos.tip),
-            'dolgi_tip': str(vnos.get_tip_display()),
-            'dimenzija': str(vnos.dimenzija),
-            'varna_dimenzija': str(vnos.dimenzija).replace('/','-'),
-            'cena':str(vnos.cena),
-            'cena_vnosa': str(vnos.skupna_cena),
-            'skupna_cena': str(vnos.baza.skupna_cena),
-            'skupno_stevilo': str(vnos.baza.skupno_stevilo),
-            'koncna_cena': str(vnos.baza.koncna_cena),
-            'cena_popusta': str(baza.cena_popusta),
-            'cena_prevoza': str(baza.cena_prevoza),
-        }
+        data = podatki_vnosa(vnos)
+        data.update(podatki_baze(baza))
+        data.update({'action':'sprememba'})
     return JsonResponse(data)
 
 def nov_vnos(request):
@@ -67,24 +54,9 @@ def nov_vnos(request):
             if slovar['pk'] == pk:
                 break
             index += 1
-        data = {
-            'action': 'novo',
-            'pk': str(pk),
-            'index': index,
-            'tip': vnos.tip,
-            'dolgi_tip': vnos.get_tip_display(),
-            'stevilo': str(vnos.stevilo),
-            'cena': str(vnos.cena),
-            'dimenzija': str(vnos.dimenzija),
-            'varna_dimenzija': str(vnos.dimenzija).replace('/','-'),
-            'cena_vnosa': str(vnos.skupna_cena),
-            'cena_popusta': str(baza.cena_popusta),
-            'cena_prevoza': str(baza.cena_prevoza),
-            'skupno_stevilo': str(baza.skupno_stevilo),
-            'skupna_cena': str(baza.skupna_cena),
-            'koncna_cena': str(baza.koncna_cena),
-            'tip_baze': baza.tip
-        }
+        data = podatki_vnosa(vnos)
+        data.update(podatki_baze(baza))
+        data.update({'action':'novo','index':index})
         return JsonResponse(data)
 
 def izbrisi_vnos(request):
@@ -94,18 +66,9 @@ def izbrisi_vnos(request):
         baza = vnos.baza
         pk = vnos.baza.pk
         vnos.delete()
-        data = {
-            'pk': str(vnos.pk),
-            'action': 'izbris',
-            'dimenzija':str(vnos.dimenzija),
-            'varna_dimenzija': str(vnos.dimenzija).replace('/','-'),
-            'tip': vnos.tip,
-            'skupno_stevilo': str(baza.skupno_stevilo),
-            'cena_popusta': str(baza.cena_popusta),
-            'cena_prevoza': str(baza.cena_prevoza),
-            'skupna_cena': str(baza.skupna_cena),
-            'koncna_cena': str(baza.koncna_cena)
-        }
+        data = podatki_vnosa(vnos)
+        data.update(podatki_baze(baza))
+        data.update({'action':'izbris'})
     return JsonResponse(data)
     
 def spremeni_popust(request):
@@ -120,10 +83,7 @@ def spremeni_popust(request):
                 popust = 0
             baza.popust = popust
             baza.save()
-        data = {}
-        data['cena_popusta'] = str(baza.cena_popusta)
-        data['popust'] = str(baza.popust)
-        data['koncna_cena'] = str(baza.koncna_cena)
+        data = podatki_baze(baza)
     return JsonResponse(data) 
 
 def spremeni_prevoz(request):
@@ -138,8 +98,28 @@ def spremeni_prevoz(request):
                 prevoz = 0
             baza.prevoz = prevoz
             baza.save()
-        data = {}
-        data['cena_prevoza'] = str(baza.cena_prevoza)
-        data['prevoz'] = str(baza.prevoz)
-        data['koncna_cena'] = str(baza.koncna_cena)
+        data = podatki_baze(baza)
     return JsonResponse(data) 
+
+def podatki_vnosa(vnos):
+    data = {}
+    data['pk'] = str(vnos.pk)
+    data['cena'] = str(vnos.cena)
+    data['cena_vnosa'] = str(vnos.skupna_cena)
+    data['stevilo'] = str(vnos.stevilo)
+    data['dimenzija'] = str(vnos.dimenzija)
+    data['varna_dimenzija'] = str(vnos.dimenzija).replace('/','-')
+    data['tip'] = vnos.tip
+    data['dolgi_tip']: vnos.get_tip_display()
+    return data
+
+def podatki_baze(baza):
+    data = {}
+    data['popust'] = str(baza.popust)
+    data['cena_popusta'] = str(baza.cena_popusta)
+    data['cena_prevoza'] = str(baza.cena_prevoza)
+    data['prevoz'] = str(baza.prevoz)
+    data['koncna_cena'] = str(baza.koncna_cena)
+    data['skupna_cena'] = str(baza.skupna_cena)
+    data['skupno_stevilo'] = str(baza.skupno_stevilo)
+    return data

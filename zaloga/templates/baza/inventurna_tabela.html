@@ -18,13 +18,13 @@
             <th width="30%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
             <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
             <th width="15%"> {{slovar|keyvalue:'Vnos'|keyvalue:jezik}}: </th>
-            <th width="15%" class="skrit inventura"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
-            <th width="15%" class="skrit inventura razlika"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
+            <th width="10%" class="skrit inventura"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
+            <th width="10%" class="skrit razlika"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
             <th width="20%" > {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}: </th>  
         </tr>
         {% for sestavina in sestavine %}
             {% with podatki=sestavine|keyvalue:sestavina sestavina=sestavina|replace %}
-            <tr class="vrstica {{podatki.radius}} {{podatki.tip}}">
+            <tr id="{{sestavina}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
                 <input type="text" class="skrit" id="pk_{{sestavina}}">
                 <td> {{sestavina}} </td>
                 <td> {{podatki.tip}} </td>
@@ -32,8 +32,8 @@
                     <div class="{{sestavina}} skrit" id="stevilo_{{sestavina}}"></div>
                     <input class="{{sestavina}} stevilo" id="stevilo_value_{{sestavina}}" type="text">
                 </td>
-                <td class="skrit inventura"> {{podatki.zaloga}} </td>
-                <td id="razlika_{{sestavina}}" class="skrit inventura razlika"> </td>
+                <td id="zaloga_{{sestavina}}" class="skrit inventura"> {{podatki.zaloga}} </td>
+                <td id="razlika_{{sestavina}}" class="razlika skrit"> </td>
                 <td>
                     <button class="{{sestavina}} novo" onclick="NovVnos('{{sestavina}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
                     <button class="{{sestavina}} skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
@@ -52,6 +52,8 @@
     $(document).ready(function() {
         {% if tip != "inventura" %}
             ToggleClass('.inventurna_tabela', 'skrit')
+        {% else %}
+            ToggleClass('.inventura', 'skrit')
         {% endif %}
         {% for sestavina in sestavine %}
             {% if sestavina in vnosi %}
@@ -94,5 +96,28 @@
                 }
             {% endwith %}
         {% endfor %}
+    }
+    function Izracunaj_razliko(){
+        var vrstice = $('#inventurna_tabela tr.vrstica')
+        for (var i = 0; i < vrstice.length; i++){
+            var vrstica = vrstice[i];
+            vrstica.classList.add('skrit')
+            var stevilo = get_innerHtml('stevilo_' + vrstica.id);
+            var zaloga = get_innerHtml('zaloga_' + vrstica.id);
+            if (stevilo != ""){
+                var razlika = parseInt(stevilo) - parseInt(zaloga)
+                if ( razlika != 0){
+                    vrstica.classList.add("razlika");
+                    set_innerHtml('razlika_' + vrstica.id, razlika);
+                }
+            }
+        }
+        ToggleClass('.razlika', 'skrit')
+    }
+    function Preklici_razliko(){
+        $('.vrstica').removeClass('skrit')
+        $('td.razlika').addClass('skrit')
+        $('th.razlika').addClass('skrit')
+        Filtriraj()
     }
 </script>

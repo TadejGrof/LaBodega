@@ -41,8 +41,8 @@
 
 <div class="delovno_okno">
     {% if tip == "inventura" %}
-        <button onclick="toggle('vrstica','none');toggle('razlika','inline-block')"> Razlika </button>
-        <button onclick="Filtriraj()"> Preklici razliko </button>
+        <button onclick="Izracunaj_razliko()"> Razlika </button>
+        <button onclick="Preklici_razliko()"> Preklici razliko </button>
         <button onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
     {% else %}
         {% if perms.zaloga.add_vnos %}
@@ -98,12 +98,15 @@
     {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
 {% endif %}
 
-{% include 'baza/tabela_vnosov.html' with tip=tip status=status baza=baza slovar=slovar %}
+{% if tip != "inventura" or status == "veljavno" %}
+    {% include 'baza/tabela_vnosov.html' with tip=tip status=status baza=baza slovar=slovar %}
+{% endif %}
 
 {% endblock %} 
 
 {% block javascript %}
     <script>
+        alert('Ce to napise potem bi moglo delati')
         function Uveljavi_bazo(gumb){
             {% if baza.stevilo_vnosov == 0 %}
                 alert('baza mora vsebovati vsaj en vnos');

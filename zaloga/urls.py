@@ -9,7 +9,6 @@ from .my_views import baza_views
 ogled_patterns = [
     path('',views.baza, name="baza"),
     path('iz_datoteke/', views.vnosi_iz_datoteke, name='iz_datoteke'),
-    path('shrani_vse/', views.shrani_vse, name='shrani_vse'),
     path('uveljavi/', views.uveljavi_bazo, name='uveljavi_bazo'),
     path('pdf/', pdf_views.pdf_baze, name='pdf_baze')
 ]

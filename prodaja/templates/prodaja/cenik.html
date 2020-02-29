@@ -41,34 +41,27 @@
 
 <div class="filter">
     <div style="margin-bottom:1%;font-size:3.5vh;display:block">
-        <form id="filter" action="{% url 'cenik_prodaje' tip %}" method="GET">
-            {% include "program/dinamic_select.html" %} 
-            <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
-        </form>
+        {% include "program/dinamic_select.html" %} 
+        <button onclick="Filtriraj()"> Filtriraj </button>
     </div>
     {% for tip in zaloga.tipi_sestavin %}
         {{tip}}:
-        <select style="width:5%" form="filter" name="{{tip}}">
-            {% if tip in tipi %}
-                <option value="true" selected> Yes </option>
-                <option value="false"> No </option>
-            {% else %}
-                <option value="true"> Yes </option>
-                <option value="false" selected> No </option>
-            {% endif %}
+        <select class="tip_box" style="width:5%" id="{{tip}}">
+            <option value="true"> Yes </option>
+            <option value="false"> No </option>
         </select>
     {% endfor %}
-    <div style="display:block;margin-top:1%">
-        <form style="display:inline-block" action="{% url 'cenik_pdf' tip %}" method="GET">
-            <input type="submit" value="PDF">
-            <input type="hidden"  value="{{radius}}" name="radius">
-            {% for tip in tipi %}
-                <input type="hidden" value="True" name="{{tip}}">
-            {% endfor %}
-        </form>
-        <button onclick="Spremeni_vse()" class="spremeni"> {{slovar|keyvalue:'Spremeni vse'|keyvalue:jezik}} </button>
-        <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}">
-    </div>
+</div>
+<div style="display:block;margin-top:1%">
+    <form style="display:inline-block" action="{% url 'cenik_pdf' tip %}" method="GET">
+        <input type="submit" value="PDF">
+        <input type="hidden"  value="" name="radius">
+        {% for tip in zaloga.tipi_sestavin %}
+            <input type="hidden" value="True" name="{{tip}}">
+        {% endfor %}
+    </form>
+    <button onclick="Spremeni_vse()" class="spremeni"> {{slovar|keyvalue:'Spremeni vse'|keyvalue:jezik}} </button>
+    <input type="submit" hidden="hidden" form="spremeni_vse_form" class="potrdi" value="{{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}}">
 </div>
 <div class="table">
     <table class="tabela_vnosov" >
@@ -86,71 +79,57 @@
                 {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}:
             </th>  
         </tr>
-            {% for sestavina in sestavine %}
-                {% if sestavina.cena__tip in tipi %}
-                    <tr class="vrstica vrstica_{{sestavina.cena__tip}}">
-                        <td> {{sestavina.dimenzija__dimenzija}}</td>
-                        <td> {{sestavina.cena__tip}}</td>
-                        <td> 
-                            <div class="spremeni spremeni_{{sestavina.cena}}">{{sestavina.cena__cena}}$</div>
-                            <div hidden="hidden" class="potrdi_{{sestavina.cena}}">
-                                <input form="spremeni_{{sestavina.cena}}_form" name="cena" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value="" required> $ 
-                            </div>
-                            <div hidden="hidden" class="potrdi">
-                                <input form="spremeni_vse_form" name="cena_{{sestavina.cena}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $ 
-                            </div>
-                        </td>
-                        <td> 
-                            <button onclick="Spremeni_ceno('{{sestavina.cena}}')" class="spremeni spremeni_{{sestavina.cena}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                            <input type="submit" form="spremeni_{{sestavina.cena}}_form" value="potrdi" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden">
-                            <button onclick="Preklici_spremembo_cene('{{sestavina.cena}}')" class="potrdi potrdi_{{sestavina.cena}}" hidden="hidden"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
-                        </td>
-                        <form id="spremeni_{{sestavina.cena}}_form" hidden="hidden" action="{% url 'spremeni_ceno' tip %}" method="POST">
-                            {% csrf_token %}
-                            <input id="form_pk" type="hidden" hidden="hidden" name="pk" value="{{sestavina.cena}}">
-                        </form>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            <form hidden="hidden" id="spremeni_vse_form" action="{% url 'spremeni_cene' tip %}" method="POST">
-                {% csrf_token %}
-            </form>
+        {% for sestavina in sestavine %}
+            {% if sestavina.dimenzija__special %}
+            <tr class="vrstica {{sestavina.cena__tip}} {{sestavina.dimenzija__radius}} {{sestavina.dimenzija__height}} {{sestavina.dimenzija__width}}C all">
+            {% else %}
+            <tr class="vrstica {{sestavina.cena__tip}} {{sestavina.dimenzija__radius}} {{sestavina.dimenzija__height}} {{sestavina.dimenzija__width}} all">
+            {% endif %}
+                <td> {{sestavina.dimenzija__dimenzija}}</td>
+                <td> {{sestavina.cena__tip}}</td>
+                {% with pk=sestavina.cena__pk %}
+                    <td> 
+                        <div id="cena_{{pk}}" class="{{pk}}">{{sestavina.cena__cena}}$ </div>
+                        <div class="{{pk}} skrit">
+                            <input id="cena_value_{{pk}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $ 
+                        </div>
+                    </td>
+                    <td>
+                        <button onclick="ToggleClass('.{{pk}}', 'skrit')" class="{{pk}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                        <button onclick="Spremeni_ceno('{{pk}}')" class="{{pk}} skrit"> Ok </button>
+                        <button onclick="ToggleClass('.{{pk}}', 'skrit')" class="{{pk}} skrit"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+                    </td>
+                {% endwith %}
+            </tr>
+        {% endfor %}
     </table>
 </div>
 
 <script>
-    function Preklici_spremembo_cene(pk){
-        toggle('spremeni_' + pk, 'inline-block')
-        toggle('potrdi_' + pk, 'none')
-    };
-    function Spremeni_ceno(pk){
-        toggle('spremeni_' + pk, 'none')
-        toggle('potrdi_' + pk, 'inline-block')
-    };
-    function Potrdi_spremembo(pk){
-        cena = document.getElementById('cena_' + pk).value
-        if (je_veljavna_cena(cena)){
-            alert(cena)
-            document.getElementById('form_cena').value = cena
-            document.getElementById('form_pk').value = pk
-            document.getElementById('form_button').click()
+    function Filtriraj(){
+        var radius = get_selected('radius')
+        var height = get_selected('height')
+        var width = get_selected('width')
+        $('.vrstica').addClass('skrit')
+        if ( width != "all"){
+            ToggleClass('.' + radius + '.' + height + '.' + width, 'skrit')
+        } else if ( height != "all"){
+            ToggleClass('.' + radius + '.' + height, 'skrit')
         } else{
-            alert('vnesi veljavno ceno')
+            ToggleClass('.' + radius, 'skrit')
         }
-    }
-    function Spremeni_vse(){
-        toggle('spremeni','none');
-        toggle('potrdi','inline-block')
-    };
-    function Potrdi_vse(){
-        var cena;
-        {% for sestavina in sestavine %}
-            cena = document.getElementById("cena_{{sestavina.cena}}").value;
-            if ( je_veljavna_cena(cena) ){
-                document.getElementById("all_cena_{{sestavina.cena}}").value = cena;
+        var tipi = []
+        var tip_boxi = document.getElementsByClassName('tip_box')
+        for(var i = 0; i < tip_boxi.length; i++){
+            var tip_box = tip_boxi[i]
+            if (get_selected(tip_box.id) == "false"){
+                tipi[tipi.length] = tip_box.id
             }
-        {% endfor %}
-        document.getElementById('all_form_button').click();
-    };
+        }
+        for(var i=0; i< tipi.length; i++){
+            $('.' + tipi[i]).addClass('skrit')
+        }
+        
+    }
 </script>
 {% endblock %}

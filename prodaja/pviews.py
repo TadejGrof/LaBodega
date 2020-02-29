@@ -82,13 +82,6 @@ def racun_izbris_vnosa(request):
         Vnos.objects.get(pk = request.POST.get('pk')).delete()
     return redirect('dnevna_prodaja')
 
-def racun_spremeni_popust(request):
-    if request.method == "POST":
-        racun = Baza.objects.get(pk = request.POST.get('pk'))
-        racun.popust = request.POST.get('popust')
-        racun.save()
-    return redirect('dnevna_prodaja')
-
 def uveljavi_racun(request,pk):
     if request.method == "POST":
         program = Program.objects.first()
@@ -129,44 +122,34 @@ def ogled_racuna(request, pk):
 def cenik(request,baza):
     if request.method == "GET":
         sestavine = zaloga.sestavina_set.all()
-        radius = request.GET.get('radius','R12')
-        height = request.GET.get('height','all')
-        width = request.GET.get('width','all')
-        if radius != "all":
-            sestavine = sestavine.filter(dimenzija__radius=radius)
-        if height != "all":
-            sestavine = sestavine.filter(dimenzija__height=height)
-        if width != "all":
-            if "C" in width:
-                width = width.replace('C','')
-                sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = True)
-            else:
-                sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = False)
         sestavine = sestavine.prefetch_related('cena_set').filter(cena__prodaja=baza).values(
             'dimenzija__dimenzija',
+            'dimenzija__radius',
+            'dimenzija__height',
+            'dimenzija__width',
+            'dimenzija__special',
             'pk',
             'cena',
             'cena__tip',
-            'cena__cena')
-        tipi = []
-        for tip in zaloga.vrni_tipe:
-            if request.GET.get(tip[0],"true") == "true":
-                tipi.append(tip[0])
+            'cena__cena',
+            'cena__pk')
         slovar = {
             'sestavine':sestavine,
             'tip':baza,
-            'tipi':tipi,
-            'radius':radius,
-            'height':height,
-            'width':width}
+        }
     return pokazi_stran(request,'prodaja/cenik.html', slovar)
 
 def spremeni_ceno(request, baza):
-    nova_cena = float(request.POST.get('cena'))
-    pk = int(request.POST.get('pk'))
-    cena = Cena.objects.get(pk = pk)
-    cena.cena = nova_cena
-    cena.save()
+    try:
+        nova_cena = float(request.POST.get('cena'))
+        pk = int(request.POST.get('pk'))
+        cena = Cena.objects.get(pk = pk)
+        cena.cena = nova_cena
+        cena.save()
+        data = {}
+        data['cena'] = str(cena.cena)
+    except:
+        pass
     return redirect('cenik_prodaje', baza=baza)
 
 def spremeni_cene(request,baza):

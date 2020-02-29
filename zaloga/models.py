@@ -376,7 +376,6 @@ def create_sestavina(sender, instance, created, **kwargs):
             for tip in zaloga.tipi_sestavin:
                 Cena.objects.create(sestavina = instance, prodaja = prodaja, tip = tip, nacin="prodaja")
 
-
 ###################################################################################################
 
 class Cena(models.Model):

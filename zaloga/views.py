@@ -209,7 +209,6 @@ def baza(request,zaloga, tip_baze, pk):
         zaloga = Zaloga.objects.get(pk=zaloga)
         baza = Baza.objects.get(pk = pk)
         if baza.status == "aktivno":
-            print(baza.uveljavljeni_vnosi)
             slovar = {
                 'zaloga': zaloga,
                 'baza':baza,
@@ -226,55 +225,6 @@ def baza(request,zaloga, tip_baze, pk):
             return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
         elif baza.status == "zaklenjeno":
             return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
-
-@login_required
-def nov_vnos(request,zaloga, tip_baze, pk):
-    if request.method == "POST":
-        dimenzija = vrni_dimenzijo(request)
-        stevilo = request.POST.get('stevilo')
-        tip = request.POST.get('tip')
-        baza = Baza.objects.get(pk = pk)
-        if tip_baze == "vele_prodaja":
-            vnos = Vnos.objects.create(
-                dimenzija = dimenzija,
-                stevilo = stevilo,
-                tip = tip,
-                cena = Sestavina.objects.get(zaloga=zaloga,dimenzija=dimenzija).cena('vele_prodaja',tip),
-                baza = baza)
-        else:
-            vnos = Vnos.objects.create(
-                dimenzija = dimenzija,
-                stevilo = stevilo,
-                tip = tip,
-                baza = baza)
-        return redirect('baza',zaloga=zaloga, tip_baze = tip_baze, pk = pk)
-
-@login_required
-def shrani_vse(request,zaloga,tip_baze, pk):
-    if request.method == "POST":
-        zaloga = Zaloga.objects.get(pk = zaloga)
-        baza = Baza.objects.get(pk = pk)
-        vnosi = []
-        for sestavina in zaloga.vrni_zalogo:
-            for tip in zaloga.vrni_tipe:
-                stevilo = request.POST.get(sestavina['dimenzija'] + '_' + tip[0])
-                if stevilo != "":
-                    dimenzija = Dimenzija.objects.get(dimenzija = sestavina['dimenzija'])
-                    if tip_baze == "vele_prodaja":
-                        vnosi.append(Vnos(
-                            dimenzija = dimenzija,
-                            tip = tip[0],
-                            stevilo = stevilo,
-                            cena = Sestavina.objects.get(dimenzija = dimenzija).cena("vele_prodaja",tip[0]),
-                            baza = baza))
-                    else: 
-                        vnosi.append(Vnos(
-                            dimenzija = dimenzija,
-                            tip = tip[0],
-                            stevilo = stevilo,
-                            baza = baza))
-        Vnos.objects.bulk_create(vnosi)
-        return redirect('baza',zaloga=zaloga.pk, tip_baze=tip_baze, pk = pk)   
 
 @login_required
 def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):

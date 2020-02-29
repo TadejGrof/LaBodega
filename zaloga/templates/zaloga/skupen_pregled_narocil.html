@@ -10,19 +10,6 @@
     </div>
     <div style="width:39%;text-align:center;display:table-cell">
         <h3> Ostala naročila: </h3>
-        <table class="tabela_vnosov" style="width:80%;margin-left:10%">
-            {% for narocilo in ostala_narocila %}
-                <tr>
-                    <td> {{narocilo.stranka__ime}}</td>
-                    <td>
-                        <form action="{% url 'skupen_pregled_narocil' zaloga_pk %}" method="GET">
-                            <input type="submit" value="Dodaj">
-                            <input type="hidden" name="gledane" value="{{gledane|dodaj:narocilo.pk}}">
-                        </form>
-                    </td>
-                </td>
-            {% endfor %}
-        </table>
     </div>
 </div>
 
@@ -32,18 +19,15 @@
         <tr>
             <th style="width:7%"> Dimenzija/Tip </th>
             {% for narocilo in narocila %}
-                <th style="width:{{85|divide:stevilo_narocil}}%" onclick="barva('td','white');barva('{{narocilo.stranka__ime}}','#ffe6e6')"> 
+                <th  onclick="barva('td','white');barva('{{narocilo.stranka__ime}}','#ffe6e6')"> 
                     <form action="{% url 'skupen_pregled_narocil' zaloga_pk %}" method="GET">
                         <input type="submit" value="-" id="submit_{{narocilo.pk}}" onclick="Nastavi_top('{{narocilo.pk}}')">
-                        <input type="hidden" value="{{gledane|odstrani:narocilo.pk}}" name="gledane">
+                        <input type="hidden" name="gledane">
                         <input type="number" hidden="hidden" value="" id="top_{{narocilo.pk}}" name="top">
                     </form>
                     <div style="width:100%;height:40%;overflow:hidden">{{narocilo.stranka__ime}}</div>
                 </th>
-            {% endfor %}
-            {% if ostalo %}
-                <th style="width:4%"> Ostalo </th>
-            {% endif %} 
+            {% endfor %} 
             <th style="width:4%"> Skupno </th>
             <th style="width:4%"> Zaloga </th>
         </tr>
@@ -52,10 +36,10 @@
                 <tr onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
                     <td class="td {{dimenzija}}"> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
-                        {% if narocilo.stranka__pk in razlicne_dimenzije|keyvalue:dimenzija %}
-                            <td class="td {{dimenzija}} {{narocilo.stranka__ime}}"> 
-                                {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.stranka__pk %}    
-                                    {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.stranka__pk|keyvalue:vnos %}
+                        {% if narocilo.pk in razlicne_dimenzije|keyvalue:dimenzija %}
+                            <td class="td {{dimenzija}} {{narocilo.pk}}"> 
+                                {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk %}    
+                                    {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk|keyvalue:vnos %}
                                         {% if stevilo == 1 %}
                                             <button id="izbrisi_{{vnos}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
                                             <button style="display:none" id="odstej_{{vnos}}" onclick="Spremeni_vnos(-1,'{{vnos}}','{{dimenzija}}')"> - </button>
@@ -70,7 +54,7 @@
                                 {% endfor %}
                             </td>
                         {% else %}
-                            <td class="td {{dimenzija}} {{narocilo.stranka__ime}}"> 
+                            <td class="td {{dimenzija}} {{narocilo.pk}}"> 
                                 <button style="display:none" id="{{dimenzija}}_izbrisi_{{narocilo.pk}}"> - </button>
                                 <button style="display:none" id="{{dimenzija}}_odstej_{{narocilo.pk}}"> - </button>
                                 <div id="{{dimenzija}}_stevilo_{{narocilo.pk}}" style="display:inline-block"> 0 </div>
@@ -79,17 +63,8 @@
                             </td>
                         {% endif %}
                     {% endfor %}
-                    {% if ostalo %}
-                        <td class="td {{dimenzija}}">
-                            {% if 'ostalo' in razlicne_dimenzije|keyvalue:dimenzija %}
-                                {{razlicne_dimenzije|keyvalue:dimenzija|keyvalue:'ostalo'}}
-                            {% else %}
-                                0
-                            {% endif %}
-                        </td>
-                    {% endif %}
-                    <td class="td {{dimenzija}}" id="skupno_{{dimenzija}}"> {{skupno|keyvalue:dimenzija }} </td>
-                    <td class="td {{dimenzija}}"> {{zaloga|keyvalue:dimenzija}} </td>
+                    <td class="td {{dimenzija}}" id="skupno_{{dimenzija}}"> {{skupno|keyvalue:dimenzija}} </td>
+                    <td class="td {{dimenzija}}"> {{na_voljo|keyvalue:dimenzija}} </td>
                 </tr>
             {% endfor %}
         {% endwith %}

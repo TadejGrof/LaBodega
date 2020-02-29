@@ -13,60 +13,32 @@ from django.http import JsonResponse
 def skupen_pregled_narocil(request, zaloga):
     zaloga = Zaloga.objects.get(pk = zaloga)
     baze = Baza.objects.filter(status="aktivno", tip="vele_prodaja")
-    gledane = request.GET.get('gledane','all')
-    ostalo = False
-    try:
-        gledane = json.loads(gledane)
-        if len(gledane) != baze.count():
-            ostalo = True
-    except:
-        gledane = [baza['pk'] for baza in baze.values('pk')]    
-    ostala_narocila = baze.exclude(pk__in = gledane).values('pk','stranka__ime')
-    narocila = baze.filter(pk__in = gledane).values('pk','stranka__ime','stranka__pk')
+    narocila = baze.values('pk','stranka__ime','stranka__pk')
     vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','tip','stevilo','pk','baza__stranka__pk')
     razlicne_dimenzije = {}
     for vnos in vnosi:
         dimenzija_tip = vnos['dimenzija__dimenzija'] + '_' + vnos['tip']
-        if not vnos['baza__pk'] in gledane:
-            stranka = 'ostalo'
-        else:
-            stranka = vnos['baza__stranka__pk']
         stevilo = vnos['stevilo']
+        baza = vnos['baza__pk']
         vnos = vnos['pk']
         if not dimenzija_tip in razlicne_dimenzije:
-            if stranka =='ostalo':
-                razlicne_dimenzije.update({dimenzija_tip:{stranka:stevilo}})
-            else:
-                razlicne_dimenzije.update({dimenzija_tip:{stranka:{vnos:stevilo}}})
-        elif not stranka in razlicne_dimenzije[dimenzija_tip]:
-            if stranka == 'ostalo':
-                razlicne_dimenzije[dimenzija_tip].update({stranka:stevilo})
-            else:
-                razlicne_dimenzije[dimenzija_tip].update({stranka:{vnos:stevilo}})
+            razlicne_dimenzije[dimenzija_tip] = {baza:{vnos:stevilo}}
+        elif not baza in razlicne_dimenzija[dimenzija_tip]:
+            razlicne_dimenzije[dimenzija_tip][baza] = {vnos:stevilo}
         else:
-            if stranka == "ostalo":
-                razlicne_dimenzije[dimenzija_tip][stranka] += stevilo
-            else:
-                razlicne_dimenzije[dimenzija_tip][stranka].update({vnos:stevilo})
+            razlicne_dimenzije[dimenzija_tip][baza][vnos] = stevilo
     skupno = {}
     for dimenzija in razlicne_dimenzije:
-        skupno.update({dimenzija:0})
-        for stranka in razlicne_dimenzije[dimenzija]:
-            if stranka != 'ostalo':
-                for vnos in razlicne_dimenzije[dimenzija][stranka]:
-                    skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka][vnos]
-            else:
-                skupno[dimenzija] += razlicne_dimenzije[dimenzija][stranka]
+        sestevek = 0
+        for baza in razlicne_dimenzije[dimenzija]:
+            for vnos in razlicne_dimenzije[dimenzija][baza]:
+                sestevek += razlicne_dimenzije[dimenzija][baza][vnos]
+        skupno[dimenzija] = sestevek
     slovar = {
         'narocila':narocila,
-        'ostala_narocila':ostala_narocila,
         'razlicne_dimenzije':razlicne_dimenzije,
-        'zaloga':zaloga,
-        'skupno':skupno,
-        'stevilo_narocil':baze.count(),
-        'top': int(request.GET.get('top',0)),
-        'ostalo':ostalo,
-        'gledane':json.dumps(gledane),
+        'na_voljo': zaloga.dimenzija_tip_zaloga,
+        'skupno':skupno
         }
     return pokazi_stran(request,'zaloga/skupen_pregled_narocil.html', slovar ) 
 

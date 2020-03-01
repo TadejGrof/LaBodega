@@ -149,6 +149,9 @@
         margin-top:5%
     }
 </style>
+
+{% include 'js/ajax_requests.html' %}
+
 {% if prodaja == None %}
     <h1>
         {{zaloga.danes}}
@@ -346,7 +349,7 @@
         }
         document.getElementById(pk + '_form_tip').value = tip
         document.getElementById(pk + '_form_button').click()
-    }
+    }   
     function delete_vnos(pk){
         document.getElementById(pk + '_delete_button').click()
     }
@@ -424,17 +427,11 @@
     };
     function Pokazi_zalogo(){
         var dimenzija = document.getElementById('dimension_label').innerHTML
-        var tipbox = document.getElementById("tip");
-        var tip = tipbox.options[tipbox.selectedIndex].value
-        {% for sestavina in na_voljo %}
-            if( "{{sestavina}}" == dimenzija ){
-                {% for tip in zaloga.tipi_sestavin %}
-                    if( "{{tip}}" == tip ){
-                        document.getElementById('zaloga_div').innerHTML = '/ {{na_voljo|keyvalue:sestavina|keyvalue:tip}}'
-                    }
-                {% endfor %}
-            }
-        {% endfor %}
+        var tip = get_selected('tip')
+        var zaloga = '{{zaloga.pk}}'
+        VrniZalogo(zaloga,dimenzija,tip,function(data){
+            set_innerHtml('zaloga_div','/ ' + data.zaloga)
+        })
     }
     function SpremeniGumbe(){
         var radiusbox = document.getElementById("radius");

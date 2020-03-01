@@ -112,23 +112,19 @@ class Zaloga(models.Model):
                 dimenzija = vnos['dimenzija__dimenzija']
                 stevilo = vnos['stevilo']
                 tip = vnos['tip']
-                if dimenzija in rezervirane:
-                    if tip in rezervirane[dimenzija]:
-                        rezervirane[dimenzija][tip] += stevilo
-                    else:
-                        rezervirane[dimenzija].update({tip:stevilo})
+                dimenzija_tip = dimenzija + '_' + tip
+                if dimenzija_tip in rezervirane:
+                    rezervirane[dimenzija_tip] += stevilo
                 else:
-                    rezervirane.update({dimenzija:{tip:stevilo}})
+                    rezervirane[dimenzija_tip] = stevilo
         return rezervirane
 
     @property
     def na_voljo(self):
-        zaloga = self.zaloga
+        zaloga = self.dimenzija_tip_zaloga
         rezervirane = self.rezervirane
         for sestavina in rezervirane:
-            tipi = rezervirane[sestavina]
-            for tip in tipi:
-                zaloga[sestavina][tip] -= rezervirane[sestavina][tip]
+            zaloga[sestavina] -= rezervirane[sestavina]
         return zaloga
 
     @property
@@ -664,14 +660,12 @@ class Baza(models.Model):
     def inventurni_vnosi(self):
         vnosi = {}
         count = 0
-        na_voljo = self.zaloga.na_voljo
         for sestavina in self.zaloga.vrni_zalogo:
             for tip in self.zaloga.vrni_tipe:
                 count += 1
                 slovar = {'dimenzija': sestavina['dimenzija'],
                         'tip': tip[0],
                         'zaloga': sestavina[tip[0]],
-                        'na_voljo': na_voljo[sestavina['dimenzija']][tip[0]],
                         'radius': sestavina['radius'],
                         'pk': count,
                         'vneseno':False,
@@ -680,7 +674,6 @@ class Baza(models.Model):
                 }
                 vnosi.update({sestavina['dimenzija'] + '_' + tip[0]: slovar})
         for vnos in self.vnos_set.all().values('dimenzija__dimenzija','pk','stevilo','tip'):
-            slovar = vnosi[vnos['dimenzija__dimenzija'] + '_' + vnos['tip']]
             slovar['vneseno'] = True
             slovar['pk_vnosa'] = vnos['pk']
             slovar['stevilo'] = vnos['stevilo']

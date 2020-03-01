@@ -20,6 +20,7 @@
             <th width="15%"> {{slovar|keyvalue:'Vnos'|keyvalue:jezik}}: </th>
             <th width="10%" class="skrit inventura"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
             <th width="10%" class="skrit razlika"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
+            <th width="10%" class="skrit na_voljo"> {{slovar|keyvalue:'Na voljo'|keyvalue:jezik}}: </th>
             <th width="20%" > {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}: </th>  
         </tr>
         {% for sestavina in sestavine %}
@@ -34,6 +35,9 @@
                 </td>
                 <td id="zaloga_{{sestavina}}" class="skrit inventura"> {{podatki.zaloga}} </td>
                 <td id="razlika_{{sestavina}}" class="razlika skrit"> </td>
+                {% with dimenzija=sestavina|replace %}
+                <td id="na_voljo_{{sestavina}}" class="skrit na_voljo"> {{na_voljo|keyvalue:dimenzija}} </td>
+                {% endwith %}
                 <td>
                     <button class="{{sestavina}} novo" onclick="NovVnos('{{sestavina}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
                     <button class="{{sestavina}} skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
@@ -50,6 +54,9 @@
 
 <script>
     $(document).ready(function() {
+        {% if tip == "vele_prodaja" %}
+            ToggleClass('.na_voljo', 'skrit')
+        {% endif %}
         {% if tip != "inventura" %}
             ToggleClass('.inventurna_tabela', 'skrit')
         {% else %}
@@ -84,7 +91,8 @@
             Nov_vnos(dimenzija,tip,stevilo)
         }
     }
-    function Shrani_vse(){
+    function Shrani_vse(gumb){
+        gumb.disabled = true;
         {% for sestavina in sestavine %}
             {% with podatki=sestavine|keyvalue:sestavina sestavina=sestavina|replace %}
                 var stevilo = get_value('stevilo_value_{{sestavina}}')
@@ -96,6 +104,7 @@
                 }
             {% endwith %}
         {% endfor %}
+        setTimeout(() => { gumb.disabled = false }, 2000);
     }
     function Izracunaj_razliko(){
         var vrstice = $('#inventurna_tabela tr.vrstica')

@@ -101,6 +101,18 @@ def spremeni_prevoz(request):
         data = podatki_baze(baza)
     return JsonResponse(data) 
 
+def vrni_zalogo(request):
+    data = {}
+    try:
+        dimenzija = request.GET.get('dimenzija')
+        tip = request.GET.get('tip')
+        zaloga = int(request.GET.get('zaloga'))
+        stevilo = getattr(Sestavina.objects.all().get(zaloga=zaloga,dimenzija__dimenzija=dimenzija),tip)
+        data['zaloga'] = stevilo
+    except:
+        data['zaloga'] = 0
+    return JsonResponse(data)
+
 def podatki_vnosa(vnos):
     data = {}
     data['pk'] = str(vnos.pk)
@@ -110,7 +122,7 @@ def podatki_vnosa(vnos):
     data['dimenzija'] = str(vnos.dimenzija)
     data['varna_dimenzija'] = str(vnos.dimenzija).replace('/','-')
     data['tip'] = vnos.tip
-    data['dolgi_tip']: vnos.get_tip_display()
+    data['dolgi_tip'] =  vnos.get_tip_display()
     return data
 
 def podatki_baze(baza):

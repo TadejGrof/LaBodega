@@ -74,7 +74,10 @@ def kj_none(value):
 
 @register.filter(name='replace')
 def replace(value):
-    return value.replace('/','-')
+    if '/' in value:
+        return value.replace('/','-')
+    else:
+        return value.replace('-','/')
     
 @register.filter(name='skupno')
 def skupno(baza,tip):

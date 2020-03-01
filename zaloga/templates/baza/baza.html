@@ -37,13 +37,14 @@
     }
 </style>
 
+{% include 'js/ajax_requests.html' %}
 {% include 'baza/bazno_okno.html' with baza=baza %}
 
 <div class="delovno_okno">
     {% if tip == "inventura" %}
         <button onclick="Izracunaj_razliko()"> Razlika </button>
         <button onclick="Preklici_razliko()"> Preklici razliko </button>
-        <button onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+        <button id="shrani_vse" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
     {% else %}
         {% if perms.zaloga.add_vnos %}
             <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
@@ -62,7 +63,7 @@
             <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
         {% endif %}
         <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
-        <button class="vnosi skrit" onclick="Shrani_vse()"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+        <button class="vnosi skrit" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
     {% endif %} 
     {% if status == "aktivno" %}
         <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
@@ -208,50 +209,32 @@
                 },
                 dataType: 'json',
                 success: function (data) {
+                    Refresh_inventurna_tabela(data);
                     Vstavi_vrstico(data);
                     Refresh_tabela_vnosov(data);
-                    Refresh_inventurna_tabela(data);
                     Nastavi_vrstice()
                 }
             }); 
         }
         function Spremeni_popust(){
             var popust = get_value('popust_value')
-            $.ajax({
-                url: '{% url "spremeni_popust" %}',
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'popust': popust,
-                'pk': '{{baza.pk}}',
-                },
-                dataType: 'json',
-                success: function (data) {
-                    set_innerHtml('popust', data.popust + ' $')
+            var pk = '{{baza.pk}}'
+            SpremeniPopust(pk, popust, function(data){
+                    set_innerHtml('popust', data.popust + ' %')
                     set_innerHtml('cena_popusta', data.cena_popusta + ' $')
                     set_innerHtml('koncna_cena', data.koncna_cena + ' $')
                     ToggleClass('.popust','skrit')
-                }
-            });  
+                })
         }
         function Spremeni_prevoz(){
             var prevoz = get_value('prevoz_value')
-            $.ajax({
-                url: '{% url "spremeni_prevoz" %}',
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'prevoz': prevoz,
-                'pk': '{{baza.pk}}',
-                },
-                dataType: 'json',
-                success: function (data) {
+            var pk = '{{baza.pk}}'
+            SpremeniPrevoz(pk,prevoz,function (data) {
                     set_innerHtml('prevoz', data.prevoz + ' $')
                     set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')
                     set_innerHtml('koncna_cena', data.koncna_cena + ' $')
                     ToggleClass('.prevoz','skrit')
-                }
-            }); 
+                })
         }
     </script>
 {% endblock %}

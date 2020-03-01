@@ -48,6 +48,9 @@ function set_innerHtml(id, html){
         element.innerHTML = html
     }
 }
+function set_placeholder(id, placeholder){
+    document.getElementById(id).placeholder = placeholder; 
+}
 function get_selected(id){
     var box = document.getElementById(id)
     if (box){

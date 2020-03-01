@@ -27,7 +27,7 @@
             {% with podatki=sestavine|keyvalue:sestavina sestavina=sestavina|replace %}
             <tr id="{{sestavina}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
                 <input type="text" class="skrit" id="pk_{{sestavina}}">
-                <td> {{sestavina}} </td>
+                <td> {{podatki.dimenzija}} </td>
                 <td> {{podatki.tip}} </td>
                 <td>
                     <div class="{{sestavina}} skrit" id="stevilo_{{sestavina}}"></div>

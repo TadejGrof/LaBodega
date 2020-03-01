@@ -31,6 +31,8 @@
     }
 </style>
 
+{% include 'js/ajax_requests.html' %}
+
 <div class="besedilo">
     {% if tip == "vele_prodaja" %}
         {{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}
@@ -130,6 +132,15 @@
             $('.' + tipi[i]).addClass('skrit')
         }
         
+    }
+    function Spremeni_ceno(pk){
+        var cena = get_value('cena_value_' + pk)
+        SpremeniCeno(pk, cena, function(data){
+            set_value('cena_value_' + pk, '')
+            set_innerHtml('cena_' + pk, data.cena + ' $')
+            set_placeholder('cena_value_' + pk, '(' + data.cena + ' $)')
+            ToggleClass('.' + pk,'skrit')
+        })
     }
 </script>
 {% endblock %}

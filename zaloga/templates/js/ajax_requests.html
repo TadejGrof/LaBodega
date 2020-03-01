@@ -44,4 +44,19 @@
             }
         });
     }
+    function SpremeniCeno(pk, cena, funkcija){
+        $.ajax({
+            url: '{% url "spremeni_ceno" %}',
+            method: 'POST',
+            data: {
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+            'pk': pk,
+            'cena': cena,
+            },
+            dataType: 'json',
+            success: function (data) {
+                funkcija(data)
+            }
+        });
+    }
 </script>

@@ -20,7 +20,6 @@ urlpatterns = [
     path('', pviews.pregled_prodaje, name='pregled_prodaje'),
     path('dnevna_prodaja/', include(dnevna_prodaja_patterns)),
     path('cenik/<str:baza>/', pviews.cenik, name='cenik_prodaje'),
-    path('cenik/<str:baza>/spremeni_ceno/', pviews.spremeni_ceno, name='spremeni_ceno'),
     path('cenik/<str:baza>/spremeni_cene/', pviews.spremeni_cene, name='spremeni_cene'),
     path('cenik/<str:tip_prodaje>/pdf/', pdf_views.pdf_cenika, name='cenik_pdf'),
 ]

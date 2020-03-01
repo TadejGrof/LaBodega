@@ -113,6 +113,20 @@ def vrni_zalogo(request):
         data['zaloga'] = 0
     return JsonResponse(data)
 
+def spremeni_ceno(request):
+    data = {}
+    if request.method == "POST":
+        try:
+            pk = int(request.POST.get('pk'))
+            nova_cena = float(request.POST.get('cena'))
+            cena = Cena.objects.get(pk = pk)
+            cena.cena = nova_cena
+            cena.save()
+            data['cena'] = str(nova_cena)
+        except:
+            data['cena'] = 0
+    return JsonResponse(data)
+        
 def podatki_vnosa(vnos):
     data = {}
     data['pk'] = str(vnos.pk)

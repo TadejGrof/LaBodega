@@ -54,6 +54,7 @@ ajax_patterns = [
     path('spremeni_popust/', baza_views.spremeni_popust, name='spremeni_popust'),
     path('spremeni_prevoz/', baza_views.spremeni_prevoz, name='spremeni_prevoz'),
     path('vrni_zalogo/', baza_views.vrni_zalogo, name='vrni_zalogo'),
+    path('spremeni_ceno/', baza_views.spremeni_ceno,name='spremeni_ceno'),
 ]
 
 urlpatterns = [

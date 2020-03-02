@@ -23,7 +23,7 @@ def skupen_pregled_narocil(request, zaloga):
         vnos = vnos['pk']
         if not dimenzija_tip in razlicne_dimenzije:
             razlicne_dimenzije[dimenzija_tip] = {baza:{vnos:stevilo}}
-        elif not baza in razlicne_dimenzija[dimenzija_tip]:
+        elif not baza in razlicne_dimenzije[dimenzija_tip]:
             razlicne_dimenzije[dimenzija_tip][baza] = {vnos:stevilo}
         else:
             razlicne_dimenzije[dimenzija_tip][baza][vnos] = stevilo

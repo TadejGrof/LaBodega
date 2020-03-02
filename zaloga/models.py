@@ -799,7 +799,7 @@ class Vnos(models.Model):
 
     def ustvari_spremembo(self,sestavina = None):
         if sestavina == None:
-            sestavina = Sestavina.objects.get(dimenzija = self.dimenzija)
+            sestavina = Sestavina.objects.get(zaloga=self.baza.zaloga, dimenzija = self.dimenzija)
         if self.baza.tip == "inventura":
             Sprememba.objects.create(
                 baza = self.baza,

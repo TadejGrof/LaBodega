@@ -33,33 +33,34 @@
         </tr>
         {% with zaloga=zaloga.dimenzija_tip_zaloga %}
             {% for dimenzija in razlicne_dimenzije %}
-                <tr onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
-                    <td class="td {{dimenzija}}"> {{dimenzija}} </td>
+                <tr id="{{dimenzija|replace}}" class="vrstica {{dimenzija|replace}}" onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
+                    <td class="td {{dimenzija|replace}}"> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
                         {% if narocilo.pk in razlicne_dimenzije|keyvalue:dimenzija %}
-                            <td class="td {{dimenzija}} {{narocilo.pk}}"> 
+                            <td id="{{dimenzija|replace}}_{{narocilo.pk}}" class="td {{dimenzija|replace}} narocilo"> 
                                 {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk %}    
                                     {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk|keyvalue:vnos %}
-                                        {% if stevilo == 1 %}
-                                            <button id="izbrisi_{{vnos}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
-                                            <button style="display:none" id="odstej_{{vnos}}" onclick="Spremeni_vnos(-1,'{{vnos}}','{{dimenzija}}')"> - </button>
-                                        {% else %}
-                                            <button style="display:none" id="izbrisi_{{vnos}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
-                                            <button id="odstej_{{vnos}}" onclick="Spremeni_vnos(-1,'{{vnos}}','{{dimenzija}}')"> - </button>
-                                        {% endif %}
-                                    <div id="stevilo_{{vnos}}" style="display:inline-block"> {{stevilo}} </div>
-                                    <button id="pristej_{{vnos}}" onclick="Spremeni_vnos(1,'{{vnos}}','{{dimenzija}}')"> + </button>
-                                    <button style="display:none" id="{{dimenzija}}_novo_{{narocilo.pk}}" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
+                                        <div  id="{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" class="vnos">
+                                            <input id="pk_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" type="text" class="skrit pk" value="{{vnos}}">
+                                            <button id="izbrisi_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
+                                            <button id="odstej_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Spremeni_vnos(-1,'{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}')"> - </button>
+                                            <div id="stevilo_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" class="inline"> {{stevilo}} </div>
+                                            <button id="pristej_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Spremeni_vnos(1,'{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}')"> + </button>
+                                            <button id="dodaj_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
+                                        </div>
                                     {% endwith %}
                                 {% endfor %}
                             </td>
                         {% else %}
-                            <td class="td {{dimenzija}} {{narocilo.pk}}"> 
-                                <button style="display:none" id="{{dimenzija}}_izbrisi_{{narocilo.pk}}"> - </button>
-                                <button style="display:none" id="{{dimenzija}}_odstej_{{narocilo.pk}}"> - </button>
-                                <div id="{{dimenzija}}_stevilo_{{narocilo.pk}}" style="display:inline-block"> 0 </div>
-                                <button id="{{dimenzija}}_novo_{{narocilo.pk}}" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
-                                <button style="display:none" id="{{dimenzija}}_pristej_{{narocilo.pk}}"> + </button>
+                            <td id="{{dimenzija|replace}}_{{narocilo.pk}}" class="td {{dimenzija|replace}} narocilo"> 
+                                <div id="{{dimenzija|replace}}_{{narocilo.pk}}_1" class="vnos">
+                                    <input type="text" class="skrit pk" value="">
+                                    <button id="izbrisi_{{dimenzija|replace}}_{{narocilo.pk}}_1"> - </button>
+                                    <button id="odstej_{{dimenzija|replace}}_{{narocilo.pk}}_1" > - </button>
+                                    <div id="stevilo_{{dimenzija|replace}}_{{narocilo.pk}}_1" class="inline"> 0 </div>
+                                    <button id="pristej_{{dimenzija|replace}}_{{narocilo.pk}}_1" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
+                                    <button id="dodaj_{{dimenzija|replace}}_{{narocilo.pk}}_1"> + </button>
+                                </div>
                             </td>
                         {% endif %}
                     {% endfor %}
@@ -83,9 +84,47 @@
 
 {% block javascript %}
   <script>
-    function Spremeni_vnos(predznak, pk, dimenzija) {
-      var stevilo = parseInt(get_innerHtml('stevilo_' + pk)) + predznak
-      var skupno = parseInt(get_innerHtml('skupno_' + dimenzija)) + predznak
+     $(document).ready(function() {
+        var vrstice = $('.vrstica')
+        for (i=0; i<vrstice.length; i++){
+            var vrstica = vrstice[i]
+            var narocila = $('#' + vrstica.id + ' td.narocilo')
+            for(n=0; n<narocila.length; n++){
+                var narocilo = narocila[n]
+                var vnosi = $('#' + narocilo.id +  ' div.vnos')
+                for(v=0;v<vnosi.length;v++){
+                    var vnos=vnosi[v]
+                    var pk = $('#' + vnos.id + ' input.pk')[0].value
+                    Nastavi_gumbe(vnos.id, pk)
+                }
+            }
+        }
+    });
+    function Nastavi_gumbe(id,pk){
+        Pokazi_gumbe(id)
+        if(pk != ""){
+            var stevilo = parseInt(get_innerHtml('stevilo_' + id))
+            $('#dodaj_' + id).addClass('skrit')
+            if(stevilo > 1){
+                $('#izbrisi_' + id).addClass('skrit')
+            } else{
+                $('#odstej_' + id).addClass('skrit')
+            }
+        } else {
+            $('#izbrisi_' + id).addClass('skrit')
+            $('#odstej_' + id).addClass('skrit')
+            $('#pristej_' + id).addClass('skrit')
+        }
+    }
+    function Pokazi_gumbe(id){
+        $('#izbrisi_' + id).removeClass('skrit')
+        $('#odstej_' + id).removeClass('skrit')
+        $('#pristej_' + id).removeClass('skrit')
+        $('#dodaj_' + id).removeClass('skrit')
+    }
+    function Spremeni_vnos(predznak, id) {
+      var stevilo = parseInt(get_innerHtml('stevilo_' + id)) + predznak
+      var pk = get_value('pk_' + id)
       $.ajax({
         url: '{% url "spremeni_vnos" %}',
         method: 'POST',
@@ -96,17 +135,9 @@
         },
         dataType: 'json',
         success: function (data) {
-          set_innerHtml('stevilo_' + pk, stevilo);
-          set_innerHtml('skupno_' + dimenzija, skupno);
-          if(stevilo == 1){
-              document.getElementById('pristej_' + pk).style.display ="inline-block"
-              document.getElementById('izbrisi_' + pk).style.display ="inline-block"
-              document.getElementById('odstej_' + pk).style.display ="none"
-          } else{
-              document.getElementById('pristej_' + pk).style.display ="inline-block"
-              document.getElementById('izbrisi_' + pk).style.display ="none"
-              document.getElementById('odstej_' + pk).style.display ="inline-block"
-          }
+          set_innerHtml('stevilo_' + id, data.stevilo);
+          Nastavi_gumbe(id, data.pk)
+          
         }
       }); 
     }

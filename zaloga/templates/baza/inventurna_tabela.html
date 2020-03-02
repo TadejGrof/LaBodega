@@ -39,10 +39,10 @@
                 <td id="na_voljo_{{sestavina}}" class="skrit na_voljo"> {{na_voljo|keyvalue:dimenzija}} </td>
                 {% endwith %}
                 <td>
-                    <button class="{{sestavina}} novo" onclick="NovVnos('{{sestavina}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
+                    <button class="{{sestavina}} novo" onclick="Nov_Vnos('{{sestavina}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
                     <button class="{{sestavina}} skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
                     <button class="{{sestavina}} skrit" onclick="Izbrisi_vnos(get_value('pk_{{sestavina}}'))"> X </button>
-                    <button class="{{sestavina}} sprememba skrit" onclick="SpremeniVnos('{{sestavina}}')"> Ok </button>
+                    <button class="{{sestavina}} sprememba skrit" onclick="Spremeni_Vnos('{{sestavina}}')"> Ok </button>
                     <button class="{{sestavina}} sprememba skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> <- </button>     
                 </td> 
             </tr>
@@ -73,7 +73,7 @@
             {% endif %}
         {% endfor %}
     });
-    function SpremeniVnos(dimenzija_tip){
+    function Spremeni_Vnos(dimenzija_tip){
         var pk = get_value('pk_' + dimenzija_tip)
         var stevilo = get_value('stevilo_value_' + dimenzija_tip)
         var cena = ""
@@ -83,7 +83,7 @@
             ToggleClass('.' + dimenzija_tip + '.novo', 'skrit')
         }
     }
-    function NovVnos(dimenzija_tip){
+    function Nov_Vnos(dimenzija_tip){
         var dimenzija = dimenzija_tip.split('_')[0]
         var tip = dimenzija_tip.split('_')[1]
         var stevilo = get_value('stevilo_value_' + dimenzija_tip)
@@ -98,9 +98,9 @@
                 var stevilo = get_value('stevilo_value_{{sestavina}}')
                 var pk = get_value('pk_{{sestavina}}')
                 if (stevilo != "" && pk != ""){
-                    SpremeniVnos('{{sestavina}}')
+                    Spremeni_Vnos('{{sestavina}}')
                 } else if ( stevilo != "" && pk == ""){
-                    NovVnos('{{sestavina}}')
+                    Nov_Vnos('{{sestavina}}')
                 }
             {% endwith %}
         {% endfor %}

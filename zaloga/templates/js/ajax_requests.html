@@ -1,4 +1,51 @@
 <script>
+    function SpremeniVnos(pk, stevilo, cena, funkcija){
+        $.ajax({
+            url: '{% url "spremeni_vnos" %}',
+            method: 'POST',
+            data: {
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+            'pk': pk,
+            'stevilo': stevilo,
+            'cena': cena,
+            },
+            dataType: 'json',
+            success: function (data) {
+                funkcija(data)
+            }
+        }); 
+    }
+    function NovVnos(baza, dimenzija, tip, stevilo, funkcija){
+        $.ajax({
+            url: '{% url "nov_vnos" %}',
+            method: 'POST',
+            data: {
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+            'pk': baza,
+            'dimenzija': dimenzija,
+            'stevilo': stevilo,
+            'tip': tip
+            },
+            dataType: 'json',
+            success: function (data) {
+                funkcija(data)
+            }
+        }); 
+    }
+    function IzbrisiVnos(pk, funkcija){
+        $.ajax({
+            url: '{% url "izbrisi_vnos" %}',
+            method: 'POST',
+            data: {
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+            'pk': pk,
+            },
+            dataType: 'json',
+            success: function (data) {
+                funkcija(data)
+            }
+        }); 
+    }
     function SpremeniPopust(baza, popust, funkcija){
             $.ajax({
                 url: '{% url "spremeni_popust" %}',

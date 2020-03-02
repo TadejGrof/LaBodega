@@ -4,6 +4,9 @@
 {% load zaloga_exstras %}
 
 {% block content %}
+
+{% include 'js/ajax_requests.html' %}
+
 <div style="width:100%;display:table;margin-bottom:2%">
     <div style="width:60%;text-align:center;display:table-cell;vertical-align:middle">
         <h1> Skupen pregled narocil <h1>
@@ -33,39 +36,37 @@
         </tr>
         {% with zaloga=zaloga.dimenzija_tip_zaloga %}
             {% for dimenzija in razlicne_dimenzije %}
-                <tr id="{{dimenzija|replace}}" class="vrstica {{dimenzija|replace}}" onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
-                    <td class="td {{dimenzija|replace}}"> {{dimenzija}} </td>
+                <tr class="vrstica" onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
+                    <td> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
                         {% if narocilo.pk in razlicne_dimenzije|keyvalue:dimenzija %}
-                            <td id="{{dimenzija|replace}}_{{narocilo.pk}}" class="td {{dimenzija|replace}} narocilo"> 
+                            <td data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}"data-baza="{{narocilo.pk}}"> 
                                 {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk %}    
                                     {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk|keyvalue:vnos %}
-                                        <div  id="{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" class="vnos">
-                                            <input id="pk_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" type="text" class="skrit pk" value="{{vnos}}">
-                                            <button id="izbrisi_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Izbrisi_vnos('{{vnos}}','{{dimenzija}}')"> - </button>
-                                            <button id="odstej_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Spremeni_vnos(-1,'{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}')"> - </button>
-                                            <div id="stevilo_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" class="inline"> {{stevilo}} </div>
-                                            <button id="pristej_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Spremeni_vnos(1,'{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}')"> + </button>
-                                            <button id="dodaj_{{dimenzija|replace}}_{{narocilo.pk}}_{{forloop.counter}}" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
+                                        <div data-vnos="{{vnos}}" class="vnos">
+                                            <button class="izbrisi" onclick="Izbrisi_vnos(this)"> - </button>
+                                            <button class="odstej" data-predznak="-1" onclick="Spremeni_vnos(this)"> - </button>
+                                            <div class="stevilo inline"> {{stevilo}} </div>
+                                            <button class="pristej" data-predznak="1" onclick="Spremeni_vnos(this)"> + </button>
+                                            <button class="dodaj" onclick="Ustvari_vnos(this)"> + </button>
                                         </div>
                                     {% endwith %}
                                 {% endfor %}
                             </td>
                         {% else %}
-                            <td id="{{dimenzija|replace}}_{{narocilo.pk}}" class="td {{dimenzija|replace}} narocilo"> 
-                                <div id="{{dimenzija|replace}}_{{narocilo.pk}}_1" class="vnos">
-                                    <input type="text" class="skrit pk" value="">
-                                    <button id="izbrisi_{{dimenzija|replace}}_{{narocilo.pk}}_1"> - </button>
-                                    <button id="odstej_{{dimenzija|replace}}_{{narocilo.pk}}_1" > - </button>
-                                    <div id="stevilo_{{dimenzija|replace}}_{{narocilo.pk}}_1" class="inline"> 0 </div>
-                                    <button id="pristej_{{dimenzija|replace}}_{{narocilo.pk}}_1" onclick="Ustvari_vnos('{{narocilo.pk}}','{{dimenzija}}')"> + </button>
-                                    <button id="dodaj_{{dimenzija|replace}}_{{narocilo.pk}}_1"> + </button>
+                            <td data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}" data-baza="{{narocilo.pk}}"> 
+                                <div data-vnos="" class="vnos">
+                                    <button class="izbrisi" onclick="Izbrisi_vnos(this)"> - </button>
+                                    <button data-predznak="-1" class="odstej" onclick="Spremeni_vnos(this)"> - </button>
+                                    <div class="stevilo inline"> 0 </div>
+                                    <button data-predznak="1" class="pristej" onclick="Spremeni_vnos(this)"> + </button>
+                                    <button class="dodaj" onclick="Ustvari_vnos(this)"> + </button>
                                 </div>
                             </td>
                         {% endif %}
                     {% endfor %}
-                    <td class="td {{dimenzija}}" id="skupno_{{dimenzija}}"> {{skupno|keyvalue:dimenzija}} </td>
-                    <td class="td {{dimenzija}}"> {{na_voljo|keyvalue:dimenzija}} </td>
+                    <td class="skupno"> {{skupno|keyvalue:dimenzija}} </td>
+                    <td class="zaloga"> {{na_voljo|keyvalue:dimenzija}} </td>
                 </tr>
             {% endfor %}
         {% endwith %}
@@ -85,115 +86,74 @@
 {% block javascript %}
   <script>
      $(document).ready(function() {
-        var vrstice = $('.vrstica')
-        for (i=0; i<vrstice.length; i++){
-            var vrstica = vrstice[i]
-            var narocila = $('#' + vrstica.id + ' td.narocilo')
-            for(n=0; n<narocila.length; n++){
-                var narocilo = narocila[n]
-                var vnosi = $('#' + narocilo.id +  ' div.vnos')
-                for(v=0;v<vnosi.length;v++){
-                    var vnos=vnosi[v]
-                    var pk = $('#' + vnos.id + ' input.pk')[0].value
-                    Nastavi_gumbe(vnos.id, pk)
-                }
-            }
+        var vnosi = $('.vnos')
+        for (i=0; i<vnosi.length; i++){
+            Nastavi_gumbe(vnosi[i])
         }
+        var vrstice = $('.vrstica')
     });
-    function Nastavi_gumbe(id,pk){
-        Pokazi_gumbe(id)
+    function Nastavi_gumbe(div){
+        var pk = div.dataset.vnos
+        var gumbi = div.getElementsByTagName('button')
+        var stevilo = parseInt(div.getElementsByClassName('stevilo')[0].innerHTML)
+        remove_class(gumbi,'skrit')
         if(pk != ""){
-            var stevilo = parseInt(get_innerHtml('stevilo_' + id))
-            $('#dodaj_' + id).addClass('skrit')
+            add_class(div.getElementsByClassName('dodaj'),'skrit')
             if(stevilo > 1){
-                $('#izbrisi_' + id).addClass('skrit')
+                add_class(div.getElementsByClassName('izbrisi'),'skrit')
             } else{
-                $('#odstej_' + id).addClass('skrit')
+                add_class(div.getElementsByClassName('odstej'), 'skrit')
             }
         } else {
-            $('#izbrisi_' + id).addClass('skrit')
-            $('#odstej_' + id).addClass('skrit')
-            $('#pristej_' + id).addClass('skrit')
+            add_class(div.getElementsByClassName('izbrisi'),'skrit')
+            add_class(div.getElementsByClassName('odstej'),'skrit')
+            add_class(div.getElementsByClassName('pristej'),'skrit')
         }
     }
-    function Pokazi_gumbe(id){
-        $('#izbrisi_' + id).removeClass('skrit')
-        $('#odstej_' + id).removeClass('skrit')
-        $('#pristej_' + id).removeClass('skrit')
-        $('#dodaj_' + id).removeClass('skrit')
-    }
-    function Spremeni_vnos(predznak, id) {
-      var stevilo = parseInt(get_innerHtml('stevilo_' + id)) + predznak
-      var pk = get_value('pk_' + id)
-      $.ajax({
-        url: '{% url "spremeni_vnos" %}',
-        method: 'POST',
-        data: {
-          'csrfmiddlewaretoken': '{{csrf_token}}',
-          'stevilo': stevilo,
-          'pk': pk,
-        },
-        dataType: 'json',
-        success: function (data) {
-          set_innerHtml('stevilo_' + id, data.stevilo);
-          Nastavi_gumbe(id, data.pk)
-          
+    function Sestej_vrstico(vrstica){
+        var vnosi = vrstica.getElementsByClassName('stevilo')
+        var stevilo = 0
+        for ( i=0; i<vnosi.length; i++){
+            stevilo = stevilo + parseInt(vnosi[i].innerHTML)
         }
-      }); 
+        vrstica.getElementsByClassName('skupno')[0].innerHTML = stevilo
     }
-    function Ustvari_vnos(pk, dimenzija_tip) {
-      var skupno = parseInt(get_innerHtml('skupno_' + dimenzija_tip)) + 1
-      var dimenzija = dimenzija_tip.split('_')[0]
-      var tip = dimenzija_tip.split('_')[1]
-      $.ajax({
-        url: '{% url "nov_vnos" %}',
-        method: 'POST',
-        data: {
-          'csrfmiddlewaretoken': '{{csrf_token}}',
-          'pk': pk,
-          'stevilo': 1,
-          'dimenzija':dimenzija,
-          'tip':tip,
-        },
-        dataType: 'json',
-        success: function (data) {
-          set_id(dimenzija_tip + '_stevilo_' + pk, 'stevilo_' + data.pk) 
-          set_id(dimenzija_tip + '_pristej_' + pk, 'pristej_' + data.pk)
-          set_id(dimenzija_tip + '_odstej_' + pk, 'odstej_' + data.pk)
-          set_id(dimenzija_tip + '_izbrisi_' + pk, 'izbrisi_' + data.pk)
-          set_innerHtml('skupno_' + dimenzija_tip, skupno);
-          set_innerHtml('stevilo_' + data.pk, 1);
-          document.getElementById(dimenzija_tip +'_novo_' + pk).style.display = "none"
-          document.getElementById('pristej_' + data.pk).style.display = "inline-block"
-          document.getElementById('izbrisi_' + data.pk).style.display = "inline-block"
-          document.getElementById('pristej_' + data.pk).onclick = function() { Spremeni_vnos(1,data.pk,dimenzija_tip); }
-          document.getElementById('odstej_' + data.pk).onclick = function() { Spremeni_vnos(-1,data.pk,dimenzija_tip); }
-          document.getElementById('izbrisi_' + data.pk).onclick = function() { Izbrisi_vnos(data.pk,dimenzija_tip); }
-        }
-      }); 
+    function Spremeni_vnos(button) {
+      var div = button.parentElement
+      var predznak = parseInt(button.dataset.predznak)
+      var stevilo = parseInt(div.getElementsByClassName('stevilo')[0].innerHTML)
+      var pk = div.dataset.vnos
+      SpremeniVnos(pk, stevilo + predznak, "", function(data){
+            div.getElementsByClassName('stevilo')[0].innerHTML = data.stevilo
+            Nastavi_gumbe(div)
+            var vrstica = div.parentElement.parentElement
+            Sestej_vrstico(vrstica)
+            
+      })
     }
-    function Izbrisi_vnos(pk, dimenzija) {
-      var skupno = parseInt(get_innerHtml('skupno_' + dimenzija)) - 1
-      $.ajax({
-        url: '{% url "izbrisi_vnos" %}',
-        method: 'POST',
-        data: {
-          'csrfmiddlewaretoken': '{{csrf_token}}',
-          'pk': pk,
-        },
-        dataType: 'json',
-        success: function (data) {
-          set_id('stevilo_' + pk,dimenzija + '_stevilo_' + data.pk) 
-          set_id('pristej_' + pk,dimenzija + '_pristej_' + data.pk)
-          set_id('odstej_' + pk,dimenzija + '_odstej_' + data.pk)
-          set_id('izbrisi_' + pk,dimenzija + '_izbrisi_' + data.pk)
-          set_innerHtml('skupno_' + dimenzija, skupno);
-          set_innerHtml(dimenzija + '_stevilo_' + data.pk, 0);
-          document.getElementById(dimenzija +'_novo_' + data.pk).style.display = "inline-block"
-          document.getElementById(dimenzija + '_pristej_' + data.pk).style.display = "none"
-          document.getElementById(dimenzija + '_izbrisi_' + data.pk).style.display = "none"
-        }
-      }); 
+    function Ustvari_vnos(button) {
+        var div = button.parentElement
+        var td = div.parentElement
+        var dimenzija = td.dataset.dimenzija
+        var baza = td.dataset.baza
+        var tip = td.dataset.tip
+        NovVnos(baza,dimenzija,tip,1,function(data){
+            div.getElementsByClassName('stevilo')[0].innerHTML = data.stevilo
+            div.dataset.vnos = data.pk
+            Nastavi_gumbe(div)
+            var vrstica = td.parentElement
+            Sestej_vrstico(vrstica)
+        })
+    }
+    function Izbrisi_vnos(button) {
+        var div = button.parentElement
+        IzbrisiVnos(div.dataset.vnos,function(data){
+            div.getElementsByClassName('stevilo')[0].innerHTML = 0
+            div.dataset.vnos = ""
+            Nastavi_gumbe(div)
+            var vrstica = div.parentElement.parentElement
+            Sestej_vrstico(vrstica)
+        })
     }
   </script>
 {% endblock %}

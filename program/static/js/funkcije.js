@@ -48,6 +48,16 @@ function set_innerHtml(id, html){
         element.innerHTML = html
     }
 }
+function add_class(elements,klas){
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].classList.add(klas)
+    }
+}
+function remove_class(elements,klas){
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].classList.remove(klas)
+    }
+}
 function set_placeholder(id, placeholder){
     document.getElementById(id).placeholder = placeholder; 
 }

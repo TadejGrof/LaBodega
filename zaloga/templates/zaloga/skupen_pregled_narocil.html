@@ -18,7 +18,7 @@
         <table class="tabela_vnosov tabela_skritih skrit">
             {% for narocilo in narocila %}
                 <tr data-baza="{{narocilo.pk}}" class="{{narocilo.pk}} skrit" >
-                    <td> {{narocilo.stranka__ime}} </td>
+                    <td>{{narocilo.stranka__ime}}</td>
                     <td> <button onclick="Pokazi(this)"> + </button>
                 </tr>
             {% endfor %}
@@ -30,36 +30,38 @@
     <button onclick="Pokazi_sporne()"> Pokazi sporne </button>
     <button onclick="Pokazi_vse()"> Pokazi vse </button>
     <button class="skrit" onclick="Preklici_vse()"> Preklici vse </button>
+    {% include 'baza/filter.html' with tipi=zaloga.vrni_tipe radiusi=zaloga.vrni_razlicne_radiuse slovar=slovar %}
 </div>
-<div style="width:95%;display:inline-block;text-aling:center">
-    <table class="tabela_vnosov">
+<div class="inline" style="margin-bottom:4%;width:95%;text-aling:center">
+    <table style="table-layout:fixed"   class="tabela_vnosov">
         <tr>
-            <th style="width:6%"> Dimenzija </th>
+            <th style="width:10%"> Dimenzija </th>
             {% for narocilo in narocila %}
-                <th data-baza="{{narocilo.pk}}" class="{{narocilo.pk}}"> 
-                    <button class="skrij" onclick="Skrij(this)"> - </button>
+                <th data-baza="{{narocilo.pk}}" class="narocilo {{narocilo.pk}}"> 
+                    <button class="skrij"> - </button>
                     <div style="width:100%;height:40%;overflow:hidden">{{narocilo.stranka__ime}}</div>
                 </th>
             {% endfor %}
-            <th style="width:4%" class="ostalo skrit"> Ostalo </th> 
-            <th style="width:4%"> Skupno </th>
-            <th style="width:4%"> Zaloga </th>
+            <th style="width:7%" class="ostalo skrit"> Ostalo </th> 
+            <th style="width:7%"> Skupno </th>
+            <th style="width:7%"> Zaloga </th>
         </tr>
         {% with zaloga=zaloga.dimenzija_tip_zaloga %}
             {% for dimenzija in razlicne_dimenzije %}
-                <tr data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" class="vrstica" onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
+            {% with podatki=razlicne_dimenzije|keyvalue:dimenzija %}
+                <tr class="{{podatki|keyvalue:'radius'}} {{podatki|keyvalue:'tip'}} vrstica"  data-tip="{{podatki|keyvalue:'tip'}}" data-dimenzija="{{podatki|keyvalue:'dimenzija'}}">
                     <td> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
-                        {% if narocilo.pk in razlicne_dimenzije|keyvalue:dimenzija %}
-                            <td class="{{narocilo.pk}}" data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}" data-baza="{{narocilo.pk}}"> 
-                                {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk %}    
-                                    {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk|keyvalue:vnos %}
+                        {% if narocilo.pk in podatki|keyvalue:'baze' %}
+                            <td class="{{narocilo.pk}}" data-baza="{{narocilo.pk}}"> 
+                                {% for vnos in podatki|keyvalue:'baze'|keyvalue:narocilo.pk %}    
+                                    {% with stevilo=podatki|keyvalue:'baze'|keyvalue:narocilo.pk|keyvalue:vnos %}
                                         <div data-vnos="{{vnos}}" class="vnos">
-                                            <button class="izbrisi" onclick="Izbrisi_vnos(this)"> - </button>
-                                            <button class="odstej" data-predznak="-1" onclick="Spremeni_vnos(this)"> - </button>
+                                            <button class="izbrisi"> - </button>
+                                            <button class="odstej" data-predznak="-1"> - </button>
                                             <div class="stevilo inline"> {{stevilo}} </div>
-                                            <button class="pristej" data-predznak="1" onclick="Spremeni_vnos(this)"> + </button>
-                                            <button class="dodaj" onclick="Ustvari_vnos(this)"> + </button>
+                                            <button class="pristej" data-predznak="1"> + </button>
+                                            <button class="dodaj"> + </button>
                                         </div>
                                     {% endwith %}
                                 {% endfor %}
@@ -67,11 +69,11 @@
                         {% else %}
                             <td class="{{narocilo.pk}}" data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}" data-baza="{{narocilo.pk}}"> 
                                 <div data-vnos="" class="vnos">
-                                    <button class="izbrisi" onclick="Izbrisi_vnos(this)"> - </button>
-                                    <button data-predznak="-1" class="odstej" onclick="Spremeni_vnos(this)"> - </button>
+                                    <button class="izbrisi"> - </button>
+                                    <button data-predznak="-1" class="odstej"> - </button>
                                     <div class="stevilo inline"> 0 </div>
-                                    <button data-predznak="1" class="pristej" onclick="Spremeni_vnos(this)"> + </button>
-                                    <button class="dodaj" onclick="Ustvari_vnos(this)"> + </button>
+                                    <button data-predznak="1" class="pristej"> + </button>
+                                    <button class="dodaj"> + </button>
                                 </div>
                             </td>
                         {% endif %}
@@ -80,6 +82,7 @@
                     <td class="skupno"> </td>
                     <td class="zaloga"> {{na_voljo|keyvalue:dimenzija}} </td>
                 </tr>
+            {% endwith %}
             {% endfor %}
         {% endwith %}
         <tr>
@@ -97,7 +100,7 @@
 
 {% block javascript %}
   <script>
-     $(document).ready(function() {
+    $(document).ready(function() {
         var vnosi = $('.vnos')
         for (i=0; i<vnosi.length; i++){
             Nastavi_gumbe(vnosi[i])
@@ -106,6 +109,7 @@
         for (i=0;i<vrstice.length;i++){
             Sestej_vrstico(vrstice[i])
         }
+        Oblikuj_tabelo()
     });
     $('.vrstica').click(function(e){
         if (e.target.tagName == "BUTTON") return;
@@ -115,6 +119,11 @@
             this.style.backgroundColor = "transparent"
         }
     })
+    $('.dodaj').click(function(){Ustvari_vnos(this)})
+    $('.pristej').click(function(){Spremeni_vnos(this)})
+    $('.odstej').click(function(){Spremeni_vnos(this)})
+    $('.izbrisi').click(function(){Izbrisi_vnos(this)})
+    $('.skrij').click(function(){Skrij(this)})
     function Nastavi_gumbe(div){
         var pk = div.dataset.vnos
         var gumbi = div.getElementsByTagName('button')
@@ -146,6 +155,7 @@
         var stranka = th.dataset.baza
         ToggleClass('.' + stranka, 'skrit')
         Nastavi_ostalo()
+        Oblikuj_tabelo()
     }
     function Pokazi(button){
         var tr = button.parentElement.parentElement
@@ -157,6 +167,17 @@
         } else{
             Nastavi_ostalo()
         }
+        Oblikuj_tabelo()
+    }
+    function Oblikuj_tabelo(){
+        var skrite = Stranke(true)
+        var stranke = Stranke(false)
+        var delno = 24
+        if (skrite.length > 0){
+            delno = delno + 7
+        }
+        var sirina = (100 - delno) / stranke.length
+        $('th.narocilo').css('width', sirina + '%')
     }
     function Nastavi_ostalo(){
         $('.ostalo').removeClass('skrit')
@@ -183,7 +204,9 @@
         for(i=0;i<stranke.length;i++){
             if(skrite && !stranke[i].classList.contains('skrit')){
                 list[list.length] = stranke[i].dataset.baza
-            }
+            } else if( !skrite && stranke[i].classList.contains('skrit')){
+                list[list.length] = stranke[i].dataset.baza
+            }       
         }
         return list
     }
@@ -203,15 +226,15 @@
     function Ustvari_vnos(button) {
         var div = button.parentElement
         var td = div.parentElement
-        var dimenzija = td.dataset.dimenzija
+        var row = td.parentElement
+        var dimenzija = row.dataset.dimenzija
         var baza = td.dataset.baza
-        var tip = td.dataset.tip
+        var tip = row.dataset.tip
         NovVnos(baza,dimenzija,tip,1,function(data){
             div.getElementsByClassName('stevilo')[0].innerHTML = data.stevilo
             div.dataset.vnos = data.pk
             Nastavi_gumbe(div)
-            var vrstica = td.parentElement
-            Sestej_vrstico(vrstica)
+            Sestej_vrstico(row)
         })
     }
     function Izbrisi_vnos(button) {

@@ -12,35 +12,46 @@
         <h1> Skupen pregled narocil <h1>
     </div>
     <div style="width:39%;text-align:center;display:table-cell">
-        <h3> Ostala naročila: </h3>
+        <h3> Ostala naročila: 
+            <button onclick="ToggleClass('.tabela_skritih','skrit')"> Pokazi </button>
+        </h3>
+        <table class="tabela_vnosov tabela_skritih skrit">
+            {% for narocilo in narocila %}
+                <tr data-baza="{{narocilo.pk}}" class="{{narocilo.pk}} skrit" >
+                    <td> {{narocilo.stranka__ime}} </td>
+                    <td> <button onclick="Pokazi(this)"> + </button>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
 </div>
 
-
+<div style="margin-bottom:2%" class="delovno_okno">
+    <button onclick="Pokazi_sporne()"> Pokazi sporne </button>
+    <button onclick="Pokazi_vse()"> Pokazi vse </button>
+    <button class="skrit" onclick="Preklici_vse()"> Preklici vse </button>
+</div>
 <div style="width:95%;display:inline-block;text-aling:center">
     <table class="tabela_vnosov">
         <tr>
-            <th style="width:7%"> Dimenzija/Tip </th>
+            <th style="width:6%"> Dimenzija </th>
             {% for narocilo in narocila %}
-                <th  onclick="barva('td','white');barva('{{narocilo.stranka__ime}}','#ffe6e6')"> 
-                    <form action="{% url 'skupen_pregled_narocil' zaloga_pk %}" method="GET">
-                        <input type="submit" value="-" id="submit_{{narocilo.pk}}" onclick="Nastavi_top('{{narocilo.pk}}')">
-                        <input type="hidden" name="gledane">
-                        <input type="number" hidden="hidden" value="" id="top_{{narocilo.pk}}" name="top">
-                    </form>
+                <th data-baza="{{narocilo.pk}}" class="{{narocilo.pk}}"> 
+                    <button class="skrij" onclick="Skrij(this)"> - </button>
                     <div style="width:100%;height:40%;overflow:hidden">{{narocilo.stranka__ime}}</div>
                 </th>
-            {% endfor %} 
+            {% endfor %}
+            <th style="width:4%" class="ostalo skrit"> Ostalo </th> 
             <th style="width:4%"> Skupno </th>
             <th style="width:4%"> Zaloga </th>
         </tr>
         {% with zaloga=zaloga.dimenzija_tip_zaloga %}
             {% for dimenzija in razlicne_dimenzije %}
-                <tr class="vrstica" onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
+                <tr data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" class="vrstica" onclick="barva('td','white');barva('{{dimenzija}}','#ffe6e6')">
                     <td> {{dimenzija}} </td>
                     {% for narocilo in narocila %}
                         {% if narocilo.pk in razlicne_dimenzije|keyvalue:dimenzija %}
-                            <td data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}"data-baza="{{narocilo.pk}}"> 
+                            <td class="{{narocilo.pk}}" data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}" data-baza="{{narocilo.pk}}"> 
                                 {% for vnos in razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk %}    
                                     {% with stevilo=razlicne_dimenzije|keyvalue:dimenzija|keyvalue:narocilo.pk|keyvalue:vnos %}
                                         <div data-vnos="{{vnos}}" class="vnos">
@@ -54,7 +65,7 @@
                                 {% endfor %}
                             </td>
                         {% else %}
-                            <td data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}" data-baza="{{narocilo.pk}}"> 
+                            <td class="{{narocilo.pk}}" data-dimenzija="{{dimenzija|split:'_'|keyvalue:0}}" data-tip="{{dimenzija|split:'_'|keyvalue:1}}" data-baza="{{narocilo.pk}}"> 
                                 <div data-vnos="" class="vnos">
                                     <button class="izbrisi" onclick="Izbrisi_vnos(this)"> - </button>
                                     <button data-predznak="-1" class="odstej" onclick="Spremeni_vnos(this)"> - </button>
@@ -65,7 +76,8 @@
                             </td>
                         {% endif %}
                     {% endfor %}
-                    <td class="skupno"> {{skupno|keyvalue:dimenzija}} </td>
+                    <td class="ostalo skrit"> </td> 
+                    <td class="skupno"> </td>
                     <td class="zaloga"> {{na_voljo|keyvalue:dimenzija}} </td>
                 </tr>
             {% endfor %}
@@ -91,7 +103,18 @@
             Nastavi_gumbe(vnosi[i])
         }
         var vrstice = $('.vrstica')
+        for (i=0;i<vrstice.length;i++){
+            Sestej_vrstico(vrstice[i])
+        }
     });
+    $('.vrstica').click(function(e){
+        if (e.target.tagName == "BUTTON") return;
+        if($(this).css("background-color") == "transparent"){
+            this.style.backgroundColor = "LightCoral"
+        } else{
+            this.style.backgroundColor = "transparent"
+        }
+    })
     function Nastavi_gumbe(div){
         var pk = div.dataset.vnos
         var gumbi = div.getElementsByTagName('button')
@@ -113,10 +136,56 @@
     function Sestej_vrstico(vrstica){
         var vnosi = vrstica.getElementsByClassName('stevilo')
         var stevilo = 0
-        for ( i=0; i<vnosi.length; i++){
-            stevilo = stevilo + parseInt(vnosi[i].innerHTML)
+        for ( n=0; n<vnosi.length; n++){
+            stevilo = stevilo + parseInt(vnosi[n].innerHTML)
         }
         vrstica.getElementsByClassName('skupno')[0].innerHTML = stevilo
+    }
+    function Skrij(button){
+        var th = button.parentElement
+        var stranka = th.dataset.baza
+        ToggleClass('.' + stranka, 'skrit')
+        Nastavi_ostalo()
+    }
+    function Pokazi(button){
+        var tr = button.parentElement.parentElement
+        var stranka = tr.dataset.baza
+        ToggleClass('.' + stranka, 'skrit')
+        var skrite = Stranke(true)
+        if ( skrite.length == 0){
+            ToggleClass('.ostalo','skrit')
+        } else{
+            Nastavi_ostalo()
+        }
+    }
+    function Nastavi_ostalo(){
+        $('.ostalo').removeClass('skrit')
+        var skrite = Stranke(true)
+        vrstice = document.getElementsByClassName('vrstica')
+        for( i=0;i<vrstice.length;i++){
+            Sestej_skrite(vrstice[i],skrite)
+        }
+    }
+    function Sestej_skrite(vrstica,skrite){
+        var vnosi = vrstica.getElementsByClassName('stevilo')
+        var stevilo = 0
+        for ( n=0; n<vnosi.length; n++){
+            var baza = vnosi[n].parentElement.parentElement.dataset.baza
+            if (skrite.includes(baza)){
+                stevilo = stevilo + parseInt(vnosi[n].innerHTML)
+            }
+        }
+        vrstica.getElementsByClassName('ostalo')[0].innerHTML = stevilo
+    }
+    function Stranke(skrite){
+        var stranke = $('.tabela_skritih tr')
+        var list = []
+        for(i=0;i<stranke.length;i++){
+            if(skrite && !stranke[i].classList.contains('skrit')){
+                list[list.length] = stranke[i].dataset.baza
+            }
+        }
+        return list
     }
     function Spremeni_vnos(button) {
       var div = button.parentElement
@@ -154,6 +223,17 @@
             var vrstica = div.parentElement.parentElement
             Sestej_vrstico(vrstica)
         })
+    }
+    function Pokazi_sporne(){
+        var vrstice = $('.vrstica')
+        for ( i = 0; i < vrstice.length; i++){
+            vrstice[i].style.backgroundColor = 'white'
+            var skupno = parseInt(vrstice[i].getElementsByClassName('skupno')[0].innerHTML)
+            var zaloga = parseInt(vrstice[i].getElementsByClassName('zaloga')[0].innerHTML)
+            if( skupno > zaloga){
+                vrstice[i].style.backgroundColor = 'LightCoral'
+            }
+        }
     }
   </script>
 {% endblock %}

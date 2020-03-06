@@ -106,4 +106,46 @@
             }
         });
     }
+    function IzbrisiRacun(pk, funkcija){
+        $.ajax({
+            url: '{% url "izbrisi_racun" %}',
+            method: 'POST',
+            data: {
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+            'pk': pk,
+            },
+            dataType: 'json',
+            success: function (data) {
+                funkcija(data)
+            }
+        });
+    }
+    function VrniDimenzijo(radius,height,width, funkcija){
+        $.ajax({
+            url: '{% url "vrni_dimenzijo" %}',
+            method: 'GET',
+            data: {
+            'radius': radius,
+            'height': height,
+            'width': width,
+            },
+            dataType: 'json',
+            success : function(data){
+                funkcija(data)
+            },
+        });
+    }
+    function VrniBazo(pk, funkcija){
+        $.ajax({
+            url: '{% url "vrni_bazo" %}',
+            method: 'GET',
+            data: {
+            'pk': pk,
+            },
+            dataType: 'json',
+            success : function(data){
+                funkcija(data)
+            },
+        });
+    }
 </script>

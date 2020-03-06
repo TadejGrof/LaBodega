@@ -5,6 +5,10 @@
 {% block content %}
 
 <style>
+    .vnos input {
+        width:80%;
+        text-align:center;
+    }
     div.ustvari_prodajo{
         display:block;
         height:60%;
@@ -20,26 +24,10 @@
         margin-top:2%;
         overflow:auto;
     }
-    div.prodaja{
-        display:block;
-        width:100%;
-        height:90%;
-        vertical-align:top;
-       
-    }
-    div.racuni{
-        display: inline-block;
-        width:26%;
-        height:75%;
-        border:1px solid black;
-        vertical-align:top;
-        margin:0.5%;
-        margin-top:2%
-    }
     div.okno{
         display: inline-block;
-        width:70%;
-        height:75%;
+        width:90%;
+        height:60%;
         border:1px solid black;
         vertical-align:top;
         margin:0.5%;
@@ -49,13 +37,13 @@
         display: inline-block;
         text-align:center;
         width:60%;
-        height:75%;
+        height:100%;
         vertical-align:top;
     }
     div.gumbi_div{
         display: inline-block;
         width:38%;
-        height:75%;
+        height:100%;
         vertical-align:top;
     }
     div.select{
@@ -80,14 +68,6 @@
         margin:0.5%;
         margin-top:2%;
     }
-    div.cena{
-        display:block;
-        height:20%;
-        margin:1%;
-        border: 1px solid black;
-        vertical-align:center;
-        text-align:center
-    }
     label.dimenzija{
         display:block;
         text-align:center;
@@ -111,42 +91,8 @@
         height:20%;
         margin-top:4%
     }
-    div.cena_inline{
-        display:inline-block;
-        width:30%;
-        margin:0.5%;
-        height:85%;
-        vertical-align:top;
-        border:1px solid black
-    }
-    div.cena_polovica{
-        display:block;
-        height:50%;
-        font-size:100%;
-        text-align:center;
-        vertical-align:top;
-    }
-    div.cena_polovica_inline{
-        display:inline-block;
-        height:100%;
-        width:48%;
-        text-align:center;
-        vertical-align:center;
-    }
     h2,h1{
         margin:2%;
-    }
-    div.cena input {
-        width:60%;
-        height:80%;
-    }
-    button.celo{
-        width:90%;
-        height:100%;
-    }
-    div.popust_delovno{
-        vertical-align:center;
-        margin-top:5%
     }
 </style>
 
@@ -163,217 +109,31 @@
         </form>
     </div>
 {% else %}
-    <div class="prodaja">
-        <h1>
-            {{prodaja.title}} {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
-        </h1>
+    <h1>
+        {{prodaja.title}} {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
+    </h1>
 
-        <div class="racuni">
-            <h2> {{slovar|keyvalue:'Racuni'|keyvalue:jezik}} </h2>
-            {% if prodaja.stevilo_veljavnih_racunov == 0 %}
-                <h3> {{slovar|keyvalue:'Brez zgodovine'|keyvalue:jezik}}</h3>
-            {% else %}
-                <div class="tabela">
-                    <table class="tabela_vnosov">
-                        <tr>
-                            <th> N.</th>
-                            <th> {{slovar|keyvalue:'Cas'|keyvalue:jezik}} </th>
-                            <th> {{slovar|keyvalue:'Cena'|keyvalue:jezik}} </th>
-                            <th> E </th>
-                        </tr>
-                        {% for racun in prodaja.racuni %}
-                        <tr>
-                            <td> {{racun.title}} </td>
-                            <td> {{racun.cas}} </td>
-                            <td> {{racun.koncna_cena}} $ </td>
-                            <td> 
-                                <form style="width:100%;height:100%" action="{% url 'ogled_dnevne_prodaje' prodaja.pk %}" method="GET">
-                                    <input type="number" hidden="hidden" name='racun_pk' value={{racun.pk}}>
-                                    <input style="width:100%;height:100%" type="submit" value="Edit">
-                                </form>  
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+    {% if danasnja %}
+        {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
+    {% endif %}
 
-                </div>
-                <div class="tabela">
-                    <table class="tabela_vnosov">
-                        <tr>
-                            <td> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </td>
-                            <td> {{prodaja.skupno_stevilo}}</td>
-                            <td> {{slovar|keyvalue:'Cena'|keyvalue:jezik}} </td>
-                            <td> {{prodaja.skupna_cena}} $</td>
-                        </tr>
-                    </table>
-                </div>
-            {% endif %}
-        </div>
+    {% include 'prodaja/racuni.html' with racuni=racuni %}
 
-        <div class="okno">
-            <div class="table">
-                <table style="margin-top:3%;width:100%" class="tabela_vnosov">
-                    <tr>
-                        <th width="25%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
-                        <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
-                        <th width="10%"> N.: </th>
-                        <th width="15%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
-                        <th width="15%"> Total: </th>
-                        <th width="20%"> Edit: </th>
-                    </tr>
-                {% if aktivni_racun.stevilo_vnosov == 0 %}
-                    </table>
-                    <h2 style="margin-top:5%">
-                        {{slovar|keyvalue:'Brez vnosov'|keyvalue:jezik}}
-                    </h2>
-                {% else %}
-                    {% for vnos in aktivni_racun.vrni_vnose %}
-                        <tr>
-                            <td> {{vnos.dimenzija}} </td>
-                            <td> 
-                                <div class="spremeni_{{vnos.pk}}">
-                                    {{vnos.tip}} 
-                                </div>
-                                <select class="potrdi_{{vnos.pk}}" name="tip" form="spremeni_{{vnos.pk}}" hidden="hidden" style="width:98%;height:90%">
-                                    {% for tip in zaloga.vrni_tipe %}
-                                        {% if vnos.tip == tip.0 %}
-                                            <option value="{{tip.0}}" selected="selected"> {{tip.1}} </option>
-                                        {% else %}
-                                            <option value="{{tip.0}}"> {{tip.1}} </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </td>
-                            <td>
-                                <div class="spremeni_{{vnos.pk}}">
-                                    {{vnos.stevilo}} 
-                                </div>
-                                <input hidden="hidden" placeholder="{{vnos.stevilo}}" type="number" class="potrdi_{{vnos.pk}}" style="width:85%;text-align:center" form="spremeni_{{vnos.pk}}" autocomplete="off" name="stevilo" min="1" max="999">
-                            </td>
-                            <td> 
-                                <div class="spremeni_{{vnos.pk}}">
-                                    {{vnos.cena}} $
-                                </div>
-                                <div hidden="hidden" class="potrdi_{{vnos.pk}}">
-                                    <input placeholder="{{vnos.cena}}" autocomplete="off" type="text" style="width:72%;text-align:center" form="spremeni_{{vnos.pk}}" name="cena" pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
-                                    $
-                                </div>
-                            </td>
-                            <td> {{vnos.skupna_cena}}$ </td>
-                            <td> 
-                                <button class="spremeni_{{vnos.pk}}" onclick="Spremeni_vnos('{{vnos.pk}}')">E</button>
-                                <input class="spremeni_{{vnos.pk}}" form="izbrisi_{{vnos.pk}}" type="submit" value="X">
-                                <input hidden="hidden" type="submit" class="potrdi_{{vnos.pk}}" value="OK" form="spremeni_{{vnos.pk}}">
-                                <button hidden="hidden" class="potrdi_{{vnos.pk}}" onclick="Preklici_spremembo_vnosa('{{vnos.pk}}')"> X </button>
-                                <form hidden="hidden" id="izbrisi_{{vnos.pk}}" action="{% url 'racun_izbrisi_vnos' %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="number" hidden="hidden" value={{vnos.pk}} name="pk">
-                                </form>
-                                <form hidden="hidden" id="spremeni_{{vnos.pk}}" action="{% url 'racun_spremeni_vnos' %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="number" value={{vnos.pk}} name="pk">
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    <tr>
-                        <td colspan = "2"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>         
-                        <td> {{aktivni_racun.skupno_stevilo}} </td>
-                        <td> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </td>
-                        <td colspan = "2"> {{aktivni_racun.skupna_cena}}$ </td>
-                    </tr>
-                </table>
-                {% endif %}
-            </div>
-            <div class="gumbi_div">
-                <form id="nov_vnos" action="{% url 'racun_nov_vnos' aktivni_racun.pk %}" method="POST">
-                {% csrf_token %}
-                <div style="margin-top:6%" class="select">
-                    {% include 'program/dinamic_select.html' %}
-                </div>
-                </form>
-                <div class="gumbi" id="gumbi">
-                    {% for n in '00000000000000000000' %}
-                        <button class="dimenzija" id="gumb_{{forloop.counter}}" onclick="KlikGumba({{forloop.counter}})" ></button>
-                    {% endfor %}
-                </div>
-                <div class="gumbi" id="koncno">
-                    <label style="width:70%;height:15%;display:inline-block;font-size:4vh" id="dimension_label"> Dimenzija </label>
-                    <input style="text-align:center;font-size:5vh;width:40%;height:30%;display:inline-block;margin:2%;margin-top:1%;margin-bottom:3%" id="stevilo_input" name="stevilo" form="nov_vnos" type="number" autocomplete="off" autofocus min="1" max="100" required onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                    <label id="zaloga_div" style="width:30%;height:30%;text-align:center;font-size:5vh;display:inline-block"> Zaloga </label>
-                    <div style="width:30%;height:15%;text-align:center;display:inline-block"> Tip: </div> 
-                    <select style="width:40%;height:15%;display:inline-block" id="tip" name="tip" form="nov_vnos" onchange="Pokazi_zalogo()">
-                        {% for tip in zaloga.vrni_tipe %}
-                            {% if tip.0 == "W" %}
-                                <option value="{{tip.0}}" selected> {{tip.1}} </option>
-                            {% else %}
-                                <option value="{{tip.0}}"> {{tip.1}} </option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <input style="width:40%;height:15%;display:inline-block;margin:10%;margin-top:3%" type="submit" value="Nov vnos" form="nov_vnos" onclick="Nov_vnos(this)">
-                </div>
-            </div>
-            <div class="cena">
-                <div class="cena_inline" >
-                    <table style="width:100%;margin-top:4%" >
-                        <tr>
-                            <td  style="font-size:4vmin ;text-align:center" width="70%"> {{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}: </td>
-                            <td  style="font-size:4vmin; text-align:center" width="30%"> {{aktivni_racun.koncna_cena}} $ </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="cena_inline">
-                    <form style="width:100%;height:100%" action="{% url 'uveljavi_racun' aktivni_racun.pk %}" method="POST" >
-                    {% csrf_token %}
-                    <input onclick="return Uveljavi(this)" style="width:100%;height:100%" type="submit" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
-                    
-                    </form>
-                </div>
-            </div>
-        </div>  
-    </div>
+    {% include 'prodaja/prodane.html' with prodaja=prodaja %}
 {% endif %}
 
 <script>
-    function shrani_vnos(pk){
-        var tipbox = document.getElementById(pk + '_tip');
-        var tip = tipbox.options[tipbox.selectedIndex].value
-        var stevilo = document.getElementById(pk + '_stevilo').value
-        var cena = document.getElementById(pk + '_cena').value
-        if (je_veljavno_stevilo(stevilo)){
-            document.getElementById(pk + '_form_stevilo').value = stevilo
-        }
-        if (je_veljavna_cena(cena)){
-            document.getElementById(pk + '_form_cena').value = cena
-        }
-        document.getElementById(pk + '_form_tip').value = tip
-        document.getElementById(pk + '_form_button').click()
-    }   
-    function delete_vnos(pk){
-        document.getElementById(pk + '_delete_button').click()
-    }
-    function edit_vnos(pk){
-        toggle(pk + '_preedit','none')
-        toggle(pk + '_edit','block')
-    };
-    function Nov_vnos(gumb){
-        if (document.getElementById('stevilo_input').value != ""){
-            gumb.disabled = true;
-            gumb.form.submit();
-        }else{
+    function Uveljavi(button){
+        button.disabled = true
+        var vnosi = document.getElementById('tabela_vnosov').getElementsByClassName('vnos')
+        if ( vnosi.length == 0){
+            alert('potreben_je_vsaj_en_vnos')
+            button.disabled = false
             return false
+        } else{
+            button.form.submit()
         }
-    };
-    function Uveljavi(gumb){
-        {% if aktivni_racun.stevilo_vnosov == 0 %}
-            alert('racun mora vsebovati vsaj en vnos');
-            return false;
-        {% else %}
-            gumb.disabled = true;
-            gumb.form.submit();
-        {% endif %}
-    };
+    }
     function Pocisti(){
         document.getElementById('radius').selectedIndex = 0
         SpremeniRadius();
@@ -420,13 +180,15 @@
         var height = heightbox.options[heightbox.selectedIndex].value
         var width = widthbox.options[widthbox.selectedIndex].value
         document.getElementById('koncno').style.display = "block"
-        var dimenzija = Tvori_dimenzijo(radius, height, width)
-        document.getElementById('dimension_label').innerHTML = dimenzija
         document.getElementById('gumbi').style.display = "none"
-        Pokazi_zalogo()
+        VrniDimenzijo(radius,height,width, function(data){
+            document.getElementById('dimenzija').innerHTML = data.dimenzija
+        })
+        setTimeout(() => { Pokazi_zalogo() }, 1000);
+        
     };
     function Pokazi_zalogo(){
-        var dimenzija = document.getElementById('dimension_label').innerHTML
+        var dimenzija = document.getElementById('dimenzija').innerHTML
         var tip = get_selected('tip')
         var zaloga = '{{zaloga.pk}}'
         VrniZalogo(zaloga,dimenzija,tip,function(data){
@@ -465,24 +227,118 @@
             };
         };
     };
-    function TvoriDimenzijo(radius, height, width){
-        if( "C" == width.substring(width.length - 1, width.length) ){
-            return height + '/' + width.substring(0, width.length - 1) + '/' + radius + 'C'
-        } else if (width == "R"){
-            return height + '/' + radius
-        } else {
-            return height + '/' + width + '/' + radius
-        }
-    }
-    function Tvori_dimenzijo(){
-        var radiusbox = document.getElementById("radius");
-        var heightbox = document.getElementById("height");
-        var widthbox = document.getElementById("width");
-        var radius = radiusbox.options[radiusbox.selectedIndex].value
-        var height = heightbox.options[heightbox.selectedIndex].value
-        var width = widthbox.options[widthbox.selectedIndex].value
-        return TvoriDimenzijo(radius,height,width)
-    }
     SpremeniGumbe()
+</script>
+
+<script>
+    function Edit_vnos(button){
+        var selector = '#' + button.parentElement.parentElement.id + ' .sprememba'
+        ToggleClass(selector,'skrit')
+    }
+    function Izbrisi_vnos(button){
+        var vrstica = button.parentElement.parentElement
+        var pk = vrstica.id
+        IzbrisiVnos(pk,function(data){
+            vrstica.parentNode.removeChild(vrstica);
+            Nastavi_podatke(data)
+            Ponastavi_napis()
+        })
+    }
+    function Spremeni_vnos(button){
+        var vrstica = button.parentElement.parentElement
+        var pk = vrstica.id
+        var stevilo = vrstica.getElementsByClassName('stevilo_value')[0].value
+        var cena = vrstica.getElementsByClassName('cena_value')[0].value
+        SpremeniVnos(pk, stevilo, cena, function(data){
+            Nastavi_podatke(data)
+            ToggleClass('#' + pk + ' .sprememba','skrit')
+        })
+    }   
+    function Nov_vnos(){
+        var dimenzija = get_innerHtml('dimenzija')
+        var stevilo = get_value('stevilo')
+        var tip = get_selected('tip')
+        var baza = '{{prodaja.aktivni_racun.pk}}'
+        NovVnos(baza,dimenzija,tip,stevilo, function(data){
+            Vstavi_vrstico('tabela_vnosov', data.index, data)
+            Nastavi_podatke(data)
+            set_value('stevilo','')
+            Pocisti()
+        })
+    }
+    function Nastavi_podatke(data){
+        var vrstica = document.getElementById(data.pk)
+        if(data.action != "izbris" ){
+            vrstica.getElementsByClassName('stevilo')[0].innerHTML = data.stevilo
+            vrstica.getElementsByClassName('cena')[0].innerHTML = data.cena + ' $'
+            vrstica.getElementsByClassName('stevilo_value')[0].value = ""
+            vrstica.getElementsByClassName('stevilo_value')[0].placeholder = "(" + data.stevilo + ")"
+            vrstica.getElementsByClassName('cena_value')[0].value = ""
+            vrstica.getElementsByClassName('cena_value')[0].placeholder = "(" + data.cena + " $)"
+            vrstica.getElementsByClassName('cena_vnosa')[0].innerHTML = data.cena_vnosa + ' $'
+        }
+        set_innerHtml('skupno_stevilo',data.skupno_stevilo)
+        set_innerHtml('skupna_cena',data.skupna_cena + ' $' )
+        set_innerHtml('skupno_stevilo_racuna',data.skupno_stevilo)
+        set_innerHtml('skupna_cena_racuna',data.skupna_cena + ' $' )
+    }
+    function Vstavi_vrstico(id_tabele, index, data){
+        var table = document.getElementById(id_tabele)
+        var row = table.insertRow(index + 1)
+        row.id = data.pk
+        row.classList.add('vnos')
+        var cell = row.insertCell(0)
+        cell.innerHTML = data.dimenzija
+        var cell = row.insertCell(1)
+        cell.innerHTML = data.tip
+        var cell = row.insertCell(2)
+        var input = document.createElement('input')
+        input.classList.add('stevilo_value','skrit','sprememba')
+        input.type = "text"
+        cell.appendChild(input)
+        var div = document.createElement('div')
+        div.innerHTML = data.stevilo
+        div.classList.add('stevilo','sprememba')     
+        cell.appendChild(div)
+        var cell = row.insertCell(3)
+        var input = document.createElement('input')
+        input.classList.add('cena_value', 'sprememba', 'skrit')
+        input.type = "text"
+        cell.appendChild(input);
+        var div = document.createElement('div')
+        div.innerHTML =  ' $'
+        div.classList.add('inline','sprememba','skrit')          
+        cell.appendChild(div)
+        var div = document.createElement('div')
+        div.innerHTML = data.cena + ' $'
+        div.classList.add('cena','sprememba')      
+        cell.appendChild(div)
+        var cell = row.insertCell(4)
+        cell.innerHTML = data.cena_vnosa + ' $'
+        cell.classList.add('cena_vnosa')
+        var cell = row.insertCell(5)
+        var button = document.createElement('button')
+        button.onclick = function(){Edit_vnos(this)}
+        button.classList.add('spremeni', 'sprememba')
+        button.innerHTML = "E"
+        cell.appendChild(button);
+        cell.appendChild (document.createTextNode(" "));
+        var button = document.createElement('button');
+        button.innerHTML = "X"
+        button.onclick = function(){Izbrisi_vnos(this)}
+        button.classList.add('izbrisi', 'sprememba');
+        cell.appendChild(button);
+        var button = document.createElement('button')
+        button.classList.add('potrdi', 'skrit', 'sprememba')
+        button.onclick = function(){Spremeni_vnos(this)}
+        button.innerHTML = "Ok"
+        cell.appendChild(button);
+        cell.appendChild (document.createTextNode(" "));
+        var button = document.createElement('button')
+        button.classList.add('spremeni', 'skrit', 'sprememba')
+        button.onclick = function(){Edit_vnos(this)}
+        button.innerHTML = "X"
+        cell.appendChild(button);
+    }
 </script>
 {% endblock %}

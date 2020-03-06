@@ -5,6 +5,26 @@ function Confirm() {
         return true
     }
 }
+function Nastavi_vrstice(id_tabele, cell_class){
+    var table = document.getElementById(id_tabele);
+    if (table){
+        for(var i = 1; i < table.rows.length; i++) {
+            var cell = table.rows[i].cells[0]
+            if(cell.classList.contains(cell_class)){
+                table.rows[i].cells[0].innerHTML = (i).toString() + '.'
+            }
+        }
+    }
+}
+function Izbrisi_elemente(id_parent, class_child){
+    var parent = document.getElementById(id_parent);
+    if (parent){
+        var children = parent.getElementsByClassName(class_child)
+        for(var n = 0; n < children.length; n++){
+            children[n].parentNode.removeChild(children[n])
+        }
+    }
+}
 function toggle(className, displayState){
     var elements = document.getElementsByClassName(className)
     for (var i = 0; i < elements.length; i++){

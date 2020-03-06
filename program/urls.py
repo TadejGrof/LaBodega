@@ -1,6 +1,7 @@
 from django.urls import include,path
 from . import views, pregled_views
 from zaloga.my_views import pdf_views
+from zaloga.my_views import baza_views
 
 pregled_zalog_patterns = [
         path('',pregled_views.pregled_zalog, name="pregled_zalog"),

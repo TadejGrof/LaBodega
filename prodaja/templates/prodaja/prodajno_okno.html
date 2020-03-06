@@ -1,0 +1,91 @@
+
+{% load zaloga_exstras %}
+
+<div class="okno">
+        <div class="table">
+            <div style="height:72%">
+                <table id="tabela_vnosov" style="vertical-align:center;table-layout:fixed;margin-top:3%;width:100%" class="tabela_vnosov">
+                    <tr>
+                        <th width="25%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+                        <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                        <th width="10%"> N.: </th>
+                        <th width="15%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                        <th width="15%"> Total: </th>
+                        <th width="20%"> Edit: </th>
+                    </tr>
+                    {% for vnos in vnosi %}
+                        <tr class="vnos" data-pk="{{vnos.pk}}" id="{{vnos.pk}}">
+                            <td> {{vnos.dimenzija__dimenzija}} </td>
+                            <td> {{vnos.tip}} </td>
+                            <td>
+                                <div class="stevilo sprememba">
+                                    {{vnos.stevilo}} 
+                                </div>
+                                <input class="skrit stevilo_value sprememba" type="text" placeholder="({{vnos.stevilo}})" style="width:85%;text-align:center" autocomplete="off">
+                            </td>
+                            <td> 
+                                <div class="cena sprememba">
+                                    {{vnos.cena}} $
+                                </div>
+                                <input class="cena_value skrit sprememba" placeholder="({{vnos.cena}} $)" autocomplete="off" type="text">
+                                <div class="skrit sprememba inline"> $ </div>
+                            </td>
+                            <td class="cena_vnosa"> {{vnos|skupna_cena}} $ </td>
+                            <td> 
+                                <button class="sprememba spremeni">E</button>
+                                <button class="sprememba skrit potrdi"> Ok </button>
+                                <button class="sprememba skrit spremeni"> X </button>
+                                <button class="sprememba izbrisi"> X </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan = "2"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>         
+                        <td id="skupno_stevilo"> {{aktivni_racun.skupno_stevilo}} </td>
+                        <td> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </td>
+                        <td id="skupna_cena" colspan = "2"> {{aktivni_racun.skupna_cena}}$ </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="text-align:center;height:24%">
+                <form style="width:100%;height:100%" action="{% url 'uveljavi_racun' aktivni_racun.pk %}" method="POST" >
+                    {% csrf_token %}
+                    <input onclick="return Uveljavi(this)" style="width:30%;height:70%" type="submit" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
+                </form>
+            </div>
+        </div>
+        <div class="gumbi_div">
+            <div style="margin-top:6%" class="select">
+                {% include 'program/dinamic_select.html' %}
+            </div>
+            <div class="gumbi" id="gumbi">
+                {% for n in '00000000000000000000' %}
+                    <button class="dimenzija" id="gumb_{{forloop.counter}}" onclick="KlikGumba({{forloop.counter}})" ></button>
+                {% endfor %}
+            </div>
+            <div class="gumbi" id="koncno">
+                <label style="width:70%;height:15%;display:inline-block;font-size:4vh" id="dimenzija"> Dimenzija </label>
+                <input style="text-align:center;font-size:5vh;width:40%;height:30%;display:inline-block;margin:2%;margin-top:1%;margin-bottom:3%" id="stevilo" type="text" autocomplete="off" autofocus onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                <label id="zaloga_div" style="width:30%;height:30%;text-align:center;font-size:5vh;display:inline-block"> Zaloga </label>
+                <div style="width:30%;height:15%;text-align:center;display:inline-block"> Tip: </div> 
+                <select style="width:40%;height:15%;display:inline-block" id="tip" name="tip" form="nov_vnos" onchange="Pokazi_zalogo()">
+                    {% for tip in zaloga.vrni_tipe %}
+                        {% if tip.0 == "W" %}
+                            <option value="{{tip.0}}" selected> {{tip.1}} </option>
+                        {% else %}
+                            <option value="{{tip.0}}"> {{tip.1}} </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <button id="dodaj"> Nov vnos </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    $('#dodaj').click(function(){Nov_vnos()})
+    $('.spremeni').click(function(){Edit_vnos(this)})
+    $('.potrdi').click(function(){Spremeni_vnos(this)})
+    $('.izbrisi').click(function(){Izbrisi_vnos(this)})
+    
+</script>

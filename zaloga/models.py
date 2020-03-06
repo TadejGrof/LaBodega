@@ -524,21 +524,17 @@ class Baza(models.Model):
     def uveljavi_racun(self, cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)
-        for vnos in self.vrni_vnose:
+        for vnos in self.vnos_set.all():
             sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
-            sestavina.spremeni_stevilo(self.sprememba_zaloge * vnos.stevilo, vnos.tip)
             sprememba = Sprememba.objects.filter(baza__dnevna_prodaja = self.dnevna_prodaja, sestavina = sestavina, tip = vnos.tip ).first()
-            if sprememba:
-                sprememba.stevilo += vnos.stevilo
-                sprememba.save()
-            else:
+        if sprememba == None:
                 sprememba = Sprememba.objects.create(
                     sestavina = sestavina,
                     tip = vnos.tip,
                     stevilo = vnos.stevilo,
                     baza = self)
-            vnos.sprememba = sprememba
-            vnos.save()
+        vnos.sprememba = sprememba
+        vnos.save()
         self.save()
 
     def uveljavi(self,datum=None,cas = None):
@@ -562,17 +558,6 @@ class Baza(models.Model):
             vnos.sprememba = sprememba
             vnos.save()
 
-    def storniraj_racun(self):
-        self.status = "storno"
-        for vnos in self.vnos_set.all():
-            sprememba = vnos.sprememba
-            vnos.sprememba = None
-            vnos.save()
-            sestavina = sprememba.sestavina
-            tip = sprememba.tip
-            sprememba.stevilo_iz_vnosov()
-            sestavina.nastavi_iz_sprememb(tip)
-        self.save()
 
     def razlicni_tipi(self):
         tipi = []
@@ -836,11 +821,17 @@ def delete_vnos(sender,instance,**kwargs):
     baza = instance.baza
     if baza.status == "veljavno":
         sestavina = Sestavina.objects.get(zaloga=baza.zaloga,dimenzija = instance.dimenzija)
-        sprememba = sestavina.sprememba_set.all().filter(baza=baza, tip=instance.tip).first()
-        if sprememba.vnos_set.all().count() == 0:
-            sprememba.delete()
+        if baza.tip == "racun":
+            sprememba = sestavina.sprememba_set.all().filter(baza__dnevna_prodaja=baza.dnevna_prodaja, tip=instance.tip).first()
         else:
-            sprememba.nastavi_iz_vnosov()
+            sprememba = sestavina.sprememba_set.all().filter(baza=baza, tip=instance.tip).first()
+        try:
+            if sprememba.vnos_set.all().count() == 0:
+                sprememba.delete()
+            else:
+                sprememba.nastavi_iz_vnosov()
+        except:
+            pass
         print('brisem_vnos')
 
 @receiver(post_save, sender=Sprememba)

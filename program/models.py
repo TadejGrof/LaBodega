@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from zaloga.models import Dimenzija,Sestavina
 from prodaja.models import Stranka
+from datetime import datetime
 
 JEZIKI = (
     ('slo','Slovenscina'),

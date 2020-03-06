@@ -1,0 +1,192 @@
+{% load zaloga_exstras %}
+
+<style>
+    button.izbrisi_racun{
+        margin-top:2%;
+        width:25%;
+        height:9%;
+    }
+    div.racuni{
+        width:40%;
+        height:90%;
+        border:1px solid black;
+        vertical-align:top;
+        margin:1%;
+    }
+    div.racun{
+        width:55%;
+        height:90%;
+        border:1px solid black;
+        vertical-align:top;
+        margin:1%
+    }
+    button.naslednji, button.prejsnji{
+        width:13%;
+        height:7%;
+    }
+    i.arrow {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    }
+    .desno {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    }
+    .levo {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+    }
+</style>
+
+<div class="inline" style="width:94%;height:70%;margin-top:3%;text-align:center">
+    <div class="inline racuni">
+        <h2> {{slovar|keyvalue:'Racuni'|keyvalue:jezik}} </h2>
+        <div class="tabela">
+            <table id="tabela_racunov" class="tabela_vnosov">
+                <tr>
+                    <th width="20%"> N.</th>
+                    <th width="22%"> {{slovar|keyvalue:'Status'|keyvalue:jezik}} </th>
+                    <th width="22%"> {{slovar|keyvalue:'Cas'|keyvalue:jezik}} </th>
+                    <th width="22%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}} </th>
+                    <th width="16%"> E </th>
+                </tr>
+                {% for racun in prodaja.racuni %}
+                <tr id="{{racun.pk}}" class="racun">
+                    <td> {{racun.title}} </td>
+                    <td> {{racun.status}} </td>
+                    <td> {{racun.cas}} </td>
+                    <td> {{racun.koncna_cena}} $ </td>
+                    <td>  <button class="poglej_racun"> Edit </button></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="tabela">
+            <table class="tabela_vnosov">
+                <tr>
+                    <td> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </td>
+                    <td id="skupno_stevilo_prodaje"> {{prodaja.skupno_stevilo}}</td>
+                    <td> {{slovar|keyvalue:'Cena'|keyvalue:jezik}} </td>
+                    <td id="skupna_cena_prodaje"> {{prodaja.skupna_cena}} $</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="racun inline">
+        <input type="hidden" id="pk_racuna" value="">
+        <button class="prejsnji"> <i class="arrow levo"></i> </button>
+        <h2 class="inline "> Racun: </h2>
+        <h2 id="title" class="inline"> None </h2> 
+        <button class="naslednji"> <i class="arrow desno"></i> </button>
+        <div>
+            <h3 class="inline" style="margin:left:3%;width:15%"> Cas: </h3>
+            <h3  id="cas" class="inline cas" style="width:30%"> </h3>
+            <h3  class="inline" style="width:15%">Prodajalec: </h3>
+            <h3 id="prodajalec" class="inline prodajalec" style="margin-right:3%;width:30%"> </h3>
+        </div>
+        <div class="tabela" style="height:32%">
+            <table id="tabela_racuna" class="tabela_vnosov" >
+                <tr>
+                    <th width="22%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+                    <th width="12%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+                    <th width="15%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+                    <th width="18%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                    <th width="18%"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </th>
+                    <th width="14%"> Edit: </th>
+                </tr>
+            </table>
+        </div>
+        <div class="tabela" style="height:10%">
+            <table id="skupno_racuna" class="tabela_vnosov" >
+                <tr>
+                    <th width="40%" colspan="2"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </th>
+                    <th width="17%" id="skupno_stevilo_racuna"> </th>
+                    <th width="22%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                    <th width="22%" id="skupna_cena_racuna"> </th>
+                </tr>
+            </table>
+        </div>
+        <button class="izbrisi_racun"> {{slovar|keyvalue:'Izbrisi'|keyvalue:jezik}}: </button>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        var racuni = document.getElementById('tabela_racunov').getElementsByClassName('racun')
+        if (racuni.length > 0){
+            var pk = racuni[0].id
+            Pokazi_racun(pk)
+        } 
+    });
+    $('.izbrisi_racun').click(function(){
+        var pk = get_value('pk_racuna')
+        if ( pk != "" && Confirm()){
+            IzbrisiRacun(pk,function(data){
+                var pk = get_value('pk_racuna')
+                var racun = document.getElementById(pk)
+                racun.parentNode.removeChild(racun);
+                set_innerHtml('skupno_stevilo_prodaje',data.skupno_stevilo)
+                set_innerHtml('skupna_cena_prodaje',data.skupna_cena + ' $')
+                var racuni = document.getElementById('tabela_racunov').getElementsByClassName('racun')
+                if (racuni.length > 0){
+                    var racuni = document.getElementById('tabela_racunov').getElementsByClassName('racun')
+                    var pk = racuni[0].id
+                    Pokazi_racun(pk)
+                } else{
+                    Ponastavi_okno()
+                }
+            })
+        }
+    })
+    $('.poglej_racun').click(function(){
+        var vrstica = this.parentElement.parentElement
+        var pk = vrstica.id
+        Pokazi_racun(pk)
+    })
+    $('.naslednji').click(function(){
+        var racuni = document.getElementById('tabela_racunov').getElementsByClassName('racun')
+        var pk = document.getElementById('pk_racuna').value
+        var racun = document.getElementById(pk)
+        if (racun.rowIndex < racuni.length){
+            var naslednji = racun.parentNode.rows[racun.rowIndex + 1]
+            Pokazi_racun(naslednji.id)
+        }
+    })
+     $('.prejsnji').click(function(){
+        var racuni = document.getElementById('tabela_racunov').getElementsByClassName('racun')
+        var pk = document.getElementById('pk_racuna').value
+        var racun = document.getElementById(pk)
+        if (racun.rowIndex > 1){ 
+            var naslednji = racun.parentNode.rows[racun.rowIndex + -1]
+            Pokazi_racun(naslednji.id)
+        }
+    })
+    function Ponastavi_okno(){
+        set_value('pk_racuna', '')
+        set_innerHtml('title', 'None')
+        set_innerHtml('cas', '')
+        set_innerHtml('prodajalec','')
+        set_innerHtml('skupno_stevilo_racuna','')
+        set_innerHtml('skupna_cena_racuna','')
+        Izbrisi_elemente('tabela_racuna', 'vnos')
+    }
+    function Pokazi_racun(pk){
+        VrniBazo(pk, function(data){
+            var racun = document.getElementById('title')
+            set_value('pk_racuna', data.pk_baze)
+            set_innerHtml('title', data.title)
+            set_innerHtml('cas',data.cas)
+            set_innerHtml('prodajalec',data.prodajalec)
+            set_innerHtml('skupno_stevilo_racuna',data.skupno_stevilo)
+            set_innerHtml('skupna_cena_racuna',data.skupna_cena + ' $')
+            Izbrisi_elemente('tabela_racuna', 'vnos')
+            for(var i=0;i<data.vnosi.length;i++){
+                Vstavi_vrstico('tabela_racuna', i , data.vnosi[i])
+                Izbrisi_elemente('tabela_racuna','izbrisi')
+            }
+        })
+    }
+</script>

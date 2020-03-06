@@ -54,7 +54,10 @@ ajax_patterns = [
     path('spremeni_popust/', baza_views.spremeni_popust, name='spremeni_popust'),
     path('spremeni_prevoz/', baza_views.spremeni_prevoz, name='spremeni_prevoz'),
     path('vrni_zalogo/', baza_views.vrni_zalogo, name='vrni_zalogo'),
-    path('spremeni_ceno/', baza_views.spremeni_ceno,name='spremeni_ceno'),
+    path('spremeni_ceno/', baza_views.spremeni_ceno, name='spremeni_ceno'),
+    path('vrni_bazo/', baza_views.vrni_bazo,name="vrni_bazo"),
+    path('vrni_dimenzijo/', baza_views.vrni_dimenzijo, name="vrni_dimenzijo"),
+    path('izbrisi_racun/', baza_views.izbrisi_racun, name="izbrisi_racun")
 ]
 
 urlpatterns = [
@@ -68,4 +71,5 @@ urlpatterns = [
     path('<int:zaloga>/skupen_pregled_narocil/', include(skupen_pregled_patterns)),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
+    
 ]

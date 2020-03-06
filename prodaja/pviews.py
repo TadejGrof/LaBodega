@@ -28,7 +28,7 @@ def dnevna_prodaja(request):
     na_voljo = zaloga.na_voljo
     if danasnja_prodaja != None:
         aktivni_racun = danasnja_prodaja.aktivni_racun
-    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
+    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':True,'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
 
 def nova_dnevna_prodaja(request):
     if request.method == "POST":
@@ -48,38 +48,11 @@ def nov_racun(request):
         program = Program.objects.first()
         prodaja = Dnevna_prodaja.objects.filter(datum = datetime.date.today()).first()
         Baza.objects.create(
+            author=request.user,
             title= program.naslednji_racun(delaj=True),
             tip='racun',
             dnevna_prodaja = prodaja,
             popust = 0,)
-    return redirect('dnevna_prodaja')
-
-def racun_nov_vnos(request, pk):
-    if request.method == "POST":
-        racun = Baza.objects.get(pk = pk)
-        dimenzija = vrni_dimenzijo(request)
-        stevilo = request.POST.get('stevilo')
-        tip = request.POST.get('tip')
-        cena = Sestavina.objects.get(dimenzija = dimenzija).cena('dnevna_prodaja', tip)
-        vnos = Vnos.objects.create(dimenzija = dimenzija, cena = cena, stevilo = stevilo, tip = tip, baza = racun)
-    return redirect('dnevna_prodaja')
-
-def racun_sprememba_vnosa(request):
-    if request.method == "POST":
-        vnos = Vnos.objects.get(pk = request.POST.get('pk'))
-        stevilo = request.POST.get('stevilo')
-        if stevilo != "":
-            vnos.stevilo = stevilo
-        cena = request.POST.get('cena')
-        if cena != "":
-            vnos.cena = float(cena)
-        vnos.tip = request.POST.get('tip')
-        vnos.save()
-    return redirect('dnevna_prodaja')
-
-def racun_izbris_vnosa(request):
-    if request.method == "POST":
-        Vnos.objects.get(pk = request.POST.get('pk')).delete()
     return redirect('dnevna_prodaja')
 
 def uveljavi_racun(request,pk):
@@ -91,20 +64,14 @@ def uveljavi_racun(request,pk):
             title = program.naslednji_racun(delaj=True),
             tip = 'racun',
             dnevna_prodaja = racun.dnevna_prodaja,
-            popust = 0,)
+            popust = 0)
     return redirect('dnevna_prodaja')
 
 ###########################################################################################
 
 def ogled_dnevne_prodaje(request, pk):
     prodaja = Dnevna_prodaja.objects.get(pk = pk)
-    if prodaja.stevilo_veljavnih_racunov() > 0:
-        racun_pk = request.GET.get('racun_pk', prodaja.baza_set.filter(tip='racun', status='veljavno').last().pk)
-        racun = Baza.objects.get(pk = racun_pk)
-    else:
-        racun = None
-    racuni = prodaja.baza_set.all().filter(tip='racun', status__in = ['veljavno','storno']).order_by('-pk').prefetch_related('vnos_set')
-    return pokazi_stran(request,'prodaja/ogled_dnevne_prodaje.html',{'prodaja':prodaja, 'racuni': racuni, 'racun': racun})
+    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':False,'prodaja': prodaja})
 
 def storniraj_racun(request,pk,pk_r):
     racun = Baza.objects.get(pk = pk_r)

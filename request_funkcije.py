@@ -4,14 +4,20 @@ import json
 from django.shortcuts import render
 
 def vrni_dimenzijo(request):
-    if request.POST.get('dimenzija'):
+    if request.method == "GET":
+        dimenzija = request.GET.get('dimenzija')
+        radius = request.GET.get('radius')
+        height = request.GET.get('height')
+        width = request.GET.get('width')
+    elif request.method == "POST":
         dimenzija = request.POST.get('dimenzija')
-        dimenzija = dimenzija.replace('-','/')
-        return Dimenzija.objects.get(dimenzija = dimenzija)
-    else:
         radius = request.POST.get('radius')
         height = request.POST.get('height')
         width = request.POST.get('width')
+    if dimenzija != None:
+        dimenzija = dimenzija.replace('-','/')
+        return Dimenzija.objects.get(dimenzija = dimenzija)
+    else:
         special = False
         if 'C' in width:
             width = width.replace('C','')

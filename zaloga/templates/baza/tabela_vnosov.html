@@ -122,15 +122,6 @@
             var tip = get_selected('tip')
             Nov_vnos(dimenzija,tip,stevilo)
         }
-        function Nastavi_vrstice(){
-            var table = document.getElementById("tabela_vnosov");
-            for(var i = 1; i < table.rows.length; i++) {
-            var cell = table.rows[i].cells[0]
-            if(cell.classList.contains('index')){
-                table.rows[i].cells[0].innerHTML = (i).toString() + '.'
-            }
-            }
-        }
         function Vstavi_vrstico(data){
             var table = document.getElementById('tabela_vnosov')
             var row = table.insertRow(data.index + 1)
@@ -207,6 +198,6 @@
             cell.appendChild(button);
         }
     $(document).ready(function() {
-        Nastavi_vrstice()
+        Nastavi_vrstice('tabela_vnosov','index')
     });
 </script>

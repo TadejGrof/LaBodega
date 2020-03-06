@@ -5,7 +5,8 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 import json 
 from .. import funkcije
-from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
+from request_funkcije import pokazi_stran, vrni_slovar
+from request_funkcije import vrni_dimenzijo as dimenzija_iz_requesta
 from django.urls import reverse
 from django.http import JsonResponse
 
@@ -30,13 +31,16 @@ def spremeni_vnos(request):
 
 def nov_vnos(request):
     if request.method == "POST":
-        dimenzija = vrni_dimenzijo(request)
+        dimenzija = dimenzija_iz_requesta(request)
         stevilo = int(request.POST.get('stevilo'))
         tip = request.POST.get('tip')
         pk = int(request.POST.get('pk'))
         baza = Baza.objects.get(pk = pk)
         zaloga = baza.zaloga
         cena = None
+        print(dimenzija)
+        print(zaloga)
+        print(tip)
         if baza.tip == "vele_prodaja":
             cena = Sestavina.objects.get(zaloga=zaloga,dimenzija__dimenzija=dimenzija).cena('vele_prodaja',tip)
         elif baza.tip == "racun":
@@ -101,18 +105,6 @@ def spremeni_prevoz(request):
         data = podatki_baze(baza)
     return JsonResponse(data) 
 
-def vrni_zalogo(request):
-    data = {}
-    try:
-        dimenzija = request.GET.get('dimenzija')
-        tip = request.GET.get('tip')
-        zaloga = int(request.GET.get('zaloga'))
-        stevilo = getattr(Sestavina.objects.all().get(zaloga=zaloga,dimenzija__dimenzija=dimenzija),tip)
-        data['zaloga'] = stevilo
-    except:
-        data['zaloga'] = 0
-    return JsonResponse(data)
-
 def spremeni_ceno(request):
     data = {}
     if request.method == "POST":
@@ -126,7 +118,58 @@ def spremeni_ceno(request):
         except:
             data['cena'] = 0
     return JsonResponse(data)
-        
+
+
+def izbrisi_racun(request):
+    data = {}
+    if request.method == "POST":
+        pk = int(request.POST.get('pk'))
+        racun = Baza.objects.get(pk = pk)
+        prodaja = racun.dnevna_prodaja
+        print(prodaja)
+        racun.delete()
+        print('po')
+        data['skupno_stevilo'] = prodaja.skupno_stevilo
+        print('po')
+        data['skupna_cena'] = prodaja.skupna_cena
+        print('po')
+    return JsonResponse(data) 
+#############################################################################
+#############################################################################
+def vrni_bazo(request):
+    data = {}
+    try:
+        baza = Baza.objects.get(pk = int(request.GET.get('pk')))
+        data.update(podatki_baze(baza))
+        data['vnosi'] = [podatki_vnosa(vnos) for vnos in baza.vnos_set.all()]
+    except:
+        pass
+    return JsonResponse(data)
+
+
+def vrni_dimenzijo(request):
+    data = {}
+    try:
+        dimenzija = dimenzija_iz_requesta(request).dimenzija  
+    except:
+        dimenzija = Dimenzija.objects.first().dimenzija
+    data['dimenzija'] = dimenzija
+    return JsonResponse(data)
+    
+def vrni_zalogo(request):
+    data = {}
+    try:
+        dimenzija = request.GET.get('dimenzija')
+        tip = request.GET.get('tip')
+        zaloga = int(request.GET.get('zaloga'))
+        stevilo = getattr(Sestavina.objects.all().get(zaloga=zaloga,dimenzija__dimenzija=dimenzija),tip)
+        data['zaloga'] = stevilo
+    except:
+        data['zaloga'] = 0
+    return JsonResponse(data)
+
+##############################################################################
+##############################################################################
 def podatki_vnosa(vnos):
     data = {}
     data['pk'] = str(vnos.pk)
@@ -141,6 +184,10 @@ def podatki_vnosa(vnos):
 
 def podatki_baze(baza):
     data = {}
+    data['pk_baze'] = baza.pk
+    data['title'] = baza.title
+    data['cas'] = baza.cas
+    data['prodajalec'] = str(baza.author.username)
     data['popust'] = str(baza.popust)
     data['cena_popusta'] = str(baza.cena_popusta)
     data['cena_prevoza'] = str(baza.cena_prevoza)

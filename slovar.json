@@ -559,6 +559,11 @@
             "ang": "Lastname",
             "spa": "Apellido"
         },
+        "Status": {
+            "slo": "Status",
+            "ang": "Status",
+            "spa": "Status"
+        },
         "Porocilo prometa": {
             "slo": "Porocilo prometa",
             "ang": "Account's report",
@@ -573,6 +578,11 @@
             "slo": "Strosek",
             "ang": "Expense",
             "spa": "Cuenta por pagar"
+        },
+        "Osvezi": {
+            "slo": "Osvezi",
+            "ang": "Refresh",
+            "spa": "Refresh"
         },
         "Koncno stanje": {
             "slo": "Koncno stanje",

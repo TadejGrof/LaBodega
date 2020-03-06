@@ -108,7 +108,9 @@
                 </tr>
             </table>
         </div>
-        <button class="izbrisi_racun"> {{slovar|keyvalue:'Izbrisi'|keyvalue:jezik}}: </button>
+        {% if perms.zaloga.delete_baza %}
+            <button class="izbrisi_racun"> {{slovar|keyvalue:'Izbrisi'|keyvalue:jezik}}: </button>
+        {% endif %}
     </div>
 </div>
 

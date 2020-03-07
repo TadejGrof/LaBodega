@@ -106,7 +106,25 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
     vnosi = baza.vnos_set.all().order_by("dimenzija")
     if tip != "all":
         vnosi = vnosi.filter(tip=tip)
+    brezplacne = []
     for vnos in vnosi:
+        if vnos.cena == 0:
+            brezplacne.append(vnos)
+        else:
+            data = [[
+                vnos.dimenzija,
+                vnos.tip, 
+                vnos.stevilo, 
+                str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/", 
+                str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]] 
+            style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                            ])
+            tabela(p,data,style)
+            top = naslednja_vrstica(p,top)
+    print(brezplacne)
+    for vnos in brezplacne:
         data = [[
             vnos.dimenzija,
             vnos.tip, 
@@ -312,3 +330,4 @@ def podpis(p,top, jezik = "spa"):
     top = naslednja_vrstica(p,top,visina=60, spodnja = 40)
     p.drawString(300,0, slovar['Podpis'][jezik] + ':  ____________________')
     return top  
+

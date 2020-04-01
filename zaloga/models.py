@@ -500,6 +500,20 @@ class Baza(models.Model):
     #    print(self.prevoz)
     #    super(Baza, self).save(*args, **kwargs)
 
+    def skupnoStevilo(self,tip):
+        skupno = 0
+        for vnos in self.vnosi_values:
+            if vnos["tip"] == tip:
+                skupno += vnos["stevilo"]
+        return skupno
+
+    def skupnaCena(self,tip):
+        skupno = 0
+        for vnos in self.vnosi_values:
+            if vnos["tip"] == tip:
+                skupno += vnos["cena"] * vnos["stevilo"]
+        return skupno
+
     def uveljavi_inventuro(self, datum = None, cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)

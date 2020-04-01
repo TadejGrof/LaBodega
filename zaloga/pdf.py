@@ -124,9 +124,9 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
             tabela(p,data,style)
             top = naslednja_vrstica(p,top)
     if baza.tip == "vele_prodaja":
-        top = zadnja_vrstica_vele_prodaje(p,baza,top,brezplacne)
+        top = zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne)
     else:
-        top = zadnja_vrstica_baze(p,baza,top)
+        top = zadnja_vrstica_baze(p,baza,tip,top)
     podpis(p,top)
 
 def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):
@@ -181,9 +181,12 @@ def zadnja_vrstica_dnevne_prodaje(p,prodaja,top, jezik = "spa"):
     tabela(p,data,style)
     return naslednja_vrstica(p,top)
 
-def zadnja_vrstica_baze(p,baza,top, jezik = "spa"):
-    skupno = baza.skupno_stevilo
-    data=  [[slovar['Skupno stevilo'][jezik] + ':', baza.skupno_stevilo, '/']] 
+def zadnja_vrstica_baze(p,baza,tip,top, jezik = "spa"):
+    if tip == "all":
+        skupno = baza.skupno_stevilo
+    else:
+        skupno = baza.skupnoStevilo(tip)
+    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno, '/']] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
@@ -191,7 +194,7 @@ def zadnja_vrstica_baze(p,baza,top, jezik = "spa"):
     tabela(p,data,style,colWidths=[168,84,168])
     return naslednja_vrstica(p,top)
 
-def zadnja_vrstica_vele_prodaje(p,baza,top,brezplacne, jezik = "spa"):
+def zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne, jezik = "spa"):
     data=  [[slovar['Popust'][jezik] + ':', str(baza.popust) + " %", slovar['Cena popusta'][jezik] + ':', str(baza.cena_popusta) + '$']] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
@@ -212,14 +215,15 @@ def zadnja_vrstica_vele_prodaje(p,baza,top,brezplacne, jezik = "spa"):
                         ])
         tabela(p,data,style)
         top = naslednja_vrstica(p,top)
-    skupno = baza.skupno_stevilo
+    if tip == "all":
+        skupno = baza.skupno_stevilo
+    else:
+        skupno = baza.skupnoStevilo(tip)
     data=  [[slovar['Skupno stevilo'][jezik] + ':', baza.skupno_stevilo, slovar['Cena'][jezik] + ':',str(baza.skupna_cena) + "$"]] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
                         ])
-    tabela(p,data,style,colWidths=[168,84,84,84])
-    top = naslednja_vrstica(p,top)
     data=  [[slovar['Prevoz'][jezik] + ':', str(baza.prevoz) + " $", slovar['Cena prevoza'][jezik] + ':', str(baza.cena_prevoza) + '$']] 
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),

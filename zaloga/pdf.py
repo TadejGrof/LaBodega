@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.pdfgen import canvas
 import datetime
-import json 
+import json
 from zaloga.models import Zaloga
 
 zaloga = Zaloga.objects.all().first()
@@ -36,12 +36,12 @@ def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, lev
     return top
 
 def tabela_zaloge(p, sestavine, tipi, top=800, jezik = "spa"):
-    kratki_tipi = [tip[0] for tip in tipi]  
+    kratki_tipi = [tip[0] for tip in tipi]
     dolgi_tipi = [tip[1] for tip in tipi]
-    data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi] 
+    data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style)
     top -= 3*VISINA_VRSTICE
@@ -53,19 +53,19 @@ def tabela_zaloge(p, sestavine, tipi, top=800, jezik = "spa"):
         data= [[sestavina['dimenzija__dimenzija']] + zaloga]
         style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
         tabela(p,data,style)
-        top = naslednja_vrstica(p, top) 
+        top = naslednja_vrstica(p, top)
     top = zaloga_skupno(p,sestavine,kratki_tipi,top)
 
 def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
-    kratki_tipi = [tip[0] for tip in tipi]  
+    kratki_tipi = [tip[0] for tip in tipi]
     dolgi_tipi = [tip[1] for tip in tipi]
-    data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi] 
+    data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style)
     top -= 3*VISINA_VRSTICE
@@ -75,7 +75,7 @@ def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
         nicelne = True
         for cena in sestavina.cena_set.all().filter(prodaja = tip_prodaje, tip__in = kratki_tipi):
             if cena.cena > 0:
-                cene.append(str(cena.cena) + "$") 
+                cene.append(str(cena.cena) + "$")
                 nicelne = False
             else:
                 cene.append('/')
@@ -83,7 +83,7 @@ def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
             data= [[sestavina.dimenzija.dimenzija] + cene]
             style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                                 ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                                ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                                ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                                 ])
             tabela(p,data,style)
             top = naslednja_vrstica(p, top)
@@ -96,10 +96,10 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
         top = title_vele_prodaje(p,baza)
     else:
         top = title_baze(p,baza)
-    data=  [[slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik], slovar['Cena'][jezik], slovar['Skupna cena'][jezik]]] 
+    data=  [[slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik], slovar['Cena'][jezik], slovar['Skupna cena'][jezik]]]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style)
     top = naslednja_vrstica(p,top)
@@ -113,13 +113,13 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
         else:
             data = [[
                 vnos.dimenzija,
-                vnos.tip, 
-                vnos.stevilo, 
-                str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/", 
-                str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]] 
+                vnos.tip,
+                vnos.stevilo,
+                str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/",
+                str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]]
             style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
             tabela(p,data,style)
             top = naslednja_vrstica(p,top)
@@ -131,12 +131,12 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
 
 def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):
     if tip_tabele == "activity_log":
-        data = [[slovar['Cas'][jezik], slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik], slovar['Cena'][jezik]]] 
+        data = [[slovar['Cas'][jezik], slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik], slovar['Cena'][jezik]]]
     elif tip_tabele == "prodane":
-        data = [[slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik], slovar['Cena'][jezik]]] 
+        data = [[slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik], slovar['Cena'][jezik]]]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
         ])
     tabela(p,data,style)
     top = naslednja_vrstica(p,top)
@@ -145,26 +145,26 @@ def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):
             data = [[
                 str(prodana['cas'])[:5],
                 prodana['dimenzija'],
-                prodana['tip'], 
-                prodana['stevilo'], 
+                prodana['tip'],
+                prodana['stevilo'],
                 str(prodana['cena']) + ' $' ]]
             style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                     ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                    ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                    ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                     ])
             tabela(p,data,style)
-            top = naslednja_vrstica(p,top)    
+            top = naslednja_vrstica(p,top)
     elif tip_tabele == "prodane":
         prodane = prodaja.prodane
         for prodana in prodane:
             data = [[
                 prodane[prodana]['dimenzija'],
                 prodane[prodana]['tip'],
-                prodane[prodana]['stevilo'], 
-                str(prodane[prodana]['cena']) + ' $']] 
+                prodane[prodana]['stevilo'],
+                str(prodane[prodana]['cena']) + ' $']]
             style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                     ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                    ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                    ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                     ])
             tabela(p,data,style)
             top = naslednja_vrstica(p,top)
@@ -173,10 +173,10 @@ def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):
 def zadnja_vrstica_dnevne_prodaje(p,prodaja,top, jezik = "spa"):
     skupno = prodaja.skupno_stevilo
     cena = str(prodaja.skupna_cena) + ' $'
-    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno, slovar['Skupna cena'][jezik] + ':', cena]] 
+    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno, slovar['Skupna cena'][jezik] + ':', cena]]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style)
     return naslednja_vrstica(p,top)
@@ -186,55 +186,57 @@ def zadnja_vrstica_baze(p,baza,tip,top, jezik = "spa"):
         skupno = baza.skupno_stevilo
     else:
         skupno = baza.skupnoStevilo(tip)
-    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno, '/']] 
+    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno, '/']]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style,colWidths=[168,84,168])
     return naslednja_vrstica(p,top)
 
 def zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne, jezik = "spa"):
-    data=  [[slovar['Popust'][jezik] + ':', str(baza.popust) + " %", slovar['Cena popusta'][jezik] + ':', str(baza.cena_popusta) + '$']] 
+    if tip == "all":
+        skupno = baza.skupno_stevilo
+    else:
+        skupno = baza.skupnoStevilo(tip)
+    data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno , slovar['Cena'][jezik] + ':',str(baza.skupna_cena) + "$"]]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+    tabela(p,data,style,colWidths=[84,84,168,84])
+    top = naslednja_vrstica(p,top)
+    data=  [[slovar['Popust'][jezik] + ':', str(baza.popust) + " %", slovar['Cena popusta'][jezik] + ':', str(baza.cena_popusta) + '$']]
+    style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style,colWidths=[84,84,168,84])
     top = naslednja_vrstica(p,top)
     for vnos in brezplacne:
         data = [[
             vnos.dimenzija,
-            vnos.tip, 
-            vnos.stevilo, 
-            str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/", 
-            str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]] 
+            vnos.tip,
+            vnos.stevilo,
+            str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/",
+            str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]]
         style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
         tabela(p,data,style)
         top = naslednja_vrstica(p,top)
-    if tip == "all":
-        skupno = baza.skupno_stevilo
-    else:
-        skupno = baza.skupnoStevilo(tip)
-    data=  [[slovar['Skupno stevilo'][jezik] + ':', baza.skupno_stevilo, slovar['Cena'][jezik] + ':',str(baza.skupna_cena) + "$"]] 
+    data=  [[slovar['Prevoz'][jezik] + ':', str(baza.prevoz) + " $", slovar['Cena prevoza'][jezik] + ':', str(baza.cena_prevoza) + '$']]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
-                        ])
-    data=  [[slovar['Prevoz'][jezik] + ':', str(baza.prevoz) + " $", slovar['Cena prevoza'][jezik] + ':', str(baza.cena_prevoza) + '$']] 
-    style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
-                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style,colWidths=[84,84,168,84])
     top = naslednja_vrstica(p,top)
-    data=  [[slovar['Koncna cena'][jezik] + ':', str(baza.koncna_cena) + "$"]] 
+    data=  [[slovar['Koncna cena'][jezik] + ':', str(baza.koncna_cena) + "$"]]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style,colWidths=[336,84])
     return naslednja_vrstica(p,top)
@@ -252,17 +254,17 @@ def zaloga_skupno(p,sestavine,tipi,top,jezik="spa"):
     for n in range(len(cena)):
         cena[n] = str(cena[n]) + '$'
 
-    data=  [[slovar['Skupno stevilo'][jezik] + ':'] + stevilo] 
+    data=  [[slovar['Skupno stevilo'][jezik] + ':'] + stevilo]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style)
     top = naslednja_vrstica(p,top)
-    data=  [[slovar['Vrednost'][jezik] + ':'] + cena] 
+    data=  [[slovar['Vrednost'][jezik] + ':'] + cena]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),      
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,data,style)
     return naslednja_vrstica(p,top)
@@ -332,5 +334,5 @@ def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
 def podpis(p,top, jezik = "spa"):
     top = naslednja_vrstica(p,top,visina=60, spodnja = 40)
     p.drawString(300,0, slovar['Podpis'][jezik] + ':  ____________________')
-    return top  
+    return top
 

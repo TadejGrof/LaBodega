@@ -9,6 +9,8 @@ from zaloga.models import Zaloga
 
 zaloga = Zaloga.objects.all().first()
 
+centerStyle  = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER')])
+
 with open('slovar.json') as dat:
         slovar = json.load(dat)
 
@@ -313,19 +315,23 @@ def title_prevzema(p,baza,top = 800, jezik = "spa"):
 
 def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
     p.translate(-15,0)
-    data = [[slovar['Podatki baze'][jezik] + ':',slovar['Podatki stranke'][jezik] + ':', slovar['Podatki prodajalca'][jezik] + ':']]
-    style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER')])
-    tabela(p,data,style,[130,160,160])
+    data = [[slovar['Tip'][jezik] + ':', slovar[baza.tip][jezik],
+            slovar['Title'][jezik] + ':', baza.title,
+            slovar['Datum'][jezik] + ':', baza.datum]]
+    tabela(p,data,centerStyle,[40,140,50,80,50,80])
+    top = naslednja_vrstica(p,top,visina=30)
+    data = [[slovar['Podatki stranke'][jezik] + ':', slovar['Podatki prodajalca'][jezik] + ':']]
+    tabela(p,data,centerStyle,[250,250])
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
-        [slovar['Tip'][jezik] + ':', slovar[baza.tip][jezik] , slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
-        [slovar['Title'][jezik] + ':', baza.title,slovar['Naslov'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Telefon'][jezik] + ':',baza.stranka.telefon],
-        [slovar['Datum'][jezik] + ':', baza.datum,slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail]
+        [slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
+        [slovar['Naslov'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Telefon'][jezik] + ':',baza.stranka.telefon],
+        [slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail]
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'LEFT')])
-    tabela(p,data,style,[55,85,65,95,65,95])
+    tabela(p,data,style,[55,220,65,150])
     p.translate(+15,+10)
     for _ in range(3):
         top =  naslednja_vrstica(p,top)

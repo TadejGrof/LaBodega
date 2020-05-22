@@ -422,7 +422,7 @@
         "Davcna": {
             "slo": "Davcna",
             "ang": "Tax number",
-            "spa": "Tax number"
+            "spa": "RUC"
         },
         "Obstojece stranke": {
             "slo": "Obstojece stranke",
@@ -728,5 +728,5 @@
             "slo": "Cena popusta",
             "ang": "Discount price",
             "spa": "Precio de discuento"
-        }  
+        }
     }

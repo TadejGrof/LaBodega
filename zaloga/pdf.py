@@ -324,11 +324,13 @@ def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
     tabela(p,data,centerStyle,[250,250])
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top)
+    top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
         [slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
         [slovar['Naslov'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Telefon'][jezik] + ':',baza.stranka.telefon],
-        [slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail]
+        [slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail],
+        [slovar['Davcna'][jezik] + ': ' , baza.stranka.davcna, '',''],
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'LEFT')])
     tabela(p,data,style,[55,220,65,150])

@@ -9,6 +9,16 @@
             "ang": "Container info",
             "spa": "Contenedor info"
         },
+        "Banka": {
+            "slo": "Banka",
+            "ang": "Bank",
+            "spa": "Banco"
+        },
+        "Stevilka racuna": {
+            "slo": "Racun",
+            "ang": "Account",
+            "spa": "Cuenta"
+        },
         "Izbris": {
             "slo": "Izbris",
             "ang": "Delete",

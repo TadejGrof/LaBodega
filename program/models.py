@@ -110,6 +110,13 @@ class Profil(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     jezik =  models.CharField(default="spa",max_length=3, choices=JEZIKI)
     stranka = models.OneToOneField(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    celo_ime = models.CharField(default="",max_length=40)
+    tip_banke = models.CharField(default="",max_length=40)
+    stevilka_racuna = models.CharField(default="",max_length=40)
+    telefon = models.CharField(default="",max_length=40)
+    
+    def __str__(self):
+        return self.user.username
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

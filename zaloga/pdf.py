@@ -325,12 +325,14 @@ def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top)
+    top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
-        [slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.username],
-        [slovar['Naslov'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Telefon'][jezik] + ':',baza.stranka.telefon],
-        [slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:',baza.stranka.mail],
-        [slovar['Davcna'][jezik] + ': ' , baza.stranka.davcna, '',''],
+        [slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.profil.celo_ime],
+        [slovar['Davcna'][jezik] + ': ' , baza.stranka.davcna, slovar['Telefon'][jezik] + ':',baza.author.profil.telefon],
+        [slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:', baza.author.email],
+        [slovar['Naslov'][jezik] + ':', baza.stranka.naslov.mesto, slovar['Banka'][jezik] + ':', baza.author.profil.tip_banke],
+        [slovar['Ulica'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Stevilka racuna'][jezik] + ':', baza.author.profil.stevilka_racuna]
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'LEFT')])
     tabela(p,data,style,[55,220,65,150])

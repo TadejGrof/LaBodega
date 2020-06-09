@@ -117,6 +117,7 @@ def spremembna_stranke(request, pk):
         stranka.naslov.drzava = request.POST.get('drzava')
         stranka.naslov.mesto = request.POST.get('mesto')
         stranka.naslov.naslov = request.POST.get('naslov')
+        stranka.naslov.save()
         stranka.save()
     return redirect('ogled_stranke', pk = pk)
 

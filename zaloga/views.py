@@ -12,7 +12,7 @@ from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
 from django.urls import reverse
 
-zaloga = Zaloga.objects.first()
+#zaloga = Zaloga.objects.first()
 
 ##################################################################################################
 
@@ -83,9 +83,8 @@ def pregled_prometa(request,tip,pk):
         pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
         zacetek_sprememb = request.GET.get('zacetek_sprememb', pred_mescem)
         konec_sprememb = request.GET.get('konec_sprememb', danes)
-        #spremembe = sestavina.sprememba_set.filter(baza__datum__gte = zacetek_sprememb, baza__datum__lte=konec_sprememb, tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
-        spremembe = sestavina.sprememba_set.filter(tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
-        zaporedna_stanja = sestavina.vrni_stanja(tip)[::-1]
+        spremembe = sestavina.sprememba_set.filter(baza__datum__gt = zacetek_sprememb, baza__datum__lte=konec_sprememb, tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
+        zaporedna_stanja = sestavina.vrni_stanja(tip,zacetek_sprememb,konec_sprememb)[::-1]
         zacetek_dp = request.GET.get('zacetek_dp', pred_mescem)
         konec_dp = request.GET.get('konec_dp', danes)
         zacetek_vp = request.GET.get('zacetek_vp', pred_mescem)

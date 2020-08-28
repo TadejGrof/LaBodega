@@ -8,7 +8,7 @@ import json
 from django.contrib.auth.models import User
 from request_funkcije import vrni_slovar, pokazi_stran
 
-zaloga = Zaloga.objects.all().first()
+#zaloga = Zaloga.objects.all().first()
 
 @login_required
 def pregled(request):

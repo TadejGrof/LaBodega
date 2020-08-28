@@ -103,7 +103,7 @@
         {{zaloga.danes}}
     </h1>
     <div class="ustvari_prodajo">
-        <form style="width:100%;height:100%;display:inline-block" action="{% url 'nova_dnevna_prodaja' %}" method="POST">
+        <form style="width:100%;height:100%;display:inline-block" action="{% url 'nova_dnevna_prodaja' zaloga.pk %}" method="POST">
             {% csrf_token %}
             <input style="width:60%;height:35%;font-size:150%" type="submit" value="{{slovar|keyvalue:'Nova dnevna prodaja'|keyvalue:jezik}}">
         </form>

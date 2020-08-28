@@ -5,6 +5,7 @@ from .my_views import pdf_views
 from .my_views import stroski_views
 from .my_views import skupen_pregled_views
 from .my_views import baza_views
+from .my_views import pviews
 
 ogled_patterns = [
     path('',views.baza, name="baza"),
@@ -47,6 +48,16 @@ pregled_patterns = [
     path('sprememba_cene/<int:cena>/', zaloga_views.sprememba_cene,name="sprememba_cene"),
 ]
 
+dnevna_prodaja_patterns = [
+    path('', pviews.dnevna_prodaja, name="dnevna_prodaja"),
+    path('nova_prodaja/', pviews.nova_dnevna_prodaja, name="nova_dnevna_prodaja"),
+    path('nov_racun/', pviews.nov_racun, name="nov_racun"),
+    path('uveljavi_racun/<int:pk_racuna>/', pviews.uveljavi_racun, name="uveljavi_racun"),
+    path('arhiv/ogled/<int:pk_prodaje>/', pviews.ogled_dnevne_prodaje, name='ogled_dnevne_prodaje'),
+    path('arhiv/ogled/<int:pk_prodaje>/pdf/<str:tip>/', pdf_views.pdf_dnevne_prodaje, name='pdf_dnevne_prodaje'),
+    path('arhiv/ogled/<int:pk_prodaje>/storniraj/<int:pk_racuna>/', pviews.storniraj_racun, name="storniraj_racun"),
+]
+
 ajax_patterns = [
     path('spremeni_vnos/', baza_views.spremeni_vnos, name='spremeni_vnos'),
     path('nov_vnos/', baza_views.nov_vnos, name="nov_vnos"),
@@ -69,6 +80,7 @@ urlpatterns = [
     path('strosek/', include(strosek_patterns)),
     path('porocilo/',include(porocilo_patterns)),
     path('<int:zaloga>/skupen_pregled_narocil/', include(skupen_pregled_patterns)),
+    path('<int:zaloga>/dnevna_prodaja/',include(dnevna_prodaja_patterns)),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
     

@@ -11,6 +11,7 @@ from prodaja.models import Prodaja, Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
+from django.utils.timezone import now
 
 TIPI_SESTAVINE = (
         ('Y','Yellow'),
@@ -52,6 +53,7 @@ TIPI_BAZE = (
     ('vele_prodaja', 'Vele prodaja'),
     ('racun','Racun'),
     ('narocilo','Narocilo'),
+    ('zaklep','Zaklep'),
 )
 
 TIPI_STROSKOV = (
@@ -67,7 +69,6 @@ class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
     tipi_prodaje = models.CharField(default='["vele_prodaja"]', max_length=50)
     tipi_sestavine = models.CharField(default='["Y","W","JP","JP50","JP70"]', max_length=50)
-
 
     def __str__(self):
         return self.title
@@ -133,12 +134,6 @@ class Zaloga(models.Model):
         for radius in self.sestavina_set.all().values('dimenzija__radius').distinct().order_by('dimenzija__radius'):
             razlicni_radiusi.append(radius['dimenzija__radius'])
         return razlicni_radiusi
-
-    @property
-    def zacetna_stanja(self):
-        with open('zacetna_stanja.json') as dat:
-            slovar = json.load(dat)
-        return slovar
 
     def ponastavi_zalogo(self):
         for sestavina in self.sestavina_set.all():
@@ -234,6 +229,44 @@ class Zaloga(models.Model):
     def vrni_sestavine(self):
         return self.sestavina_set.all()
 
+    @property
+    def zaklep_zaloge(self):
+        return self.zaklep_set.all().first()
+
+    @property
+    def datum_zaklepa(self):
+        return self.zaklep_zaloge.datum
+
+    def zakleni_zalogo(self,datum):
+        if datum > self.datum_zaklepa:
+            zaklep_json = {}
+            for sestavina in self.sestavina_set().all():
+                pk = sestavina.pk
+                zaklep_json[pk] = {}
+                for tip in self.tipi_sestavin:
+                    tip = tip[0]
+                    zaklep_json[pk][tip] = sestavina.getattr(tip)
+            Zaklep.objects.create(zaloga = self, datum = datum,stanja = json.dumps(zaklep_json))
+        else:
+            print("IZBERI DATUM PO PREJŠNJEM ZAKLEPU")
+
+class Zaklep(models.Model):
+    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
+    datum = models.DateField(default=now)
+    stanja_json = models.TextField(default="{}")
+
+    class Meta:
+        ordering = ['-datum']
+
+    @property
+    def stanja(self):
+        return json.loads(self.stanja_json)
+
+    def vrni_stanje(self,sestavina,tip):
+        stanja = self.stanja
+        return stanja[str(sestavina.pk)][tip]
+
+
 class Zaposleni(models.Model):
     user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)
     zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
@@ -266,14 +299,9 @@ class Sestavina(models.Model):
     JP = models.IntegerField(default = 0)
     JP50 = models.IntegerField(default = 0)
     JP70 = models.IntegerField(default = 0)
-    zaklep_zaloge = models.DateField(default=datetime(year=2019,month=12,day=6))
-    stanja_zaklepa = models.CharField(default="{'Y':0,'W':0,'JP':0,'JP50':0,'JP70':0}", max_length=50)
 
     class Meta:
         ordering = ['zaloga','dimenzija']
-
-    def zacetna_stanja(self):
-        return json.loads(self.stanja_zaklepa)
 
     def cena(self,prodaja,tip):
         if prodaja == "vele_prodaja" or prodaja == "dnevna_prodaja":
@@ -314,8 +342,10 @@ class Sestavina(models.Model):
         return self.dimenzija.dimenzija.replace('/','-')
 
     def nastavi_iz_sprememb(self,tip):
-        spremembe = self.sprememba_set.all().filter(tip=tip).order_by('baza__datum','baza__cas')
-        stanje = self.zaloga.zacetna_stanja[self.dimenzija.dimenzija][tip]
+        zaklep = self.zaloga.zaklep_zaloge
+        datum = zaklep.datum
+        stanje = zaklep.vrni_stanje(self,tip)
+        spremembe = self.sprememba_set.all().filter(tip = tip,baza__datum__gt = datum).order_by('baza__datum','baza__cas')
         for sprememba in spremembe:
             if sprememba.stanje == None:
                 stanje += sprememba.stevilo * sprememba.baza.sprememba_zaloge
@@ -325,18 +355,31 @@ class Sestavina(models.Model):
         self.save()
 
     def zaloga_na_datum(self,datum,tip):
-        spremembe = self.sprememba_set.all().filter(baza__datum__lte = datum, tip = tip).order_by('baza__datum','baza__cas')
-        stanje = self.zaloga.zacetna_stanja[self.dimenzija.dimenzija][tip]
-        for sprememba in spremembe:
-            if sprememba.stanje == None:
-                stanje += sprememba.stevilo * sprememba.baza.sprememba_zaloge
-            else:
-                stanje = sprememba.stanje
+        spremembe = self.sprememba_set.all().filter(tip = tip)
+        zaloga = self.zaloga
+        zaklep = zaloga.zaklep_zaloge
+        stanje = zaloga.zaklep_zaloge.vrni_stanje(self,tip)
+        # gledamo od zaklepa navzgor:
+        if zaklep.datum < datetime.strptime(datum, '%Y-%M-%d').date():
+            spremembe = spremembe.filter(baza__datum__gt = datum).order_by('baza__datum','baza__cas')
+            for sprememba in spremembe:
+                if sprememba.stanje == None:
+                    stanje += sprememba.stevilo * sprememba.baza.sprememba_zaloge
+                else:
+                    stanje = sprememba.stanje
+        # gledamo od zaklepa navzdol:
+        elif zaklep.datum > datetime.strptime(datum,'%Y-%M-%d').date():
+            spremembe = spremembe.filter(baza__datum__lte = datum).order_by('-baza__datum','-baza__cas')
+            for sprememba in spremembe:
+                if sprememba.stanje == None:
+                    stanje -= sprememba.stevilo * sprememba.baza.sprememba_zaloge
+                else:
+                    stanje = sprememba.stanje
         return stanje
 
-    def vrni_stanja(self,tip):
-        spremembe = self.sprememba_set.all().filter(tip=tip).order_by('baza__datum','baza__cas')
-        stanje = self.zaloga.zacetna_stanja[self.dimenzija.dimenzija][tip]
+    def vrni_stanja(self,tip,odDatum,doDatum):
+        spremembe = self.sprememba_set.all().filter(tip=tip,baza__datum__gt=odDatum, baza__datum__lte=doDatum).order_by('baza__datum','baza__cas')
+        stanje = self.zaloga_na_datum(odDatum,tip)
         zaporedna_stanja = [stanje]
         for sprememba in spremembe.values('baza__sprememba_zaloge','stanje','stevilo','pk'):
             if sprememba['stanje'] == None:
@@ -362,7 +405,6 @@ def create_dimenzija(sender, instance, created, **kwargs):
     if created:
         for zaloga in Zaloga.objects.all():
             sestavina = Sestavina.objects.create(zaloga = zaloga, dimenzija = instance)
-    zacetna_stanja(sestavina.zaloga)
 
 @receiver(post_save, sender=Sestavina)
 def create_sestavina(sender, instance, created, **kwargs):
@@ -382,8 +424,6 @@ class Cena(models.Model):
     prodaja = models.CharField(max_length=15, choices=TIPI_PRODAJE, null=True, blank=True, default=None)
     drzava = models.CharField(max_length=15, choices=DRZAVE, null=True,blank=True,default=None)
     
-
-
 class Kontejner(models.Model):
     stevilka = models.CharField(default="", max_length=20)
     posiljatelj = models.CharField(default="", max_length=20, choices=POSILJATELJI)

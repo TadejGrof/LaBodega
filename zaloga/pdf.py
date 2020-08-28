@@ -7,8 +7,6 @@ import datetime
 import json
 from zaloga.models import Zaloga
 
-zaloga = Zaloga.objects.all().first()
-
 centerStyle  = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER')])
 
 with open('slovar.json') as dat:

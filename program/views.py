@@ -8,17 +8,16 @@ import json
 import datetime
 from request_funkcije import pokazi_stran, vrni_slovar
 
-zaloga = Zaloga.objects.first()
-prodaja = Prodaja.objects.first()
-program = Program.objects.first()
-
 @login_required
 def ponastavi_zalogo(request):
+    zaloga = Zaloga.objects.first()
     zaloga.ponastavi_zalogo()
     return redirect('pregled_zaloge')
 
 @login_required
 def home_page(request):
+    zaloga = Zaloga.objects.first()
+    prodaja = Prodaja.objects.first()
     stranke = prodaja.stranka_set.all().filter(status="aktivno")
     tip = request.GET.get('tip','all')
     radius = request.GET.get('radius','all')

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Stranka, Prodaja, Naslov
+from prodaja.models import Stranka, Prodaja, Naslov
 from zaloga.models import Vnos, Zaloga, Dimenzija, Sestavina, Baza, Cena, Dnevna_prodaja
 from django.shortcuts import redirect
 import datetime
@@ -8,8 +8,8 @@ from program.models import Program
 import json 
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 
-def dnevna_prodaja(request):
-    zaloga = Zaloga.objects.first()
+def dnevna_prodaja(request,zaloga):
+    zaloga = Zaloga.objects.get(pk=zaloga)
     danes = timezone.localtime(timezone.now())
     danasnja_prodaja = Dnevna_prodaja.objects.filter(datum = danes).first()
     aktivni_racun = None
@@ -18,8 +18,9 @@ def dnevna_prodaja(request):
         aktivni_racun = danasnja_prodaja.aktivni_racun
     return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':True,'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
 
-def nova_dnevna_prodaja(request):
+def nova_dnevna_prodaja(request,zaloga):
     if request.method == "POST":
+        zaloga = Zaloga.objects.get(pk = pk)
         program = Program.objects.first()
         dnevna_prodaja = Dnevna_prodaja.objects.create()
         dnevna_prodaja.doloci_title()
@@ -28,46 +29,48 @@ def nova_dnevna_prodaja(request):
             tip='racun',
             dnevna_prodaja = dnevna_prodaja,
             popust = 0 )
-    return redirect('dnevna_prodaja')
+    return redirect('dnevna_prodaja',zaloga=zaloga.pk)
 
 ###########################################################################################
 
-def nov_racun(request):
+def nov_racun(request,zaloga):
     if request.method == "POST":
+        zaloga = Zaloga.objects.get(pk = pk)
         program = Program.objects.first()
         prodaja = Dnevna_prodaja.objects.filter(datum = datetime.date.today()).first()
         Baza.objects.create(
+            zaloga = zaloga,
             author=request.user,
             title= program.naslednji_racun(delaj=True),
             tip='racun',
             dnevna_prodaja = prodaja,
             popust = 0,)
-    return redirect('dnevna_prodaja')
+    return redirect('dnevna_prodaja',zaloga = zaloga.pk)
 
-def uveljavi_racun(request,pk):
+def uveljavi_racun(request,zaloga,pk_racuna):
     if request.method == "POST":
         program = Program.objects.first()
-        racun = Baza.objects.get(pk = pk)
+        racun = Baza.objects.get(pk = pk_racuna)
         racun.uveljavi_racun()
         Baza.objects.create(
             title = program.naslednji_racun(delaj=True),
             tip = 'racun',
             dnevna_prodaja = racun.dnevna_prodaja,
             popust = 0)
-    return redirect('dnevna_prodaja')
+    return redirect('dnevna_prodaja',zaloga=zaloga)
 
 ###########################################################################################
 
-def ogled_dnevne_prodaje(request, pk):
-    prodaja = Dnevna_prodaja.objects.get(pk = pk)
+def ogled_dnevne_prodaje(request,zaloga, pk_prodaje):
+    prodaja = Dnevna_prodaja.objects.get(pk = pk_prodaje)
     return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':False,'prodaja': prodaja})
 
-def storniraj_racun(request,pk,pk_r):
+def storniraj_racun(request,zaloga,pk_prodaje,pk_racuna):
     racun = Baza.objects.get(pk = pk_r)
     racun.storniraj_racun()
-    return redirect('ogled_dnevne_prodaje', pk = pk)
+    return redirect('ogled_dnevne_prodaje', zaloga = zaloga, pk = pk)
 
-def ogled_racuna(request, pk):
+def ogled_racuna(request,zaloga, pk_racuna):
     racun = Racun.objects.get(pk = pk)
     return pokazi_stran(request, 'prodaja/ogled_racuna.html', {'racun':racun})
 

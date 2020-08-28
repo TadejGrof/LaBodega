@@ -13,7 +13,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from django.http import HttpResponse
  
-zaloga = Zaloga.objects.first()
+#zaloga = Zaloga.objects.first()
 
 def pdf_zaloge(request,zaloga):
     zaloga = Zaloga.objects.get(pk = zaloga)
@@ -93,12 +93,12 @@ def pdf_baze(request,zaloga,tip_baze, pk):
     p.save()
     return response 
 
-def pdf_dnevne_prodaje(request,pk,tip):
-    dnevna_prodaja = Dnevna_prodaja.objects.get(pk = pk)
+def pdf_dnevne_prodaje(request,zaloga,pk_prodaje,tip):
+    dnevna_prodaja = Dnevna_prodaja.objects.get(pk = pk_prodaje)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="dnevna_prodaja.pdf"'
     p = canvas.Canvas(response)
-    p.translate(40,800)
+    p.translate(40,800) 
     p.drawString(180,0,'Pregled prodaje ' + dnevna_prodaja.title)
     pdf.tabela_dnevne_prodaje(p,dnevna_prodaja,tip)
     p.showPage()

@@ -181,6 +181,7 @@
             <a href="{% url 'pregled_zalog' %}" > Skladisca </a>
             <a href="{% url 'pregled_zaposlenih' %}" > Zaposleni </a>
             <a href="{% url 'pregled_strank' %}"> Stranke </a>
+            <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
     {% if perms.zaloga.view_zaloga %}
@@ -189,9 +190,6 @@
         </button>
         <div class="dropdown-container">
             <a href="{% url 'pregled_zaloge' zaloga.pk %}" >{{slovar|keyvalue:'Pregled zaloge'|keyvalue:jezik}}</a>
-            {% if perms.zaloga.add_dimenzija %}
-            <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
-            {% endif %}
             {% if perms.zaloga.add_inventura %}
             <a href="{% url 'baze' zaloga_pk 'inventura' %}">{{slovar|keyvalue:'Inventura'|keyvalue:jezik}}</a>
             {% endif %}
@@ -244,7 +242,7 @@
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{% url 'dnevna_prodaja' %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
+            <a href="{% url 'dnevna_prodaja' zaloga.pk %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
             <a href="{% url 'cenik_prodaje' 'dnevna_prodaja' %}">{{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}</a>
             {% if perms.prodaja.view_dnevna_prodaja %}
                 <a href="{% url 'arhiv_baz' zaloga_pk 'dnevna_prodaja' %}">{{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}</a>

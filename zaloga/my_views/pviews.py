@@ -49,15 +49,17 @@ def nov_racun(request,zaloga):
 
 def uveljavi_racun(request,zaloga,pk_racuna):
     if request.method == "POST":
+        zaloga = Zaloga.objects.get(pk = zaloga)
         program = Program.objects.first()
         racun = Baza.objects.get(pk = pk_racuna)
-        racun.uveljavi_racun()
+        racun.uveljavi_racun(zaloga)
         Baza.objects.create(
+            zaloga = zaloga,
             title = program.naslednji_racun(delaj=True),
             tip = 'racun',
             dnevna_prodaja = racun.dnevna_prodaja,
             popust = 0)
-    return redirect('dnevna_prodaja',zaloga=zaloga)
+    return redirect('dnevna_prodaja',zaloga=zaloga.pk)
 
 ###########################################################################################
 

@@ -4,7 +4,7 @@ register = template.Library()
 
 @register.filter(name="ima_prodajo")
 def ima_prodajo(zaloga,prodaja):
-    return zaloga.tipi_prodaj.includes(prodaja)
+    return prodaja in zaloga.tipi_prodaj
     
 @register.filter(name="ima_aktivno_bazo")
 def ima_aktivno_bazo(stranka,zaloga):

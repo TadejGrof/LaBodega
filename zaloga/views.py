@@ -258,9 +258,9 @@ def uveljavi_bazo(request,zaloga, tip_baze, pk):
         baza = Baza.objects.get(pk = pk)
         if baza.status == "aktivno":
             if tip_baze == 'inventura':
-                baza.uveljavi_inventuro()
+                baza.uveljavi_inventuro(zaloga)
             else:
-                baza.uveljavi()
+                baza.uveljavi(zaloga)
     return redirect('arhiv_baz',zaloga=zaloga, tip_baze = tip_baze)
 
 ############################################################################################

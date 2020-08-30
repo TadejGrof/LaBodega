@@ -302,7 +302,7 @@ class Sestavina(models.Model):
 
     class Meta:
         ordering = ['zaloga','dimenzija']
-F
+
     def cena(self,prodaja,tip):
         if prodaja == "vele_prodaja" or prodaja == "dnevna_prodaja":
             return self.cena_set.all().get(tip=tip, prodaja = prodaja).cena
@@ -554,13 +554,13 @@ class Baza(models.Model):
                 skupno += vnos["cena"] * vnos["stevilo"]
         return skupno
 
-    def uveljavi_inventuro(self, datum = None, cas = None):
+    def uveljavi_inventuro(self,zaloga, datum = None, cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)
         self.doloci_datum(datum)
         spremembe = []
         for vnos in self.vnos_set.all().values():
-            sestavina = Sestavina.objects.get(dimenzija_id = vnos['dimenzija_id'])
+            sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija_id = vnos['dimenzija_id'])
             tip = vnos["tip"]
             stevilo = vnos["stevilo"]
             setattr(sestavina,tip,stevilo)
@@ -575,11 +575,11 @@ class Baza(models.Model):
             )
         Sprememba.objects.bulk_create(spremembe)
 
-    def uveljavi_racun(self, cas = None):
+    def uveljavi_racun(self,zaloga, cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)
         for vnos in self.vnos_set.all():
-            sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
+            sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija = vnos.dimenzija)
             sprememba = Sprememba.objects.filter(baza__dnevna_prodaja = self.dnevna_prodaja, sestavina = sestavina, tip = vnos.tip ).first()
         if sprememba == None:
                 sprememba = Sprememba.objects.create(
@@ -591,12 +591,12 @@ class Baza(models.Model):
         vnos.save()
         self.save()
 
-    def uveljavi(self,datum=None,cas = None):
+    def uveljavi(self,zaloga,datum=None,cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)
         self.doloci_datum(datum)
         for vnos in self.vnos_set.all():
-            sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija)
+            sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija = vnos.dimenzija)
             tip = vnos.tip
             sestavina.spremeni_stevilo(self.sprememba_zaloge * vnos.stevilo, vnos.tip)
             sprememba = Sprememba.objects.filter(baza = self, sestavina = sestavina, tip = vnos.tip ).first()

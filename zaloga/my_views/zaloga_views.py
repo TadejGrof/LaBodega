@@ -29,7 +29,11 @@ def pregled_zaloge(request,zaloga):
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = True)
             else:
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = False)
-        cenik = zaloga.cenik('vele_prodaja')
+        tipi_prodaje = zaloga.tipi_prodaj
+        if 'vele_prodaja' in tipi_prodaje:
+            cenik = zaloga.cenik('vele_prodaja')
+        else:
+            cenik = zaloga.cenik('dnevna_prodaja')
         nicelne = request.GET.get('nicelne','true')
         tipi = []
         for tip in zaloga.tipi_sestavin:

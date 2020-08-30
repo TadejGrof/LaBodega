@@ -355,26 +355,29 @@ class Sestavina(models.Model):
         self.save()
 
     def zaloga_na_datum(self,datum,tip):
+        datum = datum.split("-")
+        datum = datetime(int(datum[0]),int(datum[1]),int(datum[2])).date()
         spremembe = self.sprememba_set.all().filter(tip = tip)
         zaloga = self.zaloga
         zaklep = zaloga.zaklep_zaloge
         stanje = zaloga.zaklep_zaloge.vrni_stanje(self,tip)
-        # gledamo od zaklepa navzgor:
-        if zaklep.datum < datetime.strptime(datum, '%Y-%M-%d').date():
-            spremembe = spremembe.filter(baza__datum__gt = datum).order_by('baza__datum','baza__cas')
+
+        if zaklep.datum < datum:
+            spremembe = spremembe.filter(baza__datum__gt = zaklep.datum, baza__datum__lte = datum).order_by('baza__datum','baza__cas')
             for sprememba in spremembe:
                 if sprememba.stanje == None:
                     stanje += sprememba.stevilo * sprememba.baza.sprememba_zaloge
                 else:
                     stanje = sprememba.stanje
         # gledamo od zaklepa navzdol:
-        elif zaklep.datum > datetime.strptime(datum,'%Y-%M-%d').date():
-            spremembe = spremembe.filter(baza__datum__lte = datum).order_by('-baza__datum','-baza__cas')
+        elif zaklep.datum > datum:
+            spremembe = spremembe.filter(baza__datum__lte = zaklep.datum, baza__datum__gte = datum).order_by('-baza__datum','-baza__cas')
             for sprememba in spremembe:
                 if sprememba.stanje == None:
                     stanje -= sprememba.stevilo * sprememba.baza.sprememba_zaloge
                 else:
                     stanje = sprememba.stanje
+        print(stanje)
         return stanje
 
     def vrni_stanja(self,tip,odDatum,doDatum):
@@ -617,7 +620,10 @@ class Baza(models.Model):
             self.status = "aktivno"
             for vnos in self.vnos_set.all():
                 sestavina = vnos.sprememba.sestavina
-                vnos.sprememba.delete()
+                sprememba = vnos.sprememba
+                vnos.sprememba = None
+                vnos.save()
+                sprememba.delete()
                 sestavina.nastavi_iz_sprememb(vnos.tip)
         self.save()
 

@@ -612,6 +612,14 @@ class Baza(models.Model):
             vnos.sprememba = sprememba
             vnos.save()
 
+    def razveljavi(self):
+        if self.status == "veljavno":
+            self.status = "aktivno"
+            for vnos in self.vnos_set.all():
+                sestavina = vnos.sprememba.sestavina
+                vnos.sprememba.delete()
+                sestavina.nastavi_iz_sprememb(vnos.tip)
+        self.save()
 
     def razlicni_tipi(self):
         tipi = []

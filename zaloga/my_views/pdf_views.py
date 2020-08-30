@@ -50,7 +50,7 @@ def pdf_zaloge(request,zaloga):
     p = canvas.Canvas(response)
     p.translate(40,800)
     p.drawString(200,0,'Pregled zaloge')
-    pdf.tabela_zaloge(p,sestavine,tipi)
+    pdf.tabela_zaloge(p,zaloga,sestavine,tipi)
     p.showPage()
     p.save()
     return response 

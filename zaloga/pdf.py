@@ -35,7 +35,7 @@ def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, lev
         top = zgornja - visina
     return top
 
-def tabela_zaloge(p, sestavine, tipi, top=800, jezik = "spa"):
+def tabela_zaloge(p, zaloga, sestavine, tipi, top=800, jezik = "spa"):
     kratki_tipi = [tip[0] for tip in tipi]
     dolgi_tipi = [tip[1] for tip in tipi]
     data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi]
@@ -47,17 +47,17 @@ def tabela_zaloge(p, sestavine, tipi, top=800, jezik = "spa"):
     top -= 3*VISINA_VRSTICE
     top = naslednja_vrstica(p,top)
     for sestavina in sestavine:
-        zaloga = []
+        stanje = []
         for tip in kratki_tipi:
-            zaloga.append(sestavina[tip])
-        data= [[sestavina['dimenzija__dimenzija']] + zaloga]
+            stanje.append(sestavina[tip])
+        data= [[sestavina['dimenzija__dimenzija']] + stanje]
         style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                             ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
         tabela(p,data,style)
         top = naslednja_vrstica(p, top)
-    top = zaloga_skupno(p,sestavine,kratki_tipi,top)
+    top = zaloga_skupno(p,zaloga,sestavine,kratki_tipi,top)
 
 def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
     kratki_tipi = [tip[0] for tip in tipi]
@@ -241,7 +241,7 @@ def zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne, jezik = "spa"):
     tabela(p,data,style,colWidths=[336,84])
     return naslednja_vrstica(p,top)
 
-def zaloga_skupno(p,sestavine,tipi,top,jezik="spa"):
+def zaloga_skupno(p,zaloga,sestavine,tipi,top,jezik="spa"):
     stevilo = [0 for tip in tipi]
     cena = [0 for tip in tipi]
     cenik = zaloga.cenik()

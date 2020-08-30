@@ -32,4 +32,5 @@ urlpatterns = [
     path('pregled_strank/', include(pregled_strank_patterns)),
     path('ponastavi_zalogo/', views.ponastavi_zalogo, name='ponastavi_zalogo'),
     path('spremeni_jezik/', views.spremeni_jezik, name='spremeni_jezik'),
+    path('spremeni_zalogo/<int:pk>/', views.spremeni_zalogo, name='spremeni_zalogo')
 ]

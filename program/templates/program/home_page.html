@@ -73,7 +73,8 @@
             </table>
         </div>
     {% endif %}
-    {% if perms.prodaja.view_stranka %}
+
+    {% if perms.prodaja.view_stranka and zaloga|ima_prodajo:"vele_prodaja" %}
     <div class="cetrt stranke">
         <h2> {{slovar|keyvalue:'Stranke'|keyvalue:jezik}}: </h2>
         <table class="tabela_vnosov">
@@ -89,7 +90,7 @@
                     <td> {{stranka.telefon}} </td>
                     <td> {{stranka.mail}} </td>
                     <td> 
-                        {% if stranka.ima_aktivno_prodajo %}
+                        {% if stranka|ima_aktivno_bazo:zaloga_pk %}
                             <form action="{% url 'baza' zaloga_pk 'vele_prodaja' stranka.aktivna_prodaja.pk %}" method="GET">
                                 <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                             </form>
@@ -108,7 +109,7 @@
     </div>
     {% endif %}
 
-    {% if perms.zaloga.view_dnevna_prodaja %}
+    {% if perms.zaloga.view_dnevna_prodaja and zaloga|ima_prodajo:"dnevna_prodaja" %}
     <div class="cetrt dnevna_prodaja">
         {% if dnevna_prodaja == None %}
             <h1>

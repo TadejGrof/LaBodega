@@ -32,7 +32,7 @@ def vrni_slovar(request):
 def pokazi_stran(request, html, baze={}):
     je_stranka = False
     program = Program.objects.first()
-    zaloga = Zaloga.objects.first()
+    zaloga = request.user.profil.aktivna_zaloga
     if request.user.profil.stranka != None:
         je_stranka = True
     slovar = {'je_stranka':je_stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}

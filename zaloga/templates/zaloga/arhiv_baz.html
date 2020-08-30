@@ -94,7 +94,7 @@
                 <td> {{prodaja.skupno_stevilo}} </td>
                 <td> {{prodaja.skupna_cena}} $ </td>
                 <td> 
-                    <form action="{% url 'ogled_dnevne_prodaje' prodaja.pk %}" method="GET">
+                    <form action="{% url 'ogled_dnevne_prodaje' zaloga.pk prodaja.pk %}" method="GET">
                         <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>

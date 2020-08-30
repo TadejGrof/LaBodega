@@ -16,7 +16,7 @@ def ponastavi_zalogo(request):
 
 @login_required
 def home_page(request):
-    zaloga = Zaloga.objects.first()
+    zaloga = request.user.profil.aktivna_zaloga
     prodaja = Prodaja.objects.first()
     stranke = prodaja.stranka_set.all().filter(status="aktivno")
     tip = request.GET.get('tip','all')
@@ -31,7 +31,7 @@ def home_page(request):
         sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius).order_by('-' + tip)[:10].values('dimenzija__dimenzija',tip)
         for sestavina in sestavine:
             sestavina.update({'tip':tip})
-    danasnja_prodaja = Dnevna_prodaja.objects.filter(datum = datetime.date.today()).first()
+    danasnja_prodaja = Dnevna_prodaja.objects.filter(zaloga = zaloga, datum = datetime.date.today()).first()
     slovar = {
         'dnevna_prodaja':danasnja_prodaja,
         'stranke':stranke,
@@ -54,3 +54,10 @@ def spremeni_jezik(request):
         request.user.save()
         return redirect('home_page')
 
+@login_required
+def spremeni_zalogo(request, pk):
+    if request.method == "POST":
+        zaloga = Zaloga.objects.get(pk = pk)
+        request.user.profil.aktivna_zaloga = zaloga
+        request.user.save()
+        return redirect('home_page')

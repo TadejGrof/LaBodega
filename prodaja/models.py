@@ -61,6 +61,9 @@ class Stranka(models.Model):
     def ima_aktivno_prodajo(self):
         return self.baza_set.all().filter(status="aktivno").exists()
 
+    def ima_aktivno_prodajo(self,zaloga):
+        return self.baza_set.all().filter(zaloga=zaloga,status="aktivno").exists()
+
     @property
     def aktivna_prodaja(self):
         return self.baza_set.all().filter(status="aktivno").first()

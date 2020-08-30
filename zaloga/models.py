@@ -53,7 +53,7 @@ TIPI_BAZE = (
     ('vele_prodaja', 'Vele prodaja'),
     ('racun','Racun'),
     ('narocilo','Narocilo'),
-    ('zaklep','Zaklep'),
+    ('prenos', 'Prenos med skladišči'),
 )
 
 TIPI_STROSKOV = (
@@ -132,7 +132,7 @@ class Zaloga(models.Model):
     def vrni_razlicne_radiuse(self):
         razlicni_radiusi = []
         for radius in self.sestavina_set.all().values('dimenzija__radius').distinct().order_by('dimenzija__radius'):
-            razlicni_radiusi.append(radius['dimenzija__radius'])
+                razlicni_radiusi.append(radius['dimenzija__radius'])
         return razlicni_radiusi
 
     def ponastavi_zalogo(self):
@@ -302,7 +302,7 @@ class Sestavina(models.Model):
 
     class Meta:
         ordering = ['zaloga','dimenzija']
-
+F
     def cena(self,prodaja,tip):
         if prodaja == "vele_prodaja" or prodaja == "dnevna_prodaja":
             return self.cena_set.all().get(tip=tip, prodaja = prodaja).cena

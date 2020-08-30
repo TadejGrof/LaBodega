@@ -2,6 +2,14 @@ from django import template
 import json
 register = template.Library()
 
+@register.filter(name="ima_prodajo")
+def ima_prodajo(zaloga,prodaja):
+    return zaloga.tipi_prodaj.includes(prodaja)
+    
+@register.filter(name="ima_aktivno_bazo")
+def ima_aktivno_bazo(stranka,zaloga):
+    return stranka.ima_aktivno_prodajo(zaloga)
+
 @register.filter(name='index')
 def razlika(value, index):
     return value[index] 

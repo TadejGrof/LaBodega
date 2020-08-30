@@ -184,12 +184,21 @@
             <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
+        <button class="dropdown-btn"> {{user.profil.aktivna_zaloga.title}}
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            {% for skladisce in user.profil.dovoljene_zaloge.all %}
+                <form id="myform_{{skladisce.pk}}" method="POST" action="{% url 'spremeni_zalogo' skladisce.pk %}">{% csrf_token %}</form>
+                <a href="#" onclick="document.getElementById('myform_{{skladisce.pk}}').submit()">{{skladisce.title}}</a>
+            {% endfor %}  
+        </div>
     {% if perms.zaloga.view_zaloga %}
         <button class="dropdown-btn">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{% url 'pregled_zaloge' zaloga.pk %}" >{{slovar|keyvalue:'Pregled zaloge'|keyvalue:jezik}}</a>
+            <a href="{% url 'pregled_zaloge' zaloga_pk %}" >{{slovar|keyvalue:'Pregled zaloge'|keyvalue:jezik}}</a>
             {% if perms.zaloga.add_inventura %}
             <a href="{% url 'baze' zaloga_pk 'inventura' %}">{{slovar|keyvalue:'Inventura'|keyvalue:jezik}}</a>
             {% endif %}
@@ -220,7 +229,7 @@
             <a href="{% url 'arhiv_baz' zaloga_pk 'prevzem' %}">{{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
-    {% if perms.prodaja.view_prodaja %}
+    {% if perms.prodaja.view_prodaja and zaloga|ima_prodajo:"vele_prodaja"  %}
         <button class="dropdown-btn">{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
@@ -237,7 +246,7 @@
             <a href="{% url 'cenik_prodaje' 'vele_prodaja' %}">{{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
-    {% if perms.prodaja.add_dnevna_prodaja %}
+    {% if perms.prodaja.add_dnevna_prodaja and zaloga|ima_prodajo:"dnevna_prodaja"  %}
         <button class="dropdown-btn">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>

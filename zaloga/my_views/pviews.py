@@ -20,7 +20,7 @@ def dnevna_prodaja(request,zaloga):
 
 def nova_dnevna_prodaja(request,zaloga):
     if request.method == "POST":
-        zaloga = Zaloga.objects.get(pk = pk)
+        zaloga = Zaloga.objects.get(pk = zaloga)
         program = Program.objects.first()
         dnevna_prodaja = Dnevna_prodaja.objects.create()
         dnevna_prodaja.doloci_title()

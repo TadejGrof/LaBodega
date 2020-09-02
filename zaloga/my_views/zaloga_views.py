@@ -35,6 +35,7 @@ def pregled_zaloge(request,zaloga):
         else:
             cenik = zaloga.cenik('dnevna_prodaja')
         nicelne = request.GET.get('nicelne','true')
+        rezervirane = request.GET.get('rezervirane','false')
         tipi = []
         for tip in zaloga.tipi_sestavin:
             if request.GET.get(tip,"true") == "true":
@@ -80,6 +81,7 @@ def pregled_zaloge(request,zaloga):
             'width':width,
             'skupno':skupno,
             'nicelne': nicelne,
+            'rezervirane': rezervirane,
             'cene':cene,
             'vrednost':vrednost
         }

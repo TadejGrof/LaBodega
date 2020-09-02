@@ -67,6 +67,16 @@
                     <option value="false" selected> No </option>
                 {% endif %}
             </select>
+            Rezervirane:
+            <select form="filter" name="rezervirane" style="width:5%">
+                {% if rezervirane == "true" %}
+                    <option value="true"> Yes </option>
+                    <option value="false"> No </option>
+                {% else %}
+                    <option value="true"> Yes </option>
+                    <option value="false" selected> No </option>
+                {% endif %}
+            </select>
             <form style="display:inline-block;width:8%" action="{% url 'pdf_zaloge' zaloga_pk %}" method="GET">
                 <input type="hidden"  value="{{radius}}" name="radius">
                 {% for tip in tipi %}
@@ -75,6 +85,15 @@
                 <input style="width:100%"type="submit" value="pdf">
                 <select hidden="hidden" name="nicelne" style="width:5%">
                     {% if nicelne == "true" %}
+                        <option value="true"> Yes </option>
+                        <option value="false"> No </option>
+                    {% else %}
+                        <option value="true"> Yes </option>
+                        <option value="false" selected> No </option>
+                    {% endif %}
+                </select>
+                <select hidden="hidden" name="rezervirane" style="width:5%">
+                    {% if rezervirane == "true" %}
                         <option value="true"> Yes </option>
                         <option value="false"> No </option>
                     {% else %}

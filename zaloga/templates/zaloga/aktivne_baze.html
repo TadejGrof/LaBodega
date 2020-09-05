@@ -176,6 +176,10 @@
                 <th> {{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}: </th>
                 {% endif %}
                 <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+                {% if tip == "vele_prodaja" %}
+                <th> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+                {% endif %}
                 <th> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
                 <th> {{slovar|keyvalue:'Izbris'|keyvalue:jezik}}: </th>
             </tr>
@@ -188,6 +192,10 @@
                 <td> {{baza.kontejner.stevilka}} </td>
                 {% endif %}
                 <td> {{baza.datum}} </td>
+                <td> {{baza.skupno_stevilo}} </td>
+                {% if tip == "vele_prodaja" %}
+                <td> {{baza.skupna_cena}} $ </td>
+                {% endif %}
                 <td class="ogled"> 
                     <form action="{% url 'baza' zaloga_pk tip baza.pk %}" method="GET">
                         <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
@@ -201,7 +209,19 @@
                 </td>
             </tr>
             {% endfor %}
+            <tr>
+                <td colspan="3"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </td>
+                <td>{{skupno_stevilo}} </td>
+                {% if tip == "vele_prodaja" %}
+                <td>{{skupna_cena}} $</td>
+                <td colspan="2"></td> 
+                {% else %}
+                <td colspan="3"></td>
+                {% endif %}
+            </tr>
+            
         </table>
+        <div style="height:5%"></div>
     </div>
 {% endif %}
 <script>

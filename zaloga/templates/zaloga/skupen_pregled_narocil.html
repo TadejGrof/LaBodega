@@ -29,6 +29,9 @@
 <div style="margin-bottom:2%" class="delovno_okno">
     <button onclick="Pokazi_sporne()"> Pokazi sporne </button>
     <button onclick="Pokazi_vse()"> Pokazi vse </button>
+    <form style="display:inline-block" action="{% url 'pdf_skupnega_pregleda' zaloga_pk %}" method="GET">
+        <input type="submit" value="PDF">
+    </form>
     <button class="skrit" onclick="Preklici_vse()"> Preklici vse </button>
     {% include 'baza/filter.html' with tipi=zaloga.vrni_tipe radiusi=zaloga.vrni_razlicne_radiuse slovar=slovar %}
 </div>

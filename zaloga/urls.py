@@ -24,6 +24,7 @@ baza_patterns = [
 
 skupen_pregled_patterns = [
     path('', skupen_pregled_views.skupen_pregled_narocil, name="skupen_pregled_narocil"),
+    path('pdf/',pdf_views.pdf_skupnega_pregleda,name="pdf_skupnega_pregleda"),
 ]
 
 strosek_patterns = [

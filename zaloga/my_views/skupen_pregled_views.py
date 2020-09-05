@@ -12,7 +12,7 @@ from django.http import JsonResponse
 @login_required
 def skupen_pregled_narocil(request, zaloga):
     zaloga = Zaloga.objects.get(pk = zaloga)
-    baze = Baza.objects.filter(status="aktivno", tip="vele_prodaja")
+    baze = Baza.objects.filter(zaloga = zaloga, status="aktivno", tip="vele_prodaja")
     narocila = baze.values('pk','stranka__ime','stranka__pk')
     vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','dimenzija__radius','tip','stevilo','pk','baza__stranka__pk')
     razlicne_dimenzije = {}

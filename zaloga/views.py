@@ -150,7 +150,21 @@ def baze(request,zaloga,tip_baze):
         zaloga = Zaloga.objects.get(pk = zaloga)
         baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno')
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
-        return pokazi_stran(request, 'zaloga/aktivne_baze.html', {'zaloga': zaloga, 'tip': tip_baze, 'baze':baze,'stranke':stranke})
+        skupno_stevilo = 0
+        skupna_cena = 0
+        for baza in baze:
+            skupno_stevilo += baza.skupno_stevilo
+            cena = baza.skupna_cena
+            if cena != None:
+                skupna_cena += cena 
+        slovar = {
+            'zaloga': zaloga,
+            'tip': tip_baze,
+            'baze':baze,
+            'stranke':stranke,
+            'skupno_stevilo':skupno_stevilo,
+            'skupna_cena':skupna_cena}
+        return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
         
 @login_required
 def nova_baza(request,zaloga,tip_baze):

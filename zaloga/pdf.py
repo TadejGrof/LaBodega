@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.pdfgen import canvas
 import datetime
 import json
-from zaloga.models import Zaloga
+from zaloga.models import Zaloga,Vnos
 
 centerStyle  = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER')])
 
@@ -25,7 +25,7 @@ def tabela(p, data, style, colWidths=None, rowHeights=VISINA_VRSTICE, jezik = "s
     t.wrapOn(p, aW=300, aH=50 )
     t.drawOn(p, x=50, y=-40)
 
-def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, leva = LEVA_MEJA, visina = VISINA_VRSTICE, jezik = "spa"):
+def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, leva = LEVA_MEJA, visina = VISINA_VRSTICE, jezik = "spa",header = None):
     if top > spodnja:
         p.translate(0,-(visina))
         top -= visina
@@ -33,6 +33,9 @@ def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, lev
         p.showPage()
         p.translate(leva,zgornja)
         top = zgornja - visina
+        if header != None:
+            tabela(p,header[0],header[1])
+            top = naslednja_vrstica(p,top)
     return top
 
 def tabela_zaloge(p, zaloga, sestavine, tipi, top=800, jezik = "spa"):
@@ -117,9 +120,9 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
                 vnos.stevilo,
                 str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/",
                 str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]]
-            style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+            style= TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                            ('BOX', (2,0), (-1,-1), 0.5, colors.black),
                             ])
             tabela(p,data,style)
             top = naslednja_vrstica(p,top)
@@ -128,6 +131,50 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
     else:
         top = zadnja_vrstica_baze(p,baza,tip,top)
     podpis(p,top)
+
+def tabela_baz(p,baze,top = 800, jezik = "spa"):
+    vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','dimenzija__radius','tip','stevilo','pk','baza__stranka__pk')
+    razlicne_dimenzije = {}
+    for vnos in vnosi:
+        dimenzija = vnos['dimenzija__dimenzija']
+        tip = vnos['tip']
+        dimenzija_tip = dimenzija + '_' + tip
+        radius = vnos['dimenzija__radius']
+        stevilo = vnos['stevilo']
+        baza = vnos['baza__pk']
+        vnos = vnos['pk']
+        if not dimenzija_tip in razlicne_dimenzije:
+            razlicne_dimenzije[dimenzija_tip] = {'dimenzija':dimenzija,'radius':radius,'tip':tip,'baze':{baza:{vnos:stevilo}}}
+        elif not baza in razlicne_dimenzije[dimenzija_tip]['baze']:
+            razlicne_dimenzije[dimenzija_tip]['baze'][baza] = {vnos:stevilo}
+        else:
+            razlicne_dimenzije[dimenzija_tip]['baze'][baza][vnos] = stevilo
+
+    header = ["Dim:",""] + [baza.stranka.ime[:3] for baza in baze]
+    style = TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (2,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (2,0), (-1,-1), 0.5, colors.black),
+                        ])
+    header = [[header],style]
+    tabela(p,header[0],header[1])
+    top = naslednja_vrstica(p,top)
+    def stevilo_baze(podatki,baza):
+        vnosi = podatki[baza.pk]
+        stevilo = 0
+        for vnos in vnosi:
+            stevilo += vnosi[vnos]
+        return stevilo
+
+    for dimenzija in razlicne_dimenzije:
+        podatki = razlicne_dimenzije[dimenzija]["baze"]
+        vrstica = [dimenzija.split('_')[0],""] + [stevilo_baze(podatki,baza) if baza.pk in podatki else 0 for baza in baze]
+        style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                            ('INNERGRID', (2,0), (-1,-1), 0.25, colors.black),
+                            ('BOX', (2,0), (-1,-1), 0.5, colors.black),
+                            ])
+        tabela(p,[vrstica],style)
+        top = naslednja_vrstica(p,top,header = header)
+    top = naslednja_vrstica(p,top)
 
 def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):
     if tip_tabele == "activity_log":

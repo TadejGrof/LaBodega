@@ -89,7 +89,6 @@ def pdf_cenika(request,tip_prodaje):
 def pdf_baze(request,zaloga,tip_baze, pk):
     zaloga = Zaloga.objects.get(pk = zaloga)
     tip = request.GET.get('tip')
-    print(tip)
     baza = zaloga.baza_set.all().get(pk=pk)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="baza.pdf"'
@@ -111,3 +110,14 @@ def pdf_dnevne_prodaje(request,zaloga,pk_prodaje,tip):
     p.showPage()
     p.save()
     return response 
+
+def pdf_skupnega_pregleda(request,zaloga):
+    baze = Baza.objects.filter(zaloga = zaloga, status="aktivno", tip="vele_prodaja")
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="baza.pdf"'
+    p = canvas.Canvas(response)
+    p.translate(40,850)
+    pdf.tabela_baz(p,baze)
+    p.showPage()
+    p.save()
+    return response

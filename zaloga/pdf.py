@@ -150,10 +150,11 @@ def tabela_baz(p,baze,top = 800, jezik = "spa"):
         else:
             razlicne_dimenzije[dimenzija_tip]['baze'][baza][vnos] = stevilo
 
-    header = ["Dim:",""] + [baza.stranka.ime[:3] for baza in baze] + [""]
+    header = [slovar['Dimenzija'][jezik],""," " + slovar['Tip'][jezik]] + [baza.stranka.ime[:3] for baza in baze] + [""]
     style = TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
+                        ('ALIGN',(0,0),(1,0),'LEFT'),
                         ('INNERGRID', (2,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (2,0), (-1,-1), 0.5, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     header = [[header],style]
     tabela(p,header[0],header[1])
@@ -176,15 +177,17 @@ def tabela_baz(p,baze,top = 800, jezik = "spa"):
         skupno = 0
         for baza in podatki:
             skupno += stevilo_baze(podatki,baza)
-        vrstica = [dimenzija.split('_')[0],""] + [stevilo_baze(podatki,baza) if baza.pk in podatki else 0 for baza in baze] + [skupno]
-        style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+        
+        vrstica = [dimenzija.split('_')[0],"",dimenzija.split('_')[1]] + [stevilo_baze(podatki,baza) if baza.pk in podatki else 0 for baza in baze] + [skupno]
+        style = TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
+                            ('ALIGN',(0,0),(1,0),'LEFT'),
                             ('INNERGRID', (2,0), (-1,-1), 0.25, colors.black),
-                            ('BOX', (2,0), (-1,-1), 0.5, colors.black),
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
         tabela(p,[vrstica],style)
         top = naslednja_vrstica(p,top,header = header)
 
-    skupno = ["Total:",""]
+    skupno = ["Total:","",""]
     skupno_stevilo = 0
     for baza in baze:
         stevilo = baza.skupno_stevilo

@@ -150,7 +150,7 @@ def tabela_baz(p,baze,top = 800, jezik = "spa"):
         else:
             razlicne_dimenzije[dimenzija_tip]['baze'][baza][vnos] = stevilo
 
-    header = ["Dim:",""] + [baza.stranka.ime[:3] for baza in baze]
+    header = ["Dim:",""] + [baza.stranka.ime[:3] for baza in baze] + [""]
     style = TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (2,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (2,0), (-1,-1), 0.5, colors.black),
@@ -159,7 +159,13 @@ def tabela_baz(p,baze,top = 800, jezik = "spa"):
     tabela(p,header[0],header[1])
     top = naslednja_vrstica(p,top)
     def stevilo_baze(podatki,baza):
-        vnosi = podatki[baza.pk]
+        try:
+            vnosi = podatki[baza]
+        except:
+            try:
+                vnosi = podatki[baza.pk]
+            except:
+                return 0
         stevilo = 0
         for vnos in vnosi:
             stevilo += vnosi[vnos]
@@ -167,13 +173,26 @@ def tabela_baz(p,baze,top = 800, jezik = "spa"):
 
     for dimenzija in razlicne_dimenzije:
         podatki = razlicne_dimenzije[dimenzija]["baze"]
-        vrstica = [dimenzija.split('_')[0],""] + [stevilo_baze(podatki,baza) if baza.pk in podatki else 0 for baza in baze]
+        skupno = 0
+        for baza in podatki:
+            skupno += stevilo_baze(podatki,baza)
+        vrstica = [dimenzija.split('_')[0],""] + [stevilo_baze(podatki,baza) if baza.pk in podatki else 0 for baza in baze] + [skupno]
         style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (2,0), (-1,-1), 0.25, colors.black),
                             ('BOX', (2,0), (-1,-1), 0.5, colors.black),
                             ])
         tabela(p,[vrstica],style)
         top = naslednja_vrstica(p,top,header = header)
+
+    skupno = ["Total:",""]
+    skupno_stevilo = 0
+    for baza in baze:
+        stevilo = baza.skupno_stevilo
+        skupno_stevilo += stevilo
+        skupno.append(stevilo)
+    skupno.append(skupno_stevilo)
+    skupno = [skupno]
+    tabela(p,skupno,style)
     top = naslednja_vrstica(p,top)
 
 def tabela_dnevne_prodaje(p,prodaja, tip_tabele, top = 800, jezik = "spa"):

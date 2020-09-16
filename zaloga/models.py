@@ -584,14 +584,14 @@ class Baza(models.Model):
         for vnos in self.vnos_set.all():
             sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija = vnos.dimenzija)
             sprememba = Sprememba.objects.filter(baza__dnevna_prodaja = self.dnevna_prodaja, sestavina = sestavina, tip = vnos.tip ).first()
-        if sprememba == None:
+            if sprememba == None:
                 sprememba = Sprememba.objects.create(
                     sestavina = sestavina,
                     tip = vnos.tip,
                     stevilo = vnos.stevilo,
                     baza = self)
-        vnos.sprememba = sprememba
-        vnos.save()
+            vnos.sprememba = sprememba
+            vnos.save()
         self.save()
 
     def uveljavi(self,zaloga,datum=None,cas = None):

@@ -35,6 +35,8 @@
     {{slovar|keyvalue:'Nova inventura'|keyvalue:jezik}}
 {% elif tip == "vele_prodaja" %}
     {{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}
+{% elif tip == "prenos" %}
+    {{slovar|keyvalue:'Nov prenos'|keyvalue:jezik}}
 {% endif %}
 </h1>
 
@@ -77,6 +79,38 @@
                         {% endfor %}
                     </select>
                 </td>
+            </tr>
+        </table>
+    {% elif tip == "prenos" %}
+        <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
+            <tr>
+                <th width="33%" colspan="2"> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}:</th>
+                <th width="42%" colspan="2">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}:</th>
+                <th width="25%" colspan="2"> User: </th>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </td>
+                <td> {{slovar|keyvalue:'Prenos'|keyvalue:jezik}} </td>
+                <td> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}} </td>
+                <td> 
+                    <select form="nova_baza" name="zaloga">
+                        {% for z in zaloge %}
+                            {% if z.pk != zaloga_pk %}
+                                <option value="{{z.pk}}"> {{zaloga.title}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+                <td> User: </td>
+                <td> {{user.username}} </td>
+            </tr>
+            <tr>
+                <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
+                <td> {{program.naslednji_prevzem}} </td>
+            </tr>   
+            <tr>
+                <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+                <td> {{zaloga.danes}} </td>
             </tr>
         </table>
     {% elif tip == "vele_prodaja" or tip == "narocilo" %}
@@ -174,6 +208,8 @@
                 <th> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </th>
                 {% elif tip == "prevzem" %}
                 <th> {{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}: </th>
+                {% elif tip == "prenos" %}
+                <th> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
                 {% endif %}
                 <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
                 <th> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
@@ -190,6 +226,8 @@
                 <td> {{baza.stranka}} </td>
                 {% elif tip == "prevzem" %}
                 <td> {{baza.kontejner.stevilka}} </td>
+                {% elif tip == "prenos" %}
+                <td> {{baza.getZalogaPrenosa}} </td>
                 {% endif %}
                 <td> {{baza.datum}} </td>
                 <td> {{baza.skupno_stevilo}} </td>

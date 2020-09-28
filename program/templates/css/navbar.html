@@ -225,6 +225,7 @@
         <div class="dropdown-container">
             {% if perms.zaloga.add_prevzem %}
             <a href="{% url 'baze' zaloga_pk 'prevzem' %}">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}</a>
+            <a href="{% url 'baze' zaloga_pk 'prenos' %}">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}</a>
             {% endif %}
             <a href="{% url 'arhiv_baz' zaloga_pk 'prevzem' %}">{{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}</a>
         </div>

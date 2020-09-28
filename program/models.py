@@ -18,6 +18,7 @@ class Program(models.Model):
     stevilo_faktur = models.IntegerField(default = 0)
     stevilo_racunov = models.IntegerField(default = 0)
     stevilo_inventur = models.IntegerField(default = 0)
+    stevilo_prenosov = models.IntegerField(default = 0)
 
     def naslednja_baza(self,tip,delaj=False):
         if tip == "prevzem":
@@ -30,6 +31,8 @@ class Program(models.Model):
             return self.naslednja_faktura(delaj)
         elif tip == "inventura":
             return self.naslednja_inventura(delaj)
+        elif tip == "prenos":
+            return self.naslednji_prenos(delaj)
                 
     def naslednja_faktura(self,delaj=False):
         if delaj:
@@ -66,7 +69,16 @@ class Program(models.Model):
             return 'O-2020-' + str(self.stevilo_odpisov)
         else:
             return 'O-2020-' + str(self.stevilo_odpisov + 1)
-        
+
+    def naslednji_prenos(self,delaj=False):
+        if delaj:
+            self.stevilo_prenosov += 1
+            self.save()
+            return 'PS-2020-' + str(self.stevilo_prenosov)
+        else:
+            return 'PS-2020-' + str(self.stevilo_prenosov + 1)
+
+
     def naslednja_inventura(self,delaj=False):
         if delaj:
             self.stevilo_inventur += 1

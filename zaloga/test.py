@@ -21,3 +21,12 @@ def test_prodaje(prodaje):
                 racun.cas = cas
                 racun.save()
         print("konec")
+
+def popravi_racune(prodaje):
+    for prodaja in prodaje:
+        print("delam " + str(prodaja.datum) + ":")
+        for racun in prodaja.baza_set.all().filter(status="veljavno"):
+            racun.datum = prodaja.datum
+            racun.save()
+            for vnos in racun.vnos_set.all():
+                vnos.save()

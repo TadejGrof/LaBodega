@@ -54,6 +54,7 @@ TIPI_BAZE = (
     ('racun','Racun'),
     ('narocilo','Narocilo'),
     ('prenos', 'Prenos med skladišči'),
+    ('poslanPrenos',"Poslan prenos med skladišči"),
 )
 
 TIPI_STROSKOV = (
@@ -533,6 +534,11 @@ class Baza(models.Model):
     cas = models.TimeField(default=None,null=True,blank=True)
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
     prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
+    zalogaPrenosa = models.IntegerField(default=None,null=True,blank=True)
+
+    @property 
+    def getZalogaPrenosa(self):
+        return Zaloga.objects.get(id=self.zalogaPrenosa)
 
     def __str__(self):
         return self.title
@@ -577,6 +583,22 @@ class Baza(models.Model):
                 )
             )
         Sprememba.objects.bulk_create(spremembe)
+
+    def uveljavi_prenos(self,zaloga,cas = None):
+        uveljavi()
+        bazaPrenosa = Baza.objects.create(
+                zaloga_id = self.getZalogaPrenosa.pk,
+                tip = "poslanPrenos",
+                sprememba_zaloge = -1,
+                title = self.title.replace("PS","PSX"),
+                author = self.user,
+                zalogaPrenosa = self.zaloga.pk
+            )
+        for vnos in self.vnos_set.all():
+            bazaPrenosa.dodajVnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
+        bazaPrenosa.save()
+        bazaPrenosa.uveljavi()
+        self.save()
 
     def uveljavi_racun(self,zaloga, cas = None):
         self.status = "veljavno"

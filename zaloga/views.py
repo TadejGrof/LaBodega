@@ -150,6 +150,7 @@ def baze(request,zaloga,tip_baze):
         zaloga = Zaloga.objects.get(pk = zaloga)
         baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno')
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
+        zaloge = Zaloga.objects.all()
         skupno_stevilo = 0
         skupna_cena = 0
         for baza in baze:
@@ -158,6 +159,7 @@ def baze(request,zaloga,tip_baze):
             if cena != None:
                 skupna_cena += cena 
         slovar = {
+            'zaloge':zaloge,
             'zaloga': zaloga,
             'tip': tip_baze,
             'baze':baze,
@@ -189,6 +191,16 @@ def nova_baza(request,zaloga,tip_baze):
                 author=request.user,
                 tip=tip_baze,
                 sprememba_zaloge = 1)
+        elif tip_baze == "prenos":
+            zalogaPrenosa = int(request.POST.get("zaloga"))
+            Baza.objects.create(
+                zaloga_id = zaloga,
+                tip = tip_baze,
+                sprememba_zaloge = 1,
+                title = title,
+                author = request.user,
+                zalogaPrenosa = zalogaPrenosa
+            )
         elif tip_baze == "vele_prodaja" or tip_baze == "narocilo":
             stranka = Stranka.objects.get(pk = int(request.POST.get('stranka')))
             Baza.objects.create(
@@ -273,6 +285,8 @@ def uveljavi_bazo(request,zaloga, tip_baze, pk):
         if baza.status == "aktivno":
             if tip_baze == 'inventura':
                 baza.uveljavi_inventuro(zaloga)
+            elif tip_baze == "prenos":
+                baza.uveljavi_prenos(zaloga)
             else:
                 baza.uveljavi(zaloga)
     return redirect('arhiv_baz',zaloga=zaloga, tip_baze = tip_baze)

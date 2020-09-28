@@ -429,6 +429,21 @@
             "ang": "Street",
             "spa": "Calle"
         },
+        "Nov prenos": {
+            "slo": "Nov prenos",
+            "ang": "New transaction",
+            "spa": "Nueva transacion"
+        },
+        "Prenos": {
+            "slo": "Prenos",
+            "ang": "Transacion",
+            "spa": "Transacion"
+        },
+        "prenos": {
+            "slo": "prenos",
+            "ang": "transacion",
+            "spa": "transacion"
+        },
         "Davcna": {
             "slo": "Davcna",
             "ang": "Tax number",

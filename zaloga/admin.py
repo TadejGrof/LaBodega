@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Dimenzija, Sestavina, Zaloga, Vnos,Baza, Stroski_Group, Kontejner
+from .models import Zaklep,Dimenzija, Sestavina, Zaloga, Vnos,Baza, Stroski_Group, Kontejner
 from .models import TIPI_BAZE
 
 admin.site.register(Zaloga)
@@ -21,10 +21,11 @@ class TipListFilter(admin.SimpleListFilter):
 
 @admin.register(Baza)
 class BazaAdmin(admin.ModelAdmin):
-    list_display = ('title','status','zaloga', 'tip', 'datum','stranka','kontejner','dnevna_prodaja')
+    list_display = ('title','status','zaloga', 'tip', 'datum','stranka','kontejner','dnevna_prodaja','zalogaPrenosa')
     list_filter = (TipListFilter,"zaloga","stranka",)
     exclude = ('zaloga',)
 
+admin.site.register(Zaklep)
 admin.site.register(Vnos)
 admin.site.register(Stroski_Group)
 admin.site.register(Kontejner)

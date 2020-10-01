@@ -17,7 +17,9 @@
                 <th width="14%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
                 <th width="14%"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
             {% endif %}
-            <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
+            {% if tip != "prenos" or status == "aktivno" %}
+                <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
+            {% endif %}
         </tr>
         {% for vnos in baza.vnosi_values %}
             <tr class="vrstica {{vnos.dimenzija__radius}} {{vnos.tip}}" id="vrstica_{{vnos.pk}}">
@@ -38,12 +40,14 @@
                     </td>
                     <td id="cena_vnosa_{{vnos.pk}}"> {{vnos|skupna_cena}} $ </td>
                 {% endif %}
+                {% if tip != "prenos" or status == "aktivno" %}
                 <td>
                     <button class="{{vnos.pk}}" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> E </button>
                     <button class="{{vnos.pk}}" onclick="Izbrisi_vnos('{{vnos.pk}}')"> X </button>
                     <button class="{{vnos.pk}} skrit"  onclick="spremeni_vnos('{{vnos.pk}}')"> Ok </button>
                     <button class="{{vnos.pk}} skrit" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> X </button>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
         {% if tip == "vele_prodaja" %}

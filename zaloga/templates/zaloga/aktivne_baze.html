@@ -96,7 +96,7 @@
                     <select form="nova_baza" name="zaloga">
                         {% for z in zaloge %}
                             {% if z.pk != zaloga_pk %}
-                                <option value="{{z.pk}}"> {{zaloga.title}}</option>
+                                <option value="{{z.pk}}"> {{z.title}}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
@@ -106,7 +106,7 @@
             </tr>
             <tr>
                 <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
-                <td> {{program.naslednji_prevzem}} </td>
+                <td> {{program.naslednji_prenos}} </td>
             </tr>   
             <tr>
                 <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>

@@ -1,4 +1,6 @@
 from .models import Dnevna_prodaja, Zaloga, Sestavina, Baza, Sprememba
+import json
+from .models import Zaklep
 
 dnevne_prodaje = Dnevna_prodaja.objects.all()[::-1]
 
@@ -30,3 +32,15 @@ def popravi_racune(prodaje):
             racun.save()
             for vnos in racun.vnos_set.all():
                 vnos.save()
+
+def dodaj_zaklep():
+    zaklep = Zaklep.objects.all().first()
+    prodajalna = Zaloga.objects.all()[1]
+    zaklep_json = {}
+    for sestavina in Sestavina.objects.all().filter(zaloga = prodajalna).iterator():
+        zaklep_json[sestavina.pk] = {}
+        for tip in prodajalna.vrni_tipe:
+            zaklep_json[sestavina.pk][tip[0]] = getattr(sestavina,tip[0])
+    Zaklep.objects.create(zaloga=prodajalna,datum=zaklep.datum,stanja_json = json.dumps(zaklep_json))
+
+

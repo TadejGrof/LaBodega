@@ -25,6 +25,8 @@
     {{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}
 {% elif tip == 'odpis' %}
     {{slovar|keyvalue:'Arhiv odpisov'|keyvalue:jezik}}
+{% elif tip == 'prenos' %}
+    {{slovar|keyvalue:'Arhiv prenosov'|keyvalue:jezik}}
 {% elif tip == 'inventura' %}
     {{slovar|keyvalue:'Arhiv inventur'|keyvalue:jezik}}
 {% elif tip == 'vele_prodaja' %}
@@ -48,7 +50,7 @@
                         <option value="{{cliente.pk}}"> {{cliente.naziv}} </option>
                     {% endif %}
                 {% endfor %}
-            </select>
+            </select>  
         {% endif %}
         <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
     </form>
@@ -107,6 +109,12 @@
             <th width="8%"> N. </th>
             <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
             <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+            {% if tip == "prenos" %}
+                <th width="15%">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}:</th>
+            {% elif tip == "prevzem" %} 
+                <th width="12%">{{slovar|keyvalue:'Tip'|keyvalue:jezik}}:</th>
+                <th width="12%">{{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}:</th>   
+            {% endif %}
             {% if tip != 'inventura' %}
             {% for tip in zaloga.vrni_tipe %}
             <th width="5%"> {{tip.0}} </th>
@@ -120,6 +128,12 @@
             <td> {{forloop.counter}}. </td>
             <td> {{baza.title}} </td>
             <td> {{baza.datum}} </td>
+            {% if tip == "prenos" %}
+                <td> {{baza.zaloga_prenosa}} </td>
+            {% elif tip == "prevzem" %} 
+                <td>{{baza.tipPrevzema}} </td>
+                <td>{{baza.posiljatelj}} </td>
+            {% endif %}
             {% if tip != 'inventura' %}
             {% for tip in zaloga.vrni_tipe %}
             <td> {{baza|skupno:tip.0}} </td> 

@@ -25,6 +25,7 @@ def nova_dnevna_prodaja(request,zaloga):
         dnevna_prodaja = Dnevna_prodaja.objects.create()
         dnevna_prodaja.doloci_title()
         Baza.objects.create(
+            zaloga = zaloga,
             title = program.naslednji_racun(delaj=True),
             tip='racun',
             dnevna_prodaja = dnevna_prodaja,

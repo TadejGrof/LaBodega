@@ -54,7 +54,7 @@ TIPI_BAZE = (
     ('racun','Racun'),
     ('narocilo','Narocilo'),
     ('prenos', 'Prenos med skladišči'),
-    ('poslanPrenos',"Poslan prenos med skladišči"),
+
 )
 
 TIPI_STROSKOV = (
@@ -184,11 +184,10 @@ class Zaloga(models.Model):
             sestavine.sort()
             sestavine = sestavine[::-1][:10]
         else:
-            for radius in radiusi:
-                sestavine_radiusa = self.sestavina_set.all().filter(dimenzija__radius = radius)
-                for tip in tipi:
-                    for sestavina in sestavine_radiusa.order_by('-' + tip[0])[:10].values(tip[0],'dimenzija__dimenzija'):
-                        sestavine.append((sestavina[tip[0]],tip[0],sestavina['dimenzija__dimenzija']))
+            sestavine_all = self.sestavina_set.all()
+            for tip in tipi:
+                for sestavina in sestavine_all.order_by('-' + tip[0])[:10].values(tip[0],'dimenzija__dimenzija'):
+                    sestavine.append((sestavina[tip[0]],tip[0],sestavina['dimenzija__dimenzija']))
             sestavine.sort()
             sestavine = sestavine[::-1][:10]
         return [{'dimenzija__dimenzija':sestavina[2],sestavina[1]:sestavina[0],'tip':sestavina[1]} for sestavina in sestavine]
@@ -346,12 +345,16 @@ class Sestavina(models.Model):
         zaklep = self.zaloga.zaklep_zaloge
         datum = zaklep.datum
         stanje = zaklep.vrni_stanje(self,tip)
-        spremembe = self.sprememba_set.all().filter(tip = tip,baza__datum__gt = datum).order_by('baza__datum','baza__cas')
+        spremembe = self.sprememba_set.all().filter(tip = tip,baza__datum__gt = datum).order_by('baza__datum','baza__cas').values(
+            "stevilo",
+            "baza__sprememba_zaloge",
+            "stanje"
+        )
         for sprememba in spremembe:
-            if sprememba.stanje == None:
-                stanje += sprememba.stevilo * sprememba.baza.sprememba_zaloge
+            if sprememba["stanje"] == None:
+                stanje += sprememba["stevilo"] * sprememba["baza__sprememba_zaloge"]
             else:
-                stanje = sprememba.stanje
+                stanje = sprememba["stanje"]
         setattr(self,tip,stanje)
         self.save()
 
@@ -365,20 +368,21 @@ class Sestavina(models.Model):
 
         if zaklep.datum < datum:
             spremembe = spremembe.filter(baza__datum__gt = zaklep.datum, baza__datum__lte = datum).order_by('baza__datum','baza__cas')
+            spremembe = spremembe.values("stanje","stevilo", "baza__sprememba_zaloge")
             for sprememba in spremembe:
-                if sprememba.stanje == None:
-                    stanje += sprememba.stevilo * sprememba.baza.sprememba_zaloge
+                if sprememba["stanje"] == None:
+                    stanje += sprememba["stevilo"] * sprememba["baza__sprememba_zaloge"]
                 else:
-                    stanje = sprememba.stanje
+                    stanje = sprememba["stanje"]
         # gledamo od zaklepa navzdol:
         elif zaklep.datum > datum:
             spremembe = spremembe.filter(baza__datum__lte = zaklep.datum, baza__datum__gte = datum).order_by('-baza__datum','-baza__cas')
+            spremembe = spremembe.values("stanje","stevilo", "baza__sprememba_zaloge")
             for sprememba in spremembe:
-                if sprememba.stanje == None:
-                    stanje -= sprememba.stevilo * sprememba.baza.sprememba_zaloge
+                if sprememba["stanje"] == None:
+                    stanje -= sprememba["stevilo"] * sprememba["baza__sprememba_zaloge"]
                 else:
-                    stanje = sprememba.stanje
-        print(stanje)
+                    stanje = sprememba["stanje"]
         return stanje
 
     def vrni_stanja(self,tip,odDatum,doDatum):
@@ -585,20 +589,19 @@ class Baza(models.Model):
         Sprememba.objects.bulk_create(spremembe)
 
     def uveljavi_prenos(self,zaloga,cas = None):
-        uveljavi()
+        self.uveljavi(self.zaloga)
         bazaPrenosa = Baza.objects.create(
                 zaloga_id = self.getZalogaPrenosa.pk,
-                tip = "poslanPrenos",
-                sprememba_zaloge = -1,
-                title = self.title.replace("PS","PSX"),
-                author = self.user,
+                tip = "prevzem",
+                sprememba_zaloge = 1,
+                title = self.title.replace("PS","PX"),
+                author = self.author,
                 zalogaPrenosa = self.zaloga.pk
             )
-        for vnos in self.vnos_set.all():
-            bazaPrenosa.dodajVnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
+        for vnos in self.vnos_set.all().iterator():
+            bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
         bazaPrenosa.save()
-        bazaPrenosa.uveljavi()
-        self.save()
+        bazaPrenosa.uveljavi(bazaPrenosa.zaloga)
 
     def uveljavi_racun(self,zaloga, cas = None):
         self.status = "veljavno"
@@ -616,7 +619,24 @@ class Baza(models.Model):
             vnos.save()
         self.save()
 
+    @property
+    def posiljatelj(self):
+        if self.kontejner != None:
+            return self.kontejner.get_drzava_display()
+        elif self.zalogaPrenosa != None:
+            return Zaloga.objects.get(pk = self.zalogaPrenosa).title
+        return None
+        
+    @property
+    def tipPrevzema(self):
+        if self.kontejner != None:
+            return "Kontejner"
+        elif self.zalogaPrenosa != None:
+            return "Prenos"
+        return "Drugo"
+
     def uveljavi(self,zaloga,datum=None,cas = None):
+        print(self)
         self.status = "veljavno"
         self.doloci_cas(cas)
         self.doloci_datum(datum)

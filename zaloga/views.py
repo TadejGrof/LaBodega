@@ -196,7 +196,7 @@ def nova_baza(request,zaloga,tip_baze):
             Baza.objects.create(
                 zaloga_id = zaloga,
                 tip = tip_baze,
-                sprememba_zaloge = 1,
+                sprememba_zaloge = -1,
                 title = title,
                 author = request.user,
                 zalogaPrenosa = zalogaPrenosa

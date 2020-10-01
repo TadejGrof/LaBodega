@@ -207,7 +207,7 @@
             {% endif %}
         </div>
     {% endif %}
-    {% if perms.zaloga.view_odpis %}
+    {% if false %}
         <button class="dropdown-btn">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
@@ -225,9 +225,19 @@
         <div class="dropdown-container">
             {% if perms.zaloga.add_prevzem %}
             <a href="{% url 'baze' zaloga_pk 'prevzem' %}">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}</a>
-            <a href="{% url 'baze' zaloga_pk 'prenos' %}">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}</a>
             {% endif %}
             <a href="{% url 'arhiv_baz' zaloga_pk 'prevzem' %}">{{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}</a>
+        </div>
+    {% endif %}
+    {% if perms.zaloga.view_prevzem %}
+        <button class="dropdown-btn">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            {% if perms.zaloga.add_prevzem %}
+            <a href="{% url 'baze' zaloga_pk 'prenos' %}">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}</a>
+            {% endif %}
+            <a href="{% url 'arhiv_baz' zaloga_pk 'prenos' %}">{{slovar|keyvalue:'Arhiv prenosov'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
     {% if perms.prodaja.view_prodaja and zaloga|ima_prodajo:"vele_prodaja"  %}

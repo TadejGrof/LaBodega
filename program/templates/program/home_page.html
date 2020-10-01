@@ -90,8 +90,8 @@
                     <td> {{stranka.telefon}} </td>
                     <td> {{stranka.mail}} </td>
                     <td> 
-                        {% if stranka|ima_aktivno_bazo:zaloga_pk %}
-                            <form action="{% url 'baza' zaloga_pk 'vele_prodaja' stranka.aktivna_prodaja.pk %}" method="GET">
+                        {% if stranka.aktivna_prodaja %}
+                            <form action="{% url 'baza' zaloga_pk 'vele_prodaja' stranka.aktivna_prodaja__pk %}" method="GET">
                                 <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                             </form>
                         {% else %}

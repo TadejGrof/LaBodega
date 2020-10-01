@@ -25,5 +25,5 @@ urlpatterns = [
     path('prodaja/', include('prodaja.urls')),
     path('program/', include('program.urls')),
     path('stranka/', include('zaloga.urls_stranka')),
-    path(r'^__debug__' , include(debug_toolbar.urls)),
+    #path(r'^__debug__' , include(debug_toolbar.urls)),
 ]

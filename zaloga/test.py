@@ -44,16 +44,17 @@ def dodaj_zaklep():
     Zaklep.objects.create(zaloga=prodajalna,datum=zaklep.datum,stanja_json = json.dumps(zaklep_json))
 
 
-def prenesi_cene():
-    skladisce = Zaloga.objects.all().first()
-    prodajalna = Zaloga.objects.all()[1]
-    cene = Cena.objects.all().filter(sestavina__zaloga = skladisce, prodaja = "dnevna_prodaja")
-    for cena in cene:
-        sestavina = Sestavina.objects.get(zaloga = prodajalna, dimenzija = cena.sestavina.dimenzija)
-        cena2 = Cena.objects.all().get(sestavina = sestavina, tip = cena.tip,
-        prodaja = cena.prodaja
-        )
-        cena2.cena = cena.cena
-        cena2.save() 
-    print("KONEC")
-    print(Cena.objects.all().filter(sestavina__zaloga = prodajalna))
+def popravi():
+    baza1 = Baza.objects.get(title="PX-2020-4")
+    baza2 = Baza.objects.get(title="PS-2020-4")
+    baze = [baza1,baza2]
+    for baza in baze:
+        for vnos in baza.vnos_set.all():
+            if vnos.dimenzija.dimenzija == "205/60/R16" and vnos.tip == "Y":
+                tip = vnos.tip
+                sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija, zaloga = baza.zaloga)
+                vnos.delete()
+                sestavina.nastavi_iz_sprememb(tip)
+        baza.save()
+
+

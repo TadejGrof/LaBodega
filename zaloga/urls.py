@@ -49,6 +49,11 @@ pregled_patterns = [
     path('sprememba_cene/<int:cena>/', zaloga_views.sprememba_cene,name="sprememba_cene"),
 ]
 
+cenik_patterns = [
+    path('<str:baza>/', pviews.cenik, name='cenik_prodaje'),
+    path('<str:baza>/spremeni_cene/', pviews.spremeni_cene, name='spremeni_cene'),
+    path('<str:tip_prodaje>/pdf/', pdf_views.pdf_cenika, name='cenik_pdf'),
+]
 dnevna_prodaja_patterns = [
     path('', pviews.dnevna_prodaja, name="dnevna_prodaja"),
     path('nova_prodaja/', pviews.nova_dnevna_prodaja, name="nova_dnevna_prodaja"),
@@ -82,6 +87,7 @@ urlpatterns = [
     path('porocilo/',include(porocilo_patterns)),
     path('<int:zaloga>/skupen_pregled_narocil/', include(skupen_pregled_patterns)),
     path('<int:zaloga>/dnevna_prodaja/',include(dnevna_prodaja_patterns)),
+    path('<int:zaloga>/cenik/', include(cenik_patterns)),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
     

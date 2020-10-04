@@ -55,7 +55,7 @@
     {% endfor %}
 </div>
 <div style="display:block;margin-top:1%">
-    <form style="display:inline-block" action="{% url 'cenik_pdf' tip %}" method="GET">
+    <form style="display:inline-block" action="{% url 'cenik_pdf' zaloga_pk tip %}" method="GET">
         <input type="submit" value="PDF">
         <input type="hidden"  value="" name="radius">
         {% for tip in zaloga.tipi_sestavin %}

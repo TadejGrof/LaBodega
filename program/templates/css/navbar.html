@@ -254,7 +254,7 @@
             {% if perms.prodaja.view_vele_prodaja %}
                 <a href="{% url 'arhiv_baz' zaloga_pk 'vele_prodaja' %}">{{slovar|keyvalue:'Arhiv vele prodaj'|keyvalue:jezik}}</a>
             {% endif %}
-            <a href="{% url 'cenik_prodaje' 'vele_prodaja' %}">{{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}</a>
+            <a href="{% url 'cenik_prodaje' zaloga_pk 'vele_prodaja' %}">{{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
     {% if perms.prodaja.add_dnevna_prodaja and zaloga|ima_prodajo:"dnevna_prodaja"  %}
@@ -262,8 +262,8 @@
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{% url 'dnevna_prodaja' zaloga.pk %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
-            <a href="{% url 'cenik_prodaje' 'dnevna_prodaja' %}">{{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}</a>
+            <a href="{% url 'dnevna_prodaja' zaloga_pk %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
+            <a href="{% url 'cenik_prodaje' zaloga_pk 'dnevna_prodaja' %}">{{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}</a>
             {% if perms.prodaja.view_dnevna_prodaja %}
                 <a href="{% url 'arhiv_baz' zaloga_pk 'dnevna_prodaja' %}">{{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}</a>
             {% endif %}

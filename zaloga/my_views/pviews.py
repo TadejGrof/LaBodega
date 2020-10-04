@@ -82,8 +82,9 @@ def ogled_racuna(request,zaloga, pk_racuna):
 ###########################################################################################
 ###########################################################################################    
 
-def cenik(request,baza):
+def cenik(request,baza,zaloga):
     if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk = zaloga)
         sestavine = zaloga.sestavina_set.all()
         sestavine = sestavine.prefetch_related('cena_set').filter(cena__prodaja=baza).values(
             'dimenzija__dimenzija',

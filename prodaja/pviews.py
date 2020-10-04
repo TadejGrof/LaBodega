@@ -8,8 +8,9 @@ from program.models import Program
 import json 
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 
-def cenik(request,baza):
+def cenik(request,baza,zaloga):
     if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk = zaloga)
         sestavine = zaloga.sestavina_set.all()
         sestavine = sestavine.prefetch_related('cena_set').filter(cena__prodaja=baza).values(
             'dimenzija__dimenzija',
@@ -25,6 +26,7 @@ def cenik(request,baza):
         slovar = {
             'sestavine':sestavine,
             'tip':baza,
+            'zaloga':zaloga,
         }
     return pokazi_stran(request,'prodaja/cenik.html', slovar)
 

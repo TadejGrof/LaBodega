@@ -39,5 +39,6 @@ def pokazi_stran(request, html, baze={}):
     slovar.update(baze)
     if not 'zaloga' in baze:
         slovar.update({'zaloga':zaloga})
-    slovar.update({'zaloga_pk':slovar['zaloga'].pk})
+    if not 'zaloga_pk' in baze:
+        slovar.update({'zaloga_pk':slovar['zaloga'].pk})
     return render(request, html, slovar)

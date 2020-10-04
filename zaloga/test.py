@@ -1,4 +1,4 @@
-from .models import Dnevna_prodaja, Zaloga, Sestavina, Baza, Sprememba
+from .models import Dnevna_prodaja, Zaloga, Sestavina, Baza, Sprememba, Cena
 import json
 from .models import Zaklep
 
@@ -44,3 +44,16 @@ def dodaj_zaklep():
     Zaklep.objects.create(zaloga=prodajalna,datum=zaklep.datum,stanja_json = json.dumps(zaklep_json))
 
 
+def prenesi_cene():
+    skladisce = Zaloga.objects.all().first()
+    prodajalna = Zaloga.objects.all()[1]
+    cene = Cena.objects.all().filter(sestavina__zaloga = skladisce, prodaja = "dnevna_prodaja")
+    for cena in cene:
+        sestavina = Sestavina.objects.get(zaloga = prodajalna, dimenzija = cena.sestavina.dimenzija)
+        cena2 = Cena.objects.all().get(sestavina = sestavina, tip = cena.tip,
+        prodaja = cena.prodaja
+        )
+        cena2.cena = cena.cena
+        cena2.save() 
+    print("KONEC")
+    print(Cena.objects.all().filter(sestavina__zaloga = prodajalna))

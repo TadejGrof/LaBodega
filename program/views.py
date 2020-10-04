@@ -56,6 +56,8 @@ def home_page(request):
         'stranke':stranke,
         'sestavine':sestavine,
         'tip':tip,
+        'zaloga':zaloga,
+        'zaloga_pk': zaloga.pk,
         }
     return pokazi_stran(request, 'program/home_page.html', slovar)
 

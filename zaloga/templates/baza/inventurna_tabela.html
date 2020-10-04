@@ -54,7 +54,7 @@
 
 <script>
     $(document).ready(function() {
-        {% if tip == "vele_prodaja" %}
+        {% if tip == "vele_prodaja" or tip == "prenos" %}
             ToggleClass('.na_voljo', 'skrit')
         {% endif %}
         {% if tip != "inventura" %}

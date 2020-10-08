@@ -45,12 +45,12 @@ def dodaj_zaklep():
 
 
 def popravi():
-    baza1 = Baza.objects.get(title="PX-2020-4")
-    baza2 = Baza.objects.get(title="PS-2020-4")
+    baza1 = Baza.objects.get(title="PX-2020-6")
+    baza2 = Baza.objects.get(title="PS-2020-6")
     baze = [baza1,baza2]
     for baza in baze:
         for vnos in baza.vnos_set.all():
-            if vnos.dimenzija.dimenzija == "205/60/R16" and vnos.tip == "Y":
+            if vnos.dimenzija.dimenzija == "185/55/R14" and vnos.tip == "Y":
                 tip = vnos.tip
                 sestavina = Sestavina.objects.get(dimenzija = vnos.dimenzija, zaloga = baza.zaloga)
                 vnos.delete()

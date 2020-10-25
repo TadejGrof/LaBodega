@@ -11,7 +11,8 @@ ogled_patterns = [
     path('',views.baza, name="baza"),
     path('iz_datoteke/', views.vnosi_iz_datoteke, name='iz_datoteke'),
     path('uveljavi/', views.uveljavi_bazo, name='uveljavi_bazo'),
-    path('pdf/', pdf_views.pdf_baze, name='pdf_baze')
+    path('pdf/', pdf_views.pdf_baze, name='pdf_baze'),
+    path('pdf/razlika', pdf_views.pdf_razlike, name="pdf_razlike"),
 ]
 
 baza_patterns = [

@@ -99,6 +99,18 @@ def pdf_baze(request,zaloga,tip_baze, pk):
     p.save()
     return response 
 
+def pdf_razlike(request,zaloga,tip_baze,pk):
+    zaloga = Zaloga.objects.get(pk = zaloga)
+    baza = zaloga.baza_set.all().get(pk=pk)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="razlike.pdf"'
+    p = canvas.Canvas(response)
+    p.translate(40,850)
+    pdf.tabela_razlike_inventure(p,baza,800)
+    p.showPage()
+    p.save()
+    return response 
+
 def pdf_dnevne_prodaje(request,zaloga,pk_prodaje,tip):
     dnevna_prodaja = Dnevna_prodaja.objects.get(pk = pk_prodaje)
     response = HttpResponse(content_type='application/pdf')

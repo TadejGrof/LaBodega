@@ -77,6 +77,11 @@
             <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
         </form>
         <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
+        {% if tip == "inventura" %}
+            <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip baza.pk %}" method="GET">
+                <input style="width:150px" type="submit" value="PDF Razlike">
+            </form>
+        {% endif %}
     {% endif %}
     <form class="nov_vnos inline vnosi" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="GET">
         <input style="width:150px" type="submit" value="PDF">
@@ -86,8 +91,6 @@
                 <option value="{{tip}}"> {{tip}} </option>
             {% endfor %}
         </select>
-    
-    
     </form>
 </div>
     

@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.pdfgen import canvas
 import datetime
 import json
-from zaloga.models import Zaloga,Vnos
+from zaloga.models import Zaloga,Vnos, Sestavina
 
 centerStyle  = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER')])
 
@@ -131,6 +131,47 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
     else:
         top = zadnja_vrstica_baze(p,baza,tip,top)
     podpis(p,top)
+
+def tabela_razlike_inventure(p,baza,top=800,jezik = "spa"):
+    header = [slovar['Dimenzija'][jezik],
+            slovar['Tip'][jezik], 
+            slovar['Vnos'][jezik], 
+            slovar['Zaloga'][jezik], 
+            slovar['Razlika'][jezik]
+        ]
+    style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+    header = [[header],style]
+    tabela(p,header[0],header[1])
+    top = naslednja_vrstica(p,top)
+
+    sestavine = Sestavina.objects.all().filter(zaloga = baza.zaloga)
+    
+    skupna_razlika = 0
+    for vnos in baza.vnos_set.all().order_by("dimenzija"):
+        stevilo = vnos.stevilo
+        sestavina = sestavine.get(dimenzija = vnos.dimenzija)
+        zaloga = getattr(sestavina, vnos.tip)
+        razlika = stevilo - zaloga
+        skupna_razlika += razlika
+        if razlika != 0:
+            vrstica = [vnos.dimenzija.dimenzija,vnos.tip,stevilo, zaloga, razlika]
+            style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                            ])
+            tabela(p,[vrstica],style)
+            top = naslednja_vrstica(p,top,header = header)    
+    # zadnja vrstica
+    vrstica = ["Skupna razlika:", skupna_razlika]
+    style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+    tabela(p,[vrstica],style)
+    top = naslednja_vrstica(p,top)   
 
 def tabela_baz(p,baze,top = 800, jezik = "spa"):
     vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','dimenzija__radius','tip','stevilo','pk','baza__stranka__pk')

@@ -568,6 +568,18 @@ class Baza(models.Model):
         return skupno
 
     def uveljavi_inventuro(self,zaloga, datum = None, cas = None):
+        for sestavina in Sestavina.objects.all().filter(zaloga = zaloga):
+            for tip in zaloga.tipi_sestavin:
+                vnos = self.vnos_set.all().filter(dimenzija = sestavina.dimenzija, tip = tip).first()
+                if vnos == None:
+                    stevilo = getattr(sestavina,tip)
+                    if stevilo != 0:
+                        Vnos.objects.create(
+                            dimenzija = sestavina.dimenzija,
+                            tip = tip,
+                            baza = self,
+                            stevilo = 0
+                        )
         self.status = "veljavno"
         self.doloci_cas(cas)
         self.doloci_datum(datum)
@@ -896,15 +908,17 @@ class Vnos(models.Model):
         if sestavina == None:
             sestavina = Sestavina.objects.get(zaloga=self.baza.zaloga, dimenzija = self.dimenzija)
         if self.baza.tip == "inventura":
-            Sprememba.objects.create(
+            self.sprememba = Sprememba.objects.create(
+                zaloga = self.baza.zaloga,
                 baza = self.baza,
-                zaloga = self.stevilo,
+                stanje = self.stevilo,
                 tip = self.tip,
                 sestavina = sestavina 
             )
         else:
             self.sprememba = Sprememba.objects.create(
                 baza = self.baza,
+                zaloga = self.baza.zaloga,
                 stevilo = self.stevilo,
                 tip = self.tip,
                 sestavina = sestavina 

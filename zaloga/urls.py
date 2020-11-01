@@ -42,6 +42,7 @@ stroski_patterns = [
 
 porocilo_patterns = [
     path('porocilo_prometa',stroski_views.porocilo_prometa, name='porocilo_prometa'),
+    path('porocilo_prometa/pdf/',pdf_views.pdf_porocila_prometa, name="porocilo_prometa_pdf"),
     path('porocilo_prodaje',stroski_views.porocilo_prodaje, name='porocilo_prodaje'),
 ]
 

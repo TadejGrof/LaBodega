@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from ..models import Dimenzija, Sestavina, Vnos, Dnevna_prodaja
 from ..models import Baza, Zaloga
+from ..models import Kontejner, Stroski_Group, Strosek, Zaposleni
 from django.shortcuts import redirect
 import zaloga.pdf as pdf
 import io
@@ -130,6 +131,49 @@ def pdf_skupnega_pregleda(request,zaloga):
     p = canvas.Canvas(response)
     p.translate(40,850)
     pdf.tabela_baz(p,baze)
+    p.showPage()
+    p.save()
+    return response
+
+def pdf_porocila_prometa(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="porocilo.pdf"'
+    danes = datetime.date.today().strftime('%Y-%m-%d')
+    pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+    od = request.GET.get('od',pred_mescem)
+    do = request.GET.get('do', danes)
+    stroski = Stroski_Group.objects.all().filter(datum__gte = od, datum__lte = do).order_by('-datum','-pk').prefetch_related('strosek_set')
+    vele_prodaje = Baza.objects.all().filter(tip="vele_prodaja",datum__gte=od,datum__lte=do,status="veljavno").order_by('-datum','-pk').prefetch_related('vnos_set')
+    dnevne_prodaje = Dnevna_prodaja.objects.all().filter(datum__gte=od,datum__lte=do).order_by('-datum','-pk')
+    promet = []
+    for strosek in stroski.iterator():
+        slovar = {
+            'tip':'Strosek',
+            'znesek':-float(strosek.skupni_znesek),
+            'title':strosek.title,
+            'datum':strosek.datum,
+        }
+        promet.append(slovar)
+    for vele_prodaja in vele_prodaje.iterator():
+        slovar = {
+            'tip':'Vele prodaja',
+            'znesek':float(vele_prodaja.koncna_cena),
+            'title':vele_prodaja.title,
+            'datum':vele_prodaja.datum,
+        }
+        promet.append(slovar)
+    for dnevna_prodaja in dnevne_prodaje.iterator():
+        slovar = {
+            'tip':'Dnevna prodaja',
+            'znesek':float(dnevna_prodaja.skupna_cena),
+            'title':dnevna_prodaja.title,
+            'datum':dnevna_prodaja.datum,
+        }
+        promet.append(slovar)
+    promet = sorted(promet,key = lambda i: (i['datum'],i['tip'],i['znesek']), reverse=True)
+    p = canvas.Canvas(response)
+    p.translate(40,850)
+    pdf.tabela_porocila(p,od,do,promet)
     p.showPage()
     p.save()
     return response

@@ -125,6 +125,7 @@ def porocilo_prometa(request):
         }
         promet.append(slovar)
     promet = sorted(promet,key = lambda i: (i['datum'],i['tip'],i['znesek']), reverse=True)
+    promet = promet[::-1]
     pretok, skupno = pregled_prometa(promet)
     slovar = {
         'pretok':pretok,

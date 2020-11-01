@@ -9,6 +9,11 @@ from zaloga.models import Zaloga,Vnos, Sestavina
 
 centerStyle  = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER')])
 
+style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+
 with open('slovar.json') as dat:
         slovar = json.load(dat)
 
@@ -91,6 +96,33 @@ def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
             tabela(p,data,style)
             top = naslednja_vrstica(p, top)
 
+def tabela_porocila(p,od,do,promet, top = 800, jezik = "spa"):
+    header = [["Report"]]
+    tabela(p,header,style)
+    top = naslednja_vrstica(p,top)
+    podatki = [["From:",od,"To:",do]]
+    tabela(p,podatki,style)
+    top = naslednja_vrstica(p,top)
+    top = naslednja_vrstica(p,top)
+    skupno = 0
+    header = [["Date:","Type:","Title:","Amount:","All:"]]
+    tabela(p,header,style)
+    top = naslednja_vrstica(p,top)
+    for podatek in promet[::-1]:
+        znesek = podatek["znesek"]
+        skupno += znesek
+        if znesek > 0:
+            znesek = "+" + str(znesek) + "$"
+        else:
+            znesek = str(znesek) + "$"
+        
+        if skupno > 0:
+            skupno_str = "+" + str(skupno) + "$"
+        else:
+            skupno_str = str(skupno) + "$"
+        data = [[podatek["datum"],podatek["tip"],podatek["title"],znesek,skupno_str]]
+        tabela(p,data,style)
+        top = naslednja_vrstica(p,top)
 
 def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
     if baza.tip == "prevzem":

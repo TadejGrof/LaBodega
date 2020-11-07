@@ -35,6 +35,8 @@ TIPI_CEN = (
 POSILJATELJI = (
     ('bozo', 'Bozo'),
     ('japan', 'Japan'),
+    ('poland',"Poland"),
+    ('sweden',"Sweden")
 )
 
 DRZAVE = (
@@ -44,6 +46,7 @@ DRZAVE = (
     ('ang', 'England'),
     ('kor', 'Korea'),
     ('pan', 'Panama'),
+    ('swe',"Sweden"),
 )
 
 TIPI_BAZE = (

@@ -937,8 +937,19 @@ def create_vnos(sender, instance, created, **kwargs):
 def change_vnos(sender,instance,created,**kwargs):
     if not created:
         if instance.baza.status=="veljavno":
-           print('spreminjam_veljaven_vnos')
-           instance.sprememba.nastavi_iz_vnosov() 
+            if instance.baza.tip == "inventura":
+                sestavina = Sestavina.objects.get(
+                    zaloga = instance.baza.zaloga,
+                    dimenzija = instance.dimenzija)
+                sprememba = Sprememba.objects.filter(
+                    baza = instance.baza,
+                    sestavina = sestavina,
+                    tip = instance.tip
+                ).first()
+                sprememba.stanje = instance.stevilo
+                sprememba.save()
+            else:
+                instance.sprememba.nastavi_iz_vnosov() 
     
 @receiver(post_delete, sender=Vnos)
 def delete_vnos(sender,instance,**kwargs):

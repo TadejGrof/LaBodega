@@ -38,9 +38,6 @@ def nov_vnos(request):
         baza = Baza.objects.get(pk = pk)
         zaloga = baza.zaloga
         cena = None
-        print(dimenzija)
-        print(zaloga)
-        print(tip)
         if baza.tip == "vele_prodaja":
             cena = Sestavina.objects.get(zaloga=zaloga,dimenzija__dimenzija=dimenzija).cena('vele_prodaja',tip)
         elif baza.tip == "racun":

@@ -269,6 +269,15 @@ class Zaklep(models.Model):
         stanja = self.stanja
         return stanja[str(sestavina.pk)][tip]
 
+    def nastavi_stanje(self,sestavina,tip,stanje = 0):
+        stanja = self.stanja
+        if str(sestavina.pk) in stanja:
+            stanja[tip] = stanje
+        else:
+            stanja[str(sestavina.pk)] = {tip:stanje}
+        self.stanja_json = json.dumps(stanja)
+        self.save()
+
 
 class Zaposleni(models.Model):
     user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)

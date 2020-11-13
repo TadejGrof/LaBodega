@@ -112,7 +112,7 @@ class Zaloga(models.Model):
     @property            
     def rezervirane(self):
         rezervirane = {}
-        for baza in self.baza_set.all().filter(status="aktivno", tip="vele_prodaja"):
+        for baza in self.baza_set.all().filter(status="aktivno", tip__in =  ["vele_prodaja","prenos"]):
             for vnos in baza.vnos_set.all().values('dimenzija__dimenzija','stevilo','tip'):
                 dimenzija = vnos['dimenzija__dimenzija']
                 stevilo = vnos['stevilo']

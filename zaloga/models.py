@@ -269,14 +269,21 @@ class Zaklep(models.Model):
         stanja = self.stanja
         return stanja[str(sestavina.pk)][tip]
 
+    def remove_key(self,key):
+        stanja = self.stanja
+        stanja.pop(key,None)
+        self.stanja_json = json.dumps(stanja)
+        self.save()
+
     def nastavi_stanje(self,sestavina,tip,stanje = 0):
         stanja = self.stanja
         if str(sestavina.pk) in stanja:
-            stanja[tip] = stanje
+            stanja[str(sestavina.pk)][tip] = stanje
         else:
             stanja[str(sestavina.pk)] = {tip:stanje}
         self.stanja_json = json.dumps(stanja)
         self.save()
+        return stanja
 
 
 class Zaposleni(models.Model):

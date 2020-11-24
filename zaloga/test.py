@@ -130,5 +130,25 @@ def testiraj_stanje_zaklepa(zaloga):
                 stanja = zaklep.nastavi_stanje(sestavina,tip[0])
     zaklep.save()
     zaloga.save()
+
+
+def testiraj_prenos(baza):
+    bazaPrenosa = Baza.objects.filter(title = baza.title.replace("PS","PX"),).first()
+    if(bazaPrenosa == None):
+        print("NI BAZE PRENOSA")
+        print("POPRAVLJAM")
+        bazaPrenosa = Baza.objects.create(
+                zaloga_id = baza.getZalogaPrenosa.pk,
+                tip = "prevzem",
+                sprememba_zaloge = 1,
+                title = baza.title.replace("PS","PX"),
+                author = baza.author,
+                zalogaPrenosa = baza.zaloga.pk
+            )
+        for vnos in baza.vnos_set.all().iterator():
+            bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
+        bazaPrenosa.save()
+        bazaPrenosa.uveljavi(bazaPrenosa.zaloga)
+    
                     
       

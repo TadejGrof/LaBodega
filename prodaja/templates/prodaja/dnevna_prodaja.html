@@ -115,11 +115,18 @@
 
     {% if danasnja %}
         {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
+        {% include 'prodaja/racuni.html' with racuni=racuni %}
+        {% include 'prodaja/prodane.html' with prodaja=prodaja %}
     {% endif %}
 
-    {% include 'prodaja/racuni.html' with racuni=racuni %}
+    
 
-    {% include 'prodaja/prodane.html' with prodaja=prodaja %}
+    {% if not danasnja %}
+        {% include 'prodaja/prodane.html' with prodaja=prodaja %}
+        {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
+        {% include 'prodaja/racuni.html' with racuni=racuni %}
+    {% endif %}
+
 {% endif %}
 
 <script>

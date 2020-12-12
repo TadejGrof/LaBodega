@@ -587,6 +587,7 @@ class Baza(models.Model):
         return skupno
 
     def uveljavi_inventuro(self,zaloga, datum = None, cas = None):
+        zaloga = Zaloga.objects.all().get(pk = zaloga)
         for sestavina in Sestavina.objects.all().filter(zaloga = zaloga):
             for tip in zaloga.tipi_sestavin:
                 vnos = self.vnos_set.all().filter(dimenzija = sestavina.dimenzija, tip = tip).first()

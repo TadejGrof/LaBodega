@@ -36,7 +36,8 @@ POSILJATELJI = (
     ('bozo', 'Bozo'),
     ('japan', 'Japan'),
     ('poland',"Poland"),
-    ('sweden',"Sweden")
+    ('sweden',"Sweden"),
+    ('zoki',"Zoki"),
 )
 
 DRZAVE = (
@@ -47,6 +48,7 @@ DRZAVE = (
     ('kor', 'Korea'),
     ('pan', 'Panama'),
     ('swe',"Sweden"),
+    ('sui',"Switzerland")
 )
 
 TIPI_BAZE = (

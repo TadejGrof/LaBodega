@@ -208,6 +208,7 @@
                 <th> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </th>
                 {% elif tip == "prevzem" %}
                 <th> {{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </th>
                 {% elif tip == "prenos" %}
                 <th> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
                 {% endif %}
@@ -226,6 +227,7 @@
                 <td> {{baza.stranka}} </td>
                 {% elif tip == "prevzem" %}
                 <td> {{baza.kontejner.stevilka}} </td>
+                <td> {{baza.kontejner.drzava}} </td>
                 {% elif tip == "prenos" %}
                 <td> {{baza.getZalogaPrenosa}} </td>
                 {% endif %}

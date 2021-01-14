@@ -23,7 +23,6 @@ class TipListFilter(admin.SimpleListFilter):
 class BazaAdmin(admin.ModelAdmin):
     list_display = ('title','status','zaloga', 'tip', 'datum','stranka','kontejner','dnevna_prodaja','zalogaPrenosa')
     list_filter = (TipListFilter,"zaloga","stranka",)
-    exclude = ('zaloga',)
 
 admin.site.register(Zaklep)
 admin.site.register(Vnos)

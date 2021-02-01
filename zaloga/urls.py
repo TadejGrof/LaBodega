@@ -13,6 +13,7 @@ ogled_patterns = [
     path('uveljavi/', views.uveljavi_bazo, name='uveljavi_bazo'),
     path('pdf/', pdf_views.pdf_baze, name='pdf_baze'),
     path('pdf/razlika', pdf_views.pdf_razlike, name="pdf_razlike"),
+    path('spremeni_ceno_nakupa/',views.spremeni_ceno_nakupa, name="spremeni_ceno_nakupa"),
 ]
 
 baza_patterns = [

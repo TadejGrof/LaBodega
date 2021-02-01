@@ -560,6 +560,7 @@ class Baza(models.Model):
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
     prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
     zalogaPrenosa = models.IntegerField(default=None,null=True,blank=True)
+    cena = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
 
     @property 
     def getZalogaPrenosa(self):
@@ -746,7 +747,7 @@ class Baza(models.Model):
 
     @property
     def vnosi_values(self):
-        return self.vnos_set.all().order_by('dimenzija').values(
+        vnosi_values = self.vnos_set.all().order_by('dimenzija').values(
             'dimenzija__dimenzija',
             'dimenzija__radius',
             'pk',
@@ -754,10 +755,54 @@ class Baza(models.Model):
             'tip',
             'cena',
         )
+        if self.tip == "prevzem":
+            povprecna_cena = self.povprecna_cena 
+            cenik_dnevne = self.zaloga.cenik("dnevna_prodaja")
+            cenik_vele = self.zaloga.cenik("vele_prodaja")
+            for vnos in vnosi_values:
+                vnos["cena_nakupa"] = povprecna_cena * vnos["stevilo"]
+                if vnos["tip"] == "JP70":
+                    try: 
+                        vnos["cena_prodaje"] = cenik_dnevne[vnos["dimenzija__dimenzija"]]["JP70"] * vnos["stevilo"]
+                        if vnos["cena_prodaje"] == 0:
+                            vnos["cena_prodaje"] = cenik_dnevne[vnos["dimenzija__dimenzija"]]["W"] * vnos["stevilo"]
+                    except:
+                        vnos["cena_prodaje"] = 0.
+                else:
+                    try:
+                        vnos["cena_prodaje"] = cenik_vele[vnos["dimenzija__dimenzija"]][vnos["tip"]] * vnos["stevilo"]
+                    except:
+                        vnos["cena_prodaje"] = 0.
+        return vnosi_values
+
     @property
-    
+    def cena_nakupa(self):
+        if self.cena == None:
+            return 0
+        return float(self.cena)
+
+    @property
+    def skupna_cena_prodaje(self):
+        vnosi = self.vnosi_values
+        cena = 0
+        for vnos in vnosi:
+            cena += vnos["cena_prodaje"]
+        return cena
+
+    @property
     def stevilo_vnosov(self):
         return self.vnos_set.all().count()
+
+    @property
+    def zasluzek(self):
+        return float(self.skupna_cena_prodaje) - float(self.cena_nakupa)
+
+    @property
+    def povprecna_cena(self):
+        cena = self.cena
+        if cena == None:
+            cena = 0
+        return round(cena / self.skupno_stevilo, 2)
 
     @property
     def uveljavljeni_vnosi(self):

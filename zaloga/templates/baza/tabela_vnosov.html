@@ -17,6 +17,10 @@
                 <th width="14%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
                 <th width="14%"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
             {% endif %}
+            {% if tip == "prevzem" %}
+                <th width="14%"> Kupna cena: </th>
+                <th width="14%"> Prodajna cena: </th>
+            {% endif %} 
             {% if tip != "prenos" or status == "aktivno" %}
                 <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
             {% endif %}
@@ -39,6 +43,10 @@
                         <div class="{{vnos.pk}} skrit inline"> $ </div>
                     </td>
                     <td id="cena_vnosa_{{vnos.pk}}"> {{vnos|skupna_cena}} $ </td>
+                {% endif %}
+                {% if tip == "prevzem" %}
+                    <td class="cene"> {{vnos.cena_nakupa}} $ </td>
+                    <td class="cene"> {{vnos.cena_prodaje}} $ </td>
                 {% endif %}
                 {% if tip != "prenos" or status == "aktivno" %}
                 <td>
@@ -104,8 +112,29 @@
             <tr>
                 <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
                 <td id="skupno_stevilo"> {{baza|skupno:"all"}} </td>
+                {% if tip == "prevzem" %}
+                    <td class="cena"> 
+                        <div class="cena_nakupa inline">{{baza.cena_nakupa}} $</div>
+                        <button class="cena_nakupa inline" onclick="ToggleClass('.cena_nakupa','skrit')"> E </button>
+                        <input class="cena_nakupa skrit input" form="cena_nakupa" style="width:35%" type="text" name="cena_nakupa" autocomplete="off" pattern="[0-9]{0,6}?\.{0,1}[0-9]{0,2}">
+                        <div class="cena_nakupa skrit inline"> $ </div>
+                        <input type="submit" form="cena_nakupa" class="cena_nakupa skrit inline" text="OK">
+                        <button class="cena_nakupa skrit inline" onclick="ToggleClass('.cena_nakupa','skrit')"> X </button>
+                    </td>
+                    <form class="skrit" id="cena_nakupa" action="{% url 'spremeni_ceno_nakupa' zaloga_pk tip baza.pk %}" method="POST">
+                        {% csrf_token %}
+                    </form>
+                    <td> {{baza.skupna_cena_prodaje}} $ </td>
+                {% endif %}
                 <td> </td>
             </tr>
+            {% if tip == "prevzem" %}
+            <tr>
+                <td colspan="4"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </td>
+                <td colspan="2"> {{baza.zasluzek}} $ </td>
+                <td> </td>
+            </tr>
+            {% endif %}
         {% endif %}
     </table>
 </div>

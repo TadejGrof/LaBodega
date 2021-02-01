@@ -278,6 +278,19 @@ def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
     Vnos.objects.bulk_create(vnosi)
     return redirect('baza',zaloga=zaloga.pk, tip_baze = tip_baze, pk = pk)
 
+def spremeni_ceno_nakupa(request,zaloga,tip_baze,pk):
+    if request.method == "POST":
+        baza = Baza.objects.get(pk = pk)
+        try:
+            cena = float(request.POST.get("cena_nakupa"))
+            if not cena > 0:
+                cena = 0
+        except:
+            cena = 0
+        baza.cena = cena
+        baza.save()
+        return redirect("baza",zaloga=zaloga,tip_baze=tip_baze,pk=pk)
+
 @login_required
 def uveljavi_bazo(request,zaloga, tip_baze, pk):
     if request.method == "POST":

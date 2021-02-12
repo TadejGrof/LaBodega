@@ -63,16 +63,19 @@ def pdf_zaloge(request,zaloga):
     p.save()
     return response 
     
-def pdf_cenika(request,tip_prodaje):
-    radius = request.GET.get('radius')
+def pdf_cenika(request,zaloga,tip_prodaje):
+    radius = request.GET.get('radius',"all")
+    zaloga = Zaloga.objects.get(pk=zaloga)
     sestavine = zaloga.sestavina_set.all()
-    if radius != 'all':
-        sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius)
+    print(sestavine)
+    print(radius)
+    print(radius == "")
+    if radius != 'all' and radius != "":
+        sestavine = sestavine.filter(dimenzija__radius = radius)
     tipi = []
     for tip in zaloga.vrni_tipe:
         if request.GET.get(tip[0]):
             tipi.append(tip)
-
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="cenik.pdf"'
     p = canvas.Canvas(response)

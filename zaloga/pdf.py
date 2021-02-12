@@ -390,8 +390,12 @@ def zaloga_skupno(p,zaloga,sestavine,tipi,top,jezik="spa"):
     for sestavina in sestavine:
         n = 0
         for tip in tipi:
-            stevilo[n] += sestavina[tip]
-            cena[n] += cenik[sestavina['dimenzija__dimenzija']][tip] * sestavina[tip]
+            try:
+                stevilo[n] += sestavina[tip]
+                cena[n] += cenik[sestavina['dimenzija__dimenzija']][tip] * sestavina[tip]
+            except:
+                stevilo[n] = 0
+                cena[n] = 0
             n += 1
     for n in range(len(cena)):
         cena[n] = str(cena[n]) + '$'

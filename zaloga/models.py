@@ -245,13 +245,12 @@ class Zaloga(models.Model):
     def zakleni_zalogo(self,datum):
         if datum > self.datum_zaklepa:
             zaklep_json = {}
-            for sestavina in self.sestavina_set().all():
+            for sestavina in self.sestavina_set.all():
                 pk = sestavina.pk
                 zaklep_json[pk] = {}
                 for tip in self.tipi_sestavin:
-                    tip = tip[0]
-                    zaklep_json[pk][tip] = sestavina.getattr(tip)
-            Zaklep.objects.create(zaloga = self, datum = datum,stanja = json.dumps(zaklep_json))
+                    zaklep_json[pk][tip] = sestavina.zaloga_na_datum(datum,tip)
+            Zaklep.objects.create(zaloga = self, datum = datum,stanja_json = json.dumps(zaklep_json))
         else:
             print("IZBERI DATUM PO PREJŠNJEM ZAKLEPU")
 
@@ -286,6 +285,14 @@ class Zaklep(models.Model):
         self.stanja_json = json.dumps(stanja)
         self.save()
         return stanja
+
+@receiver(post_save, sender=Zaklep)
+def create_zaklep(sender, instance, created, **kwargs):
+    if created:
+        baze = instance.zaloga.baza_set.all().filter(status = "veljavno", datum__lte = instance.datum)
+        for baza in baze:
+            baza.status = "zaklenjeno"
+        Baza.objects.bulk_update(baze,["status"])
 
 
 class Zaposleni(models.Model):
@@ -380,8 +387,9 @@ class Sestavina(models.Model):
         self.save()
 
     def zaloga_na_datum(self,datum,tip):
-        datum = datum.split("-")
-        datum = datetime(int(datum[0]),int(datum[1]),int(datum[2])).date()
+        if isinstance(datum,str):
+            datum = datum.split("-")
+            datum = datetime(int(datum[0]),int(datum[1]),int(datum[2])).date()
         spremembe = self.sprememba_set.all().filter(tip = tip)
         zaloga = self.zaloga
         zaklep = zaloga.zaklep_zaloge

@@ -11,6 +11,7 @@ from . import funkcije
 from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
 from django.urls import reverse
+from .test import testiraj_stanja_zaklepov
 
 #zaloga = Zaloga.objects.first()
 
@@ -136,6 +137,7 @@ def dodaj_dimenzijo(request):
             height = height,
             width = width,
             special = special)
+        testiraj_stanja_zaklepov()
         return redirect('nova_dimenzija')
     else:
         return pokazi_stran(request, 'zaloga/dodaj_dimenzijo.html')
@@ -320,7 +322,7 @@ def arhiv(request,zaloga, tip_baze):
         if tip_baze == "dnevna_prodaja":
             baze = Dnevna_prodaja.objects.filter(zaloga=zaloga,datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
         else:
-            baze = Baza.objects.filter(zaloga=zaloga,tip=tip_baze,status='veljavno',datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
+            baze = Baza.objects.filter(zaloga=zaloga,tip=tip_baze,status__in =['veljavno','zaklenjeno'],datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
             stranka = request.GET.get('stranka','all')
             if tip_baze == "vele_prodaja" and stranka != "all":
                 stranka = int(stranka)

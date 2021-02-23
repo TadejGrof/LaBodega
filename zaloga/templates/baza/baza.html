@@ -41,46 +41,48 @@
 {% include 'baza/bazno_okno.html' with baza=baza %}
 
 <div class="delovno_okno">
-    {% if tip == "inventura" %}
-        <button onclick="Izracunaj_razliko()"> Razlika </button>
-        <button onclick="Preklici_razliko()"> Preklici razliko </button>
-        <button id="shrani_vse" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
-    {% else %}
-        {% if perms.zaloga.add_vnos %}
-            <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-            <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
-                {% for dimenzija in program.vrni_dimenzije %}
-                    <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
-                {% endfor %}
-            </select>
-            <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
-            <select id="tip" class="nov_vnos skrit">
-                {% for tip in zaloga.vrni_tipe %}
-                    <option value="{{tip.0}}"> {{tip.1}} </option>
-                {% endfor %}
-            </select>
-            <button class="nov_vnos skrit" onclick="nov_vnos()"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-            <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
-        {% endif %}
-        <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
-        <button class="vnosi skrit" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
-    {% endif %} 
-    {% if status == "aktivno" %}
-        <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
-        <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip baza.pk %}" method="POST">
-            {% csrf_token %}
-            <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
-            <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
-        </form>
-        <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip baza.pk %}" method="POST">
-            {% csrf_token %}
-            <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
-        </form>
-        <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
+    {% if status != "zaklenjeno" %}
         {% if tip == "inventura" %}
-            <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip baza.pk %}" method="GET">
-                <input style="width:150px" type="submit" value="PDF Razlike">
+            <button onclick="Izracunaj_razliko()"> Razlika </button>
+            <button onclick="Preklici_razliko()"> Preklici razliko </button>
+            <button id="shrani_vse" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+        {% else %}
+            {% if perms.zaloga.add_vnos %}
+                <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+                <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
+                    {% for dimenzija in program.vrni_dimenzije %}
+                        <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
+                    {% endfor %}
+                </select>
+                <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
+                <select id="tip" class="nov_vnos skrit">
+                    {% for tip in zaloga.vrni_tipe %}
+                        <option value="{{tip.0}}"> {{tip.1}} </option>
+                    {% endfor %}
+                </select>
+                <button class="nov_vnos skrit" onclick="nov_vnos()"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+                <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+            {% endif %}
+            <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+            <button class="vnosi skrit" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+        {% endif %} 
+        {% if status == "aktivno" %}
+            <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
+            <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip baza.pk %}" method="POST">
+                {% csrf_token %}
+                <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
+                <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
             </form>
+            <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip baza.pk %}" method="POST">
+                {% csrf_token %}
+                <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
+            </form>
+            <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
+            {% if tip == "inventura" %}
+                <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip baza.pk %}" method="GET">
+                    <input style="width:150px" type="submit" value="PDF Razlike">
+                </form>
+            {% endif %}
         {% endif %}
     {% endif %}
     <form class="nov_vnos inline vnosi" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="GET">
@@ -93,6 +95,7 @@
         </select>
     </form>
 </div>
+
     
 {% if status == "aktivno" %}
     {% include 'baza/filter.html' with tipi=tipi radiusi=razlicni_radiusi slovar=slovar %}
@@ -102,7 +105,7 @@
     {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
 {% endif %}
 
-{% if tip != "inventura" or status == "veljavno" %}
+{% if tip != "inventura" or status == "veljavno" or status == "zaklenjeno" %}
     {% include 'baza/tabela_vnosov.html' with tip=tip status=status baza=baza slovar=slovar %}
 {% endif %}
 

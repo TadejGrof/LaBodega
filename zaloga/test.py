@@ -57,6 +57,9 @@ def popravi():
                 sestavina.nastavi_iz_sprememb(tip)
         baza.save()
 
+def zakleni_zaloge(datum):
+    for zaloga in Zaloga.objects.all():
+        zaloga.zakleni_zalogo(datum)
 
 
 def testiraj_baze():

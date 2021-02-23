@@ -22,7 +22,9 @@
                 <th width="14%"> Prodajna cena: </th>
             {% endif %} 
             {% if tip != "prenos" or status == "aktivno" %}
+                {% if status != "zaklenjeno" %}
                 <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
+                {% endif %}
             {% endif %}
         </tr>
         {% for vnos in baza.vnosi_values %}
@@ -49,12 +51,14 @@
                     <td class="cene"> {{vnos.cena_prodaje}} $ </td>
                 {% endif %}
                 {% if tip != "prenos" or status == "aktivno" %}
-                <td>
-                    <button class="{{vnos.pk}}" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> E </button>
-                    <button class="{{vnos.pk}}" onclick="Izbrisi_vnos('{{vnos.pk}}')"> X </button>
-                    <button class="{{vnos.pk}} skrit"  onclick="spremeni_vnos('{{vnos.pk}}')"> Ok </button>
-                    <button class="{{vnos.pk}} skrit" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> X </button>
-                </td>
+                    {% if status != "zaklenjeno" %}
+                        <td>
+                            <button class="{{vnos.pk}}" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> E </button>
+                            <button class="{{vnos.pk}}" onclick="Izbrisi_vnos('{{vnos.pk}}')"> X </button>
+                            <button class="{{vnos.pk}} skrit"  onclick="spremeni_vnos('{{vnos.pk}}')"> Ok </button>
+                            <button class="{{vnos.pk}} skrit" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> X </button>
+                        </td>
+                    {% endif %}
                 {% endif %}
             </tr>
         {% endfor %}
@@ -126,13 +130,17 @@
                     </form>
                     <td> {{baza.skupna_cena_prodaje}} $ </td>
                 {% endif %}
-                <td> </td>
+                {% if status != "zaklenjeno" %}
+                    <td> </td>
+                {% endif %}
             </tr>
             {% if tip == "prevzem" %}
             <tr>
                 <td colspan="4"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </td>
                 <td colspan="2"> {{baza.zasluzek}} $ </td>
-                <td> </td>
+                {% if status != "zaklenjeno" %}
+                    <td> </td>
+                {% endif %}
             </tr>
             {% endif %}
         {% endif %}

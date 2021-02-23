@@ -152,9 +152,9 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
                 vnos.stevilo,
                 str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/",
                 str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]]
-            style= TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
+            style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                            ('BOX', (2,0), (-1,-1), 0.5, colors.black),
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
             tabela(p,data,style)
             top = naslednja_vrstica(p,top)

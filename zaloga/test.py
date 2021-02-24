@@ -9,6 +9,12 @@ def test_dnevna_prodaja(odDatum,doDatum):
     prodaje = dnevne_prodaje.filter(datum__lte = doDatum, datum__gte = odDatum)
     test_prodaje(prodaje)
 
+def popravi_bazo(baza):
+    for sprememba in Sprememba.objects.all().filter(baza = baza):
+        if len(sprememba.vnos_set.all()) == 0:
+            print("BRISEM SPREMEMBO " + str(sprememba))
+            sprememba.delete()
+
 def test_prodaje(prodaje):
     for prodaja in prodaje:
         print("delam " + str(prodaja.datum) + ":")
@@ -73,6 +79,7 @@ def testiraj_zalogo(zaloga):
 def testiraj_tip(zaloga,tip):
     for baza in Baza.objects.all().filter(zaloga = zaloga, tip = tip, status = "veljavno"):
         testiraj_bazo(baza)
+
 
 def testiraj_bazo(baza):
     for vnos in baza.vnos_set.all():

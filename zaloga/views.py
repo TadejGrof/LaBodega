@@ -303,7 +303,7 @@ def uveljavi_bazo(request,zaloga, tip_baze, pk):
             elif tip_baze == "prenos":
                 baza.uveljavi_prenos(zaloga)
             else:
-                baza.uveljavi(zaloga)
+                baza.uveljavi()
     return redirect('arhiv_baz',zaloga=zaloga, tip_baze = tip_baze)
 
 ############################################################################################

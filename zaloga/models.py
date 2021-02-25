@@ -4,12 +4,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+
 from datetime import datetime
 import os
 from django.contrib.auth.models import User
 from prodaja.models import Prodaja, Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.functions import Concat, Cast
+from django.db.models import F, CharField
 from django.dispatch import receiver
 from django.utils.timezone import now
 
@@ -342,12 +345,14 @@ class Sestavina(models.Model):
         cena.cena = nova_cena
         cena.save()
         
-    def spremeni_stevilo(self,stevilo,tip):
-        for tip_zaloge in self.zaloga.vrni_tipe:
-            if tip_zaloge[0] == tip:
-                stevilo = getattr(self,tip_zaloge[0]) + stevilo
-                setattr(self,tip,stevilo)
-        self.save()
+    def spremeni_stevilo(self,stevilo,tip,save=True):
+        try:
+            stevilo = getattr(self,tip) + stevilo
+            setattr(self,tip,stevilo)
+        except:
+            print("NAPAKA PRI SPREMEMBI STEVILA ZA SESTAVINO: " + str(self.dimenzija) + " tipa: " + tip)
+        if save:
+            self.save()
 
     def prodaja(self,tip_baze,tip,zacetek,konec):
         spremembe = self.sprememba_set.all().filter(baza__tip = tip_baze, tip=tip, baza__datum__gte = zacetek, baza__datum__lte = konec)
@@ -631,8 +636,14 @@ class Baza(models.Model):
             )
         Sprememba.objects.bulk_create(spremembe)
 
+    @property 
+    def is_prevzem_prenosa(self):
+        return "PX" in self.title
+
     def uveljavi_prenos(self,zaloga,cas = None):
-        self.uveljavi(self.zaloga)
+        self.uveljavi()
+        self.status = "zaklenjeno"
+        self.save()
         bazaPrenosa = Baza.objects.create(
                 zaloga_id = self.getZalogaPrenosa.pk,
                 tip = "prevzem",
@@ -644,7 +655,9 @@ class Baza(models.Model):
         for vnos in self.vnos_set.all().iterator():
             bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
         bazaPrenosa.save()
-        bazaPrenosa.uveljavi(bazaPrenosa.zaloga)
+        bazaPrenosa.uveljavi()
+        bazaPrenosa.status = "zaklenjeno"
+        bazaPrenosa.save()
 
     def uveljavi_racun(self,zaloga, cas = None):
         self.status = "veljavno"
@@ -678,38 +691,59 @@ class Baza(models.Model):
             return "Prenos"
         return "Drugo"
 
-    def uveljavi(self,zaloga,datum=None,cas = None):
-        print(self)
+    def uveljavi(self,datum=None,cas = None):
         self.status = "veljavno"
         self.doloci_cas(cas)
         self.doloci_datum(datum)
-        for vnos in self.vnos_set.all():
-            sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija = vnos.dimenzija)
-            tip = vnos.tip
-            sestavina.spremeni_stevilo(self.sprememba_zaloge * vnos.stevilo, vnos.tip)
-            sprememba = Sprememba.objects.filter(baza = self, sestavina = sestavina, tip = vnos.tip ).first()
-            if sprememba:
-                sprememba.stevilo += vnos.stevilo
-                sprememba.save()
-            else:
-                sprememba = Sprememba.objects.create(
+        self.save()
+        vnosi = self.vnos_set.all()
+        spremembe = []
+        seznam_sestavin = []
+        sestavine = Sestavina.objects.filter(zaloga = self.zaloga)
+        slovar_sestavin = {}
+        for sestavina in sestavine.iterator():
+            slovar_sestavin[sestavina.dimenzija_id] = sestavina
+        slovar_sprememb = { dimenzija_tip[0] : None for dimenzija_tip in vnosi.all().annotate(dimenzija_tip = Concat(Cast("dimenzija",CharField()),F("tip"))).values("dimenzija_tip").distinct().values_list("dimenzija_tip")}
+        for vnos in vnosi.values("dimenzija","stevilo","tip"):
+            sestavina = slovar_sestavin[vnos["dimenzija"]]
+            sestavina.spremeni_stevilo(self.sprememba_zaloge * vnos["stevilo"], vnos["tip"],False)
+            seznam_sestavin.append(sestavina)
+            dimenzija_tip = str(vnos["dimenzija"]) + vnos["tip"]
+            sprememba = slovar_sprememb[dimenzija_tip]
+            if not sprememba:
+                sprememba = Sprememba(
                     sestavina = sestavina,
-                    tip = vnos.tip,
-                    stevilo = vnos.stevilo,
+                    tip = vnos["tip"],
+                    stevilo = vnos["stevilo"],
                     baza = self)
-            vnos.sprememba = sprememba
-            vnos.save()
+                spremembe.append(sprememba)
+                slovar_sprememb[dimenzija_tip] = sprememba
+            else:
+                sprememba.stevilo = sprememba.stevilo + vnos["stevilo"]
+        spremembe = Sprememba.objects.bulk_create(spremembe)
+        spremembe = Sprememba.objects.filter(baza = self)
+        for sprememba in spremembe.values("sestavina__dimenzija","tip","pk"):
+            slovar_sprememb[str(sprememba["sestavina__dimenzija"]) + sprememba["tip"]] = sprememba["pk"]
+        for vnos in vnosi:
+            sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
+            vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
+        Sestavina.objects.bulk_update(seznam_sestavin, self.zaloga.tipi_sestavin)
+        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])
+        
 
     def razveljavi(self):
         if self.status == "veljavno":
             self.status = "aktivno"
             for vnos in self.vnos_set.all():
-                sestavina = vnos.sprememba.sestavina
-                sprememba = vnos.sprememba
-                vnos.sprememba = None
-                vnos.save()
-                sprememba.delete()
-                sestavina.nastavi_iz_sprememb(vnos.tip)
+                try:
+                    sestavina = vnos.sprememba.sestavina
+                    sprememba = vnos.sprememba
+                    vnos.sprememba = None
+                    vnos.save()
+                    sprememba.delete()
+                    sestavina.nastavi_iz_sprememb(vnos.tip)
+                except:
+                    continue
         self.save()
 
     def razlicni_tipi(self):
@@ -740,14 +774,12 @@ class Baza(models.Model):
             self.cas = timezone.localtime(timezone.now())
         else:
             self.cas = cas
-        self.save()
 
     def doloci_datum(self,datum):
         if datum == None:
             self.datum = timezone.localtime(timezone.now())
         else:
             self.datum = datum
-        self.save()
 
     @property
     def vrni_vnose(self):
@@ -810,7 +842,10 @@ class Baza(models.Model):
         cena = self.cena
         if cena == None:
             cena = 0
-        return round(cena / self.skupno_stevilo, 2)
+        try:
+            return round(cena / self.skupno_stevilo, 2)
+        except:
+            return 0
 
     @property
     def uveljavljeni_vnosi(self):
@@ -972,8 +1007,7 @@ class Vnos(models.Model):
         self.save()
 
     def vrni_sestavino(self):
-        dimenzija = Dimenzija.objects.get(dimenzija = self.dimenzija)
-        return Sestavina.objects.get(dimenzija = dimenzija)
+        return Sestavina.objects.get(zaloga = self.baza.zaloga, dimenzija = self.dimenzija)
 
     def doloci_spremembo(self,sprememba):
         self.sprememba = sprememba
@@ -981,7 +1015,7 @@ class Vnos(models.Model):
 
     def ustvari_spremembo(self,sestavina = None):
         if sestavina == None:
-            sestavina = Sestavina.objects.get(zaloga=self.baza.zaloga, dimenzija = self.dimenzija)
+            sestavina = self.vrni_sestavino()
         if self.baza.tip == "inventura":
             self.sprememba = Sprememba.objects.create(
                 zaloga = self.baza.zaloga,
@@ -998,6 +1032,7 @@ class Vnos(models.Model):
                 tip = self.tip,
                 sestavina = sestavina 
             )
+            
         self.save()
 
 @receiver(post_save, sender=Vnos)

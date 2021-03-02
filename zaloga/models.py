@@ -602,30 +602,45 @@ class Baza(models.Model):
                 skupno += vnos["cena"] * vnos["stevilo"]
         return skupno
 
-    def uveljavi_inventuro(self,zaloga, datum = None, cas = None):
-        zaloga = Zaloga.objects.all().get(pk = zaloga)
-        for sestavina in Sestavina.objects.all().filter(zaloga = zaloga):
-            for tip in zaloga.tipi_sestavin:
-                vnos = self.vnos_set.all().filter(dimenzija = sestavina.dimenzija, tip = tip).first()
-                if vnos == None:
-                    stevilo = getattr(sestavina,tip)
-                    if stevilo != 0:
-                        Vnos.objects.create(
-                            dimenzija = sestavina.dimenzija,
-                            tip = tip,
-                            baza = self,
-                            stevilo = 0
-                        )
-        self.status = "veljavno"
-        self.doloci_cas(cas)
-        self.doloci_datum(datum)
+    def uveljavi_inventuro(self,delno = False):
+        print("uveljavljam inventuro")
+        slovar_vnosov = {}
+        tipi_sestavin = self.zaloga.tipi_sestavin
+        sestavine = Sestavina.objects.filter(zaloga = self.zaloga)
+        slovar_sestavin = {}
+        for sestavina in sestavine.iterator():
+            slovar_sestavin[sestavina.dimenzija_id] = sestavina
+        vnosi = self.vnos_set.all()
+
+        if not delno:
+            for sestavina in sestavine.values("dimenzija"):
+                for tip in tipi_sestavin:
+                    slovar_vnosov[str(sestavina["dimenzija"]) + "-" + tip] = None
+            for vnos in vnosi.values("dimenzija","tip","pk"):
+                slovar_vnosov[str(vnos["dimenzija"]) + "-" +vnos["tip"]] = vnos["pk"]
+            seznam_vnosov = []
+            for dimenzija_tip in slovar_vnosov:
+                if slovar_vnosov[dimenzija_tip] == None:
+                    dimenzija_tip = dimenzija_tip.split("-")
+                    dimenzija = int(dimenzija_tip[0])
+                    tip = dimenzija_tip[1]
+                    vnos = Vnos(
+                        dimenzija_id = dimenzija,
+                        tip = tip,
+                        baza = self,
+                        stevilo = 0
+                    )
+                    seznam_vnosov.append(vnos)
+            Vnos.objects.bulk_create(seznam_vnosov)
+        
         spremembe = []
+        seznam_sestavin = []
         for vnos in self.vnos_set.all().values():
-            sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija_id = vnos['dimenzija_id'])
+            sestavina = slovar_sestavin[vnos["dimenzija_id"]]
             tip = vnos["tip"]
             stevilo = vnos["stevilo"]
             setattr(sestavina,tip,stevilo)
-            sestavina.save()
+            seznam_sestavin.append(sestavina)
             spremembe.append(
                 Sprememba(
                 baza=self,
@@ -634,14 +649,19 @@ class Baza(models.Model):
                 stanje=stevilo,
                 )
             )
+        Sestavina.objects.bulk_update(seznam_sestavin,tipi_sestavin)
         Sprememba.objects.bulk_create(spremembe)
-
-    @property 
-    def is_prevzem_prenosa(self):
-        return "PX" in self.title
+        spremembe = Sprememba.objects.filter(baza = self)
+        slovar_sprememb = {}
+        for sprememba in spremembe.values("sestavina__dimenzija","tip","pk"):
+            slovar_sprememb[str(sprememba["sestavina__dimenzija"]) + sprememba["tip"]] = sprememba["pk"]
+        for vnos in vnosi:
+            sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
+            vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
+        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"]) 
 
     def uveljavi_prenos(self,zaloga,cas = None):
-        self.uveljavi()
+        self.uveljavi_bazo()
         self.status = "zaklenjeno"
         self.save()
         bazaPrenosa = Baza.objects.create(
@@ -655,13 +675,11 @@ class Baza(models.Model):
         for vnos in self.vnos_set.all().iterator():
             bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
         bazaPrenosa.save()
-        bazaPrenosa.uveljavi()
+        bazaPrenosa.uveljavi_bazo()
         bazaPrenosa.status = "zaklenjeno"
         bazaPrenosa.save()
 
-    def uveljavi_racun(self,zaloga, cas = None):
-        self.status = "veljavno"
-        self.doloci_cas(cas)
+    def uveljavi_racun(self):
         for vnos in self.vnos_set.all():
             sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija = vnos.dimenzija)
             sprememba = Sprememba.objects.filter(baza__dnevna_prodaja = self.dnevna_prodaja, sestavina = sestavina, tip = vnos.tip ).first()
@@ -673,7 +691,6 @@ class Baza(models.Model):
                     baza = self)
             vnos.sprememba = sprememba
             vnos.save()
-        self.save()
 
     @property
     def posiljatelj(self):
@@ -691,11 +708,21 @@ class Baza(models.Model):
             return "Prenos"
         return "Drugo"
 
-    def uveljavi(self,datum=None,cas = None):
+    def uveljavi(self,delno=False,datum=None,cas=None):
         self.status = "veljavno"
         self.doloci_cas(cas)
         self.doloci_datum(datum)
         self.save()
+        if self.tip == "inventura":
+            self.uveljavi_inventuro(delno)
+        elif self.tip == "prenos":
+            self.uveljavi_prenos()
+        elif self.tip == "racun":
+            self.uveljavi_racun()
+        else:
+            self.uveljavi_bazo()
+
+    def uveljavi_bazo(self):
         vnosi = self.vnos_set.all()
         spremembe = []
         seznam_sestavin = []
@@ -728,8 +755,7 @@ class Baza(models.Model):
             sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
             vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
         Sestavina.objects.bulk_update(seznam_sestavin, self.zaloga.tipi_sestavin)
-        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])
-        
+        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])       
 
     def razveljavi(self):
         if self.status == "veljavno":

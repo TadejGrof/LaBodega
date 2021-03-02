@@ -2,7 +2,8 @@ from .models import Dnevna_prodaja, Zaloga, Sestavina, Baza, Sprememba, Cena
 import json
 from .models import Zaklep
 from .models import TIPI_BAZE
-
+from django.db.models import F, IntegerField,Value
+from django.db.models.functions import Concat
 dnevne_prodaje = Dnevna_prodaja.objects.all()[::-1]
 
 def test_dnevna_prodaja(odDatum,doDatum):
@@ -162,3 +163,12 @@ def testiraj_prenos(baza):
     
                     
       
+def poskus():
+    baza = Baza.objects.all().filter(tip="prevzem").first()
+    pc = 3
+    slovar = {3 : 5}
+    print(baza.vnos_set.all().values()
+        .annotate(povprecna_cena = Value(pc,IntegerField()))
+        .annotate(cena_nakupa = F("povprecna_cena") * F("stevilo"))
+        .annotate(poskus = Value(slovar[F("povprecna_cena")], IntegerField())))
+    

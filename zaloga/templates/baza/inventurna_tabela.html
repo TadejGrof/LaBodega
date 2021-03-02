@@ -25,7 +25,11 @@
         </tr>
         {% for sestavina in sestavine %}
             {% with podatki=sestavine|keyvalue:sestavina sestavina=sestavina|replace %}
+            {% if podatki.kupljena %}
+            <tr id="{{sestavina}}" class="vrstica {{podatki.radius}} {{podatki.tip}} kupljena">
+            {% else %}
             <tr id="{{sestavina}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
+            {% endif %}
                 <input type="text" class="skrit" id="pk_{{sestavina}}">
                 <td> {{podatki.dimenzija}} </td>
                 <td> {{podatki.tip}} </td>

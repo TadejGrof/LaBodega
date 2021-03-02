@@ -12,7 +12,7 @@ from prodaja.models import Prodaja, Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.db.models.functions import Concat, Cast
-from django.db.models import F, CharField
+from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 
@@ -225,13 +225,9 @@ class Zaloga(models.Model):
  
     @property
     def vrni_zalogo(self):
-        sestavine = self.sestavina_set.all().values()
-        dimenzije = Dimenzija.objects.all().values()
-        for sestavina in sestavine:
-            for dimenzija in dimenzije:
-                if dimenzija['id'] == sestavina['dimenzija_id']:
-                    sestavina.update({'dimenzija':dimenzija['dimenzija'],'radius':dimenzija['radius']})
-        return sestavine
+        return self.sestavina_set.all().order_by("dimenzija")\
+        .values().annotate(radius = F("dimenzija__radius"),dim = F("dimenzija__dimenzija"))
+
 
     @property
     def vrni_sestavine(self):
@@ -808,6 +804,23 @@ class Baza(models.Model):
             self.datum = datum
 
     @property
+    def slovar_dosedanjih_kupljenih(self):
+        kupljene = self.dosedanje_kupljene_stranke
+        slovar = {}
+        for kupljena in kupljene:
+            slovar[kupljena["dimenzija_tip"]] = True
+        return slovar
+
+    @property
+    def dosedanje_kupljene_stranke(self):
+        if self.tip == "vele_prodaja":
+            return Vnos.objects.filter(baza__stranka = self.stranka)\
+            .order_by("dimenzija").values("dimenzija__dimenzija","tip")\
+            .annotate(dimenzija_tip = Concat(F("dimenzija__dimenzija"),Value("_"),F("tip")))\
+            .values("dimenzija_tip").distinct()
+        return []
+
+    @property
     def vrni_vnose(self):
         return self.vnos_set.all()
 
@@ -820,7 +833,8 @@ class Baza(models.Model):
             'stevilo',
             'tip',
             'cena',
-        )
+        ).annotate(dimenzija_tip = Concat(F("dimenzija__dimenzija"),Value("_"),F("tip")))
+
         if self.tip == "prevzem":
             povprecna_cena = self.povprecna_cena 
             cenik_dnevne = self.zaloga.cenik("dnevna_prodaja")
@@ -903,10 +917,12 @@ class Baza(models.Model):
     def inventurni_vnosi(self):
         vnosi = {}
         count = 0
+        slovar_kupljenih = self.slovar_dosedanjih_kupljenih
+        print(slovar_kupljenih)
         for sestavina in self.zaloga.vrni_zalogo:
             for tip in self.zaloga.vrni_tipe:
                 count += 1
-                slovar = {'dimenzija': sestavina['dimenzija'],
+                slovar = {'dimenzija': sestavina['dim'],
                         'tip': tip[0],
                         'zaloga': sestavina[tip[0]],
                         'radius': sestavina['radius'],
@@ -915,7 +931,11 @@ class Baza(models.Model):
                         'pk_vnosa':None,
                         'stevilo':None
                 }
-                vnosi.update({sestavina['dimenzija'] + '_' + tip[0]: slovar})
+                try:
+                    slovar["kupljena"] = slovar_kupljenih[sestavina["dim"] + "_" + tip[0]]
+                except:
+                    slovar["kupljena"] = False 
+                vnosi.update({sestavina['dim'] + '_' + tip[0]: slovar})
         for vnos in self.vnos_set.all().values('dimenzija__dimenzija','pk','stevilo','tip'):
             slovar['vneseno'] = True
             slovar['pk_vnosa'] = vnos['pk']

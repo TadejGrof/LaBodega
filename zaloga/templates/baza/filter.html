@@ -25,6 +25,9 @@
         {% endfor %}
     </select>
     <button onclick="Filtriraj()"> {{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}} </button>
+    {% if tip == "vele_prodaja" %}
+    <button onclick="posebnoFiltriranje()"> Posebno filtriranje </button>
+    {% endif %}
 </div>
 
 <script>
@@ -33,6 +36,14 @@
         set_selected('radius_box', 0)
         Filtriraj()
     }
+
+
+    function posebnoFiltriranje(){
+        $('.vrstica').removeClass('skrit')
+        ToggleClass('.vrstica','skrit') 
+        ToggleClass('.kupljena','skrit')
+    }
+
     function Filtriraj(){
         var tip = get_selected('tip_box')
         var radius = get_selected('radius_box')
@@ -49,7 +60,6 @@
                 ToggleClass('.vrstica','skrit')
                 ToggleClass('.' + radius, 'skrit')
             }
-        }
-        
+        }  
     }
 </script>

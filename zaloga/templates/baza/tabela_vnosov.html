@@ -28,7 +28,7 @@
             {% endif %}
         </tr>
         {% for vnos in baza.vnosi_values %}
-            <tr class="vrstica {{vnos.dimenzija__radius}} {{vnos.tip}}" id="vrstica_{{vnos.pk}}">
+            <tr class="vrstica {{vnos.dimenzija__radius}} {{vnos.tip}} kupljena" id="vrstica_{{vnos.pk}}">
                 <td class="index"> {{forloop.counter}}. </td>
                 <td > {{ vnos.dimenzija__dimenzija }} </td>
                 <td class="tip">

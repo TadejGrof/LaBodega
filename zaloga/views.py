@@ -236,6 +236,9 @@ def baza(request,zaloga, tip_baze, pk):
         zaloga = Zaloga.objects.get(pk=zaloga)
         baza = Baza.objects.get(pk = pk)
         if baza.status == "aktivno":
+            dosedanje_kupljene = None
+            if baza.tip == "vele_prodaja":
+                dosedanje_kupljene = baza.dosedanje_kupljene_stranke
             slovar = {
                 'zaloga': zaloga,
                 'baza':baza,
@@ -246,7 +249,8 @@ def baza(request,zaloga, tip_baze, pk):
                 'na_voljo':zaloga.na_voljo,
                 'razlicni_radiusi':zaloga.vrni_razlicne_radiuse,
                 'sestavine':zaloga.vrni_zalogo,
-                'tipi': zaloga.vrni_tipe}
+                'tipi': zaloga.vrni_tipe,
+                "dosedanje_kupljene": dosedanje_kupljene}
             return pokazi_stran(request, 'baza/baza.html',slovar)
         elif baza.status == "veljavno":
             return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})

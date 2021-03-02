@@ -98,7 +98,7 @@
 
     
 {% if status == "aktivno" %}
-    {% include 'baza/filter.html' with tipi=tipi radiusi=razlicni_radiusi slovar=slovar %}
+    {% include 'baza/filter.html' with tip=tip tipi=tipi radiusi=razlicni_radiusi slovar=slovar dosedanje_kupljene=dosedanje_kupljene %}
 {% endif %}
 
 {% if status == "aktivno" %}

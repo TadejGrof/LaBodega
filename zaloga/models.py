@@ -656,7 +656,7 @@ class Baza(models.Model):
             vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
         Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"]) 
 
-    def uveljavi_prenos(self,zaloga,cas = None):
+    def uveljavi_prenos(self,cas = None):
         self.uveljavi_bazo()
         self.status = "zaklenjeno"
         self.save()

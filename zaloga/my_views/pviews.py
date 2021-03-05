@@ -54,7 +54,7 @@ def uveljavi_racun(request,zaloga,pk_racuna):
         zaloga = Zaloga.objects.get(pk = zaloga)
         program = Program.objects.first()
         racun = Baza.objects.get(pk = pk_racuna)
-        racun.uveljavi_racun(zaloga)
+        racun.uveljavi_racun()
         Baza.objects.create(
             zaloga = zaloga,
             title = program.naslednji_racun(delaj=True),
@@ -64,9 +64,6 @@ def uveljavi_racun(request,zaloga,pk_racuna):
             popust = 0)
         danes = timezone.localtime(timezone.now())
         danes = datetime.datetime(danes.year,danes.month,danes.day).date()
-        print(danes)
-        print(racun.dnevna_prodaja.datum)
-        print(danes == racun.dnevna_prodaja.datum)
         if danes == racun.dnevna_prodaja.datum:
             return redirect('dnevna_prodaja',zaloga=zaloga.pk)
         else:

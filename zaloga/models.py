@@ -677,7 +677,7 @@ class Baza(models.Model):
 
     def uveljavi_racun(self):
         for vnos in self.vnos_set.all():
-            sestavina = Sestavina.objects.get(zaloga = zaloga, dimenzija = vnos.dimenzija)
+            sestavina = Sestavina.objects.get(zaloga = self.zaloga, dimenzija = vnos.dimenzija)
             sprememba = Sprememba.objects.filter(baza__dnevna_prodaja = self.dnevna_prodaja, sestavina = sestavina, tip = vnos.tip ).first()
             if sprememba == None:
                 sprememba = Sprememba.objects.create(

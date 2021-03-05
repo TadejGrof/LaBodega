@@ -54,7 +54,7 @@ def uveljavi_racun(request,zaloga,pk_racuna):
         zaloga = Zaloga.objects.get(pk = zaloga)
         program = Program.objects.first()
         racun = Baza.objects.get(pk = pk_racuna)
-        racun.uveljavi_racun()
+        racun.uveljavi()
         Baza.objects.create(
             zaloga = zaloga,
             title = program.naslednji_racun(delaj=True),

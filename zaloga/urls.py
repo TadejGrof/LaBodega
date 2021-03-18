@@ -81,6 +81,7 @@ ajax_patterns = [
 ]
 
 urlpatterns = [
+    path('poskus/',views.poskus,name="poskus"),
     path('<int:zaloga>/pregled_zaloge/', zaloga_views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),
     path('<int:zaloga>/pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),

@@ -12,6 +12,7 @@ from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
 from django.urls import reverse
 from .test import testiraj_stanja_zaklepov
+from django.http import HttpResponse
 
 #zaloga = Zaloga.objects.first()
 
@@ -257,6 +258,10 @@ def baza(request,zaloga, tip_baze, pk):
         elif baza.status == "zaklenjeno":
             return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
 
+def poskus(request):
+    print("tadej")
+    return HttpResponse("TADEJ")
+
 @login_required
 def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
     zaloga = Zaloga.objects.get(pk=zaloga)
@@ -328,4 +333,3 @@ def arhiv(request,zaloga, tip_baze):
                 baze = baze.filter(stranka__id = stranka)
         zaloga = Zaloga.objects.get(pk =zaloga)
         return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'zaloga':zaloga,'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})
-

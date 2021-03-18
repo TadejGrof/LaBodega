@@ -25,5 +25,6 @@ urlpatterns = [
     path('prodaja/', include('prodaja.urls')),
     path('program/', include('program.urls')),
     path('stranka/', include('zaloga.urls_stranka')),
+    path('android/',include('android.urls')),
     #path(r'^__debug__' , include(debug_toolbar.urls)),
 ]

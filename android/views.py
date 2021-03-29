@@ -4,6 +4,9 @@ from django.http import JsonResponse
 from zaloga.models import Dimenzija
 from django.db.models import F
 
+def authenticate(request):
+    return HttpResponse("true")
+
 def dimenzije(request):
     dimenzije = list(Dimenzija.objects.all().values()\
     .annotate(radij=F("radius"))\

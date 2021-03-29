@@ -1038,6 +1038,7 @@ class Vnos(models.Model):
     baza = models.ForeignKey(Baza,default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
     sprememba = models.ForeignKey(Sprememba,default=None,null=True,blank=True,on_delete=models.CASCADE)
+    cena_nakupa = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
     
     @property
     def skupna_cena(self):

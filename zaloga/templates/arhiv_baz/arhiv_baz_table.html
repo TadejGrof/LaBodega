@@ -1,0 +1,13 @@
+{% load zaloga_exstras %}
+
+<div class="table" style="margin-bottom:30px">
+    <table class="tabela_vnosov">
+        {% include 'arhiv_baz/arhiv_baz_table_header.html' with tip=tip slovar=slovar jezik=jezik %}
+        {% for baza in baze %}
+            {% include 'arhiv_baz/arhiv_baz_table_row.html' with baza=baza tip=tip zaloga_pk=zaloga_pk slovar=slovar jezik=jezik %}
+        {% endfor %}
+        {% include 'arhiv_baz/arhiv_baz_table_final_row.html' with tip=tip slovar=slovar jezik=jezik %}
+
+        
+    </table>
+</div>

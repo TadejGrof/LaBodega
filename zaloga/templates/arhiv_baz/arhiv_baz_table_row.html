@@ -1,0 +1,42 @@
+{% load zaloga_exstras %}
+
+<tr>
+    {% if tip == "vele_prodaja" %}
+        <td> {{baza.title}} </td>
+        <td> {{baza.naziv_stranke}} </td>
+        <td> {{baza.datum}} </td>
+        <td> {{baza.skupno_stevilo}} </td>
+        <td> {{baza.koncna_cena}} $</td>
+        <td> {% include 'forms/baza_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %} </td>
+        <td> {% include 'forms/pdf_baze_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk select=False %} </td>
+    {% elif tip == "dnevna_prodaja" %}
+        <td> {{baza.title}} </td>
+        <td> {{baza.skupno_stevilo}} </td>
+        <td> {{baza.skupna_cena}} $ </td>
+        <td> {% include 'forms/ogled_dnevne_prodaje_form.html' with prodaja=baza.pk zaloga=zaloga_pk slovar=slovar jezik=jezik %}</td>
+    {% elif tip == "prevzem" %}
+        <td> {{baza.title}} </td>
+        <td> {{baza.datum}} </td>
+        <td> {{baza.tip_prevzema}} </td>
+        <td> {{baza.posiljatelj}} </td>
+        <td> {{baza.skupno_stevilo}} </td>
+        <td> {{baza.skupna_cena_nakupa}} $ </td>
+        <td> {{baza.skupna_cena}} $</td>
+        <td> {{baza.razlika}} $ </td>
+        <td> {% include 'forms/baza_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %} </td>  
+        <td> {% include 'forms/pdf_baze_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk select=False %} </td>
+    {% elif tip == "prenos" %}
+        <td> {{baza.title}} </td>
+        <td> {{baza.datum}} </td>
+        <td> {{baza.zaloga_prenosa}} </td>
+        <td> {{baza.skupno_stevilo}} </td>
+        <td> {% include 'forms/baza_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %} </td>  
+    {% elif tip == "inventura" %}
+        <td> {{baza.title}} </td>
+        <td> {{baza.datum}} </td>
+        <td> {{baza.skupno_stevilo}} </td>
+        <td> {{baza.skupna_cena}} $ </td>
+        <td> {% include 'forms/baza_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %} </td>  
+        <td> {% include 'forms/pdf_baze_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk select=False %} </td>
+    {% endif %}
+</tr>

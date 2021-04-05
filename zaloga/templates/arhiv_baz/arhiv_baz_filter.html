@@ -1,0 +1,22 @@
+{% load zaloga_exstras %}
+
+<div class="filter" style="margin-top:3%">
+    <form action="{% url 'arhiv_baz' zaloga_pk tip %}" method="GET">
+        {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{zacetek}}" name="zacetek">
+        {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{konec}}" name="konec">
+        {% if tip == "vele_prodaja" %}
+            {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:
+            <select name="stranka">
+                <option value="all"> All </option>
+                {% for cliente in stranke %}
+                    {% if cliente.pk == stranka %}
+                        <option value="{{cliente.pk}}" selected> {{cliente.naziv}} </option>
+                    {% else %}
+                        <option value="{{cliente.pk}}"> {{cliente.naziv}} </option>
+                    {% endif %}
+                {% endfor %}
+            </select>  
+        {% endif %}
+        <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
+    </form>
+</div>

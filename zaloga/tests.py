@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from .models import Zaloga, Sestavina, Dimenzija, Zaklep
 
+
 def preveriZaklepZaloge():
     for zaloga in Zaloga.objects.all():
         zaklep = zaloga.zaklep_zaloge

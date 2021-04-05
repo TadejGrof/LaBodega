@@ -1,0 +1,30 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<style>
+    div.table{
+        display:inline-block;
+        margin-top:2%;
+        width:80%;
+        overflow: auto
+    }
+    div.besedilo{
+        height:8%;
+        font-size:6vh;
+        display:block;
+        text-align:center;
+        margin-top:2%
+    }
+</style>
+
+{% include 'arhiv_baz/arhiv_baz_title.html' with tip=tip slovar=slovar jezik=jezik%}
+
+{% include 'arhiv_baz/arhiv_baz_filter.html' with zaloga_pk=zaloga_pk stranke=stranke zacetek=zacetek konec=konec tip=tip slovar=slovar jezik=jezik%}
+
+{% include 'arhiv_baz/arhiv_baz_table.html' with tip=tip slovar=slovar jezik=jezik %}
+
+{% endblock %}
+

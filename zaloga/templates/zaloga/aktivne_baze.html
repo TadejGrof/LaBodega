@@ -26,6 +26,7 @@
     }
 </style>
 
+
 <h1>
 {% if tip == "prevzem" %}
     {{slovar|keyvalue:'Nov prevzem'|keyvalue:jezik}}
@@ -224,12 +225,12 @@
             <tr>
                 <td> {{baza.title}} </td>
                 {% if tip == "vele_prodaja" %}
-                <td> {{baza.stranka}} </td>
+                <td> {{baza.naziv_stranke}} </td>
                 {% elif tip == "prevzem" %}
-                <td> {{baza.kontejner.stevilka}} </td>
-                <td> {{baza.kontejner.drzava}} </td>
+                <td> {{baza.stevilka_kontejnerja}} </td>
+                <td> {{baza.drzava}} </td>
                 {% elif tip == "prenos" %}
-                <td> {{baza.getZalogaPrenosa}} </td>
+                <td> {{baza.zaloga_prenosa}} </td>
                 {% endif %}
                 <td> {{baza.datum}} </td>
                 <td> {{baza.skupno_stevilo}} </td>
@@ -237,12 +238,12 @@
                 <td> {{baza.skupna_cena}} $ </td>
                 {% endif %}
                 <td class="ogled"> 
-                    <form action="{% url 'baza' zaloga_pk tip baza.pk %}" method="GET">
+                    <form action="{% url 'baza' zaloga_pk tip baza.id %}" method="GET">
                         <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                     </form>
                 </td>
                 <td class="izbris">
-                    <form action="{% url 'izbris_baze' zaloga_pk baza.tip baza.pk %}" onsubmit="return Confirm()" method="POST">
+                    <form action="{% url 'izbris_baze' zaloga_pk baza.tip baza.id %}" onsubmit="return Confirm()" method="POST">
                         {% csrf_token %}
                         <input type="submit" value="{{slovar|keyvalue:'Izbris'|keyvalue:jezik}}">
                     </form>
@@ -250,8 +251,12 @@
             </tr>
             {% endfor %}
             <tr>
+                {% if tip == "prevzem" %}
+                <td colspan="4"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </td>
+                {% else %}
                 <td colspan="3"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </td>
-                <td>{{skupno_stevilo}} </td>
+                {% endif %}
+                <td> {{skupno_stevilo}} </td>
                 {% if tip == "vele_prodaja" %}
                 <td>{{skupna_cena}} $</td>
                 <td colspan="2"></td> 

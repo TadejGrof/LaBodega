@@ -15,6 +15,7 @@ from django.db.models.functions import Concat, Cast
 from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
+from . import database_functions
 
 TIPI_SESTAVINE = (
         ('Y','Yellow'),
@@ -668,8 +669,10 @@ class Baza(models.Model):
                 author = self.author,
                 zalogaPrenosa = self.zaloga.pk
             )
+        cenik_nakupa = self.zaloga.cenik()
+        cenik_prodaje = self.getZalogaPrenosa.cenik("dnevna_prodaja")
         for vnos in self.vnos_set.all().iterator():
-            bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo)
+            bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo,cenik_nakupa[vnos.dimenzija.dimenzija][vnos.tip],cenik_prodaje[vnos.dimenzija.dimenzija][vnos.tip])
         bazaPrenosa.save()
         bazaPrenosa.uveljavi_bazo()
         bazaPrenosa.status = "zaklenjeno"
@@ -775,8 +778,8 @@ class Baza(models.Model):
                 tipi.append(vnos['tip'])
         return tipi
 
-    def dodaj_vnos(self,dimenzija,tip,stevilo):
-        vnos = Vnos.objects.create(dimenzija=dimenzija,tip=tip,stevilo=stevilo,baza=self)
+    def dodaj_vnos(self,dimenzija,tip,stevilo,cena_nakupa = None,cena_prodaje = None):
+        vnos = Vnos.objects.create(dimenzija=dimenzija,tip=tip,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
         if self.status == 'veljavno':
             sestavina = Sestavina.objects.get(dimenzija__dimenzija = dimenzija)
             sprememba = Sprememba.objects.filter(baza=self, sestavina = sestavina, tip=tip).first()
@@ -790,6 +793,7 @@ class Baza(models.Model):
             else:
                 sprememba.dodaj_stevilo(vnos.stevilo)
             sestavina.nastavi_iz_sprememb(tip)
+        return vnos
 
     def doloci_cas(self,cas):
         if cas == None:
@@ -826,47 +830,22 @@ class Baza(models.Model):
 
     @property
     def vnosi_values(self):
-        vnosi_values = self.vnos_set.all().order_by('dimenzija').values(
-            'dimenzija__dimenzija',
-            'dimenzija__radius',
-            'pk',
-            'stevilo',
-            'tip',
-            'cena',
-        ).annotate(dimenzija_tip = Concat(F("dimenzija__dimenzija"),Value("_"),F("tip")))
-
-        if self.tip == "prevzem":
-            povprecna_cena = self.povprecna_cena 
-            cenik_dnevne = self.zaloga.cenik("dnevna_prodaja")
-            cenik_vele = self.zaloga.cenik("vele_prodaja")
-            for vnos in vnosi_values:
-                vnos["cena_nakupa"] = povprecna_cena * vnos["stevilo"]
-                if vnos["tip"] == "JP70":
-                    try: 
-                        vnos["cena_prodaje"] = cenik_dnevne[vnos["dimenzija__dimenzija"]]["JP70"] * vnos["stevilo"]
-                        if vnos["cena_prodaje"] == 0:
-                            vnos["cena_prodaje"] = cenik_dnevne[vnos["dimenzija__dimenzija"]]["W"] * vnos["stevilo"]
-                    except:
-                        vnos["cena_prodaje"] = 0.
-                else:
-                    try:
-                        vnos["cena_prodaje"] = cenik_vele[vnos["dimenzija__dimenzija"]][vnos["tip"]] * vnos["stevilo"]
-                    except:
-                        vnos["cena_prodaje"] = 0.
-        return vnosi_values
+        return database_functions.vnosi_values(self.vrni_vnose) 
 
     @property
     def cena_nakupa(self):
-        if self.cena == None:
-            return 0
-        return float(self.cena)
+        vnosi = self.vnosi_values
+        cena = 0
+        for vnos in vnosi:
+            cena += vnos["skupna_cena_nakupa"]
+        return cena
 
     @property
     def skupna_cena_prodaje(self):
         vnosi = self.vnosi_values
         cena = 0
         for vnos in vnosi:
-            cena += vnos["cena_prodaje"]
+            cena += vnos["skupna_cena"]
         return cena
 
     @property
@@ -980,6 +959,7 @@ class Baza(models.Model):
                 return self.skupna_cena - self.cena_popusta
         except:
             return None
+
 ###################################################################################################
 
 class Sprememba(models.Model):
@@ -1039,14 +1019,21 @@ class Vnos(models.Model):
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
     sprememba = models.ForeignKey(Sprememba,default=None,null=True,blank=True,on_delete=models.CASCADE)
     cena_nakupa = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
-    
+
     @property
     def skupna_cena(self):
         try:
             return self.stevilo * self.cena
         except:
-            return None
+            return 0
             
+    @property
+    def skupna_cena_nakupa(self):
+        try:
+            return self.stevilo * self.cena_nakupa
+        except:
+            return 0
+
     def doloci_ceno(self,cena = None):
         if cena == None:
             cena = float(self.vrni_sestavino().cena(self.baza.tip,self.tip))

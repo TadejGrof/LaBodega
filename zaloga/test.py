@@ -172,3 +172,14 @@ def poskus():
         .annotate(cena_nakupa = F("povprecna_cena") * F("stevilo"))
         .annotate(poskus = Value(slovar[F("povprecna_cena")], IntegerField())))
     
+
+def dodaj_cene():
+    vnosi = Vnos.objects.all().filter(baza__title__contains = "PX")
+    cenik_nakupa = Zaloga.objects.all()[0].cenik("vele_prodaja")
+    cenik_prodaje = Zaloga.objects.all()[1].cenik("dnevna_prodaja")
+    for vnos in vnosi:
+        vnos.cena_nakupa = cenik_nakupa[vnos.dimenzija.dimenzija][vnos.tip]
+        vnos.cena = cenik_prodaje[vnos.dimenzija.dimenzija][vnos.tip]
+    Vnos.objects.bulk_update(vnosi)
+        
+

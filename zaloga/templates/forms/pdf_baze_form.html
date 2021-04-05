@@ -1,0 +1,13 @@
+{% load zaloga_exstras %}
+
+<form class="nov_vnos inline vnosi" action="{% url 'pdf_baze' zaloga tip baza %}" method="GET">
+    <input style="width:65px" type="submit" value="PDF">
+    {% if select %}
+        <select name="tip">
+            <option value="all"> All </option>
+            {% for tip in razlicni_tipi %}
+                <option value="{{tip}}"> {{tip}} </option>
+            {% endfor %}
+        </select>
+    {% endif %}
+</form>

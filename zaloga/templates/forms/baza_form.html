@@ -1,0 +1,5 @@
+{% load zaloga_exstras %}
+
+<form action="{% url 'baza' zaloga tip baza %}" method="GET">
+    <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+</form>

@@ -1,0 +1,37 @@
+{% load zaloga_exstras %}
+
+{% if tip == "inventura" %}
+
+{% else %}
+
+<tr>
+    {% if tip == "vele_prodaja" %}
+        <td colspan="2" > Skupno: </td>
+        <td> {{values.stevilo_baz}} </td>
+        <td> {{values.skupno_stevilo}} </td>
+        <td> {{values.skupna_cena}} $</td>
+        <td colspan="2"> </td>
+    {% elif tip == "dnevna_prodaja" %}
+        <td> Skupno: </td>
+        <td> {{values.skupno_stevilo}} </td>
+        <td> {{values.skupna_cena}} $</td>
+        <td> </td>
+    {% elif tip == "prevzem" %}
+        <td> Stevilo: </td>
+        <td> {{values.stevilo_baz}} </td>
+        <td colspan="2" > Skupno: </td>
+        <td> {{values.skupno_stevilo}} </td>
+        <td> {{values.skupna_cena_nakupa}} $</td>
+        <td> {{values.skupna_cena}} $</td>
+        <td> {{values.skupen_zasluzek}} $</td>
+        <td colspan="2">  </td>
+    {% elif tip == "prenos" %}
+        <td> Stevilo: </td>
+        <td> {{values.stevilo_baz}} </td>
+        <td> Skupno: </td>
+        <td> {{values.skupno_stevilo}} </td>
+        <td> </td>
+    {% endif %}
+</tr>
+
+{% endif %}

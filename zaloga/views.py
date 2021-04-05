@@ -1,8 +1,11 @@
 from django.shortcuts import render
+from django.db.models import Sum
 from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 import io
 import datetime
 from django.contrib.auth.decorators import login_required
@@ -13,6 +16,7 @@ from program.models import Program
 from django.urls import reverse
 from .test import testiraj_stanja_zaklepov
 from django.http import HttpResponse
+from . import database_functions
 
 #zaloga = Zaloga.objects.first()
 
@@ -152,23 +156,21 @@ def baze(request,zaloga,tip_baze):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk = zaloga)
         baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno')
+        values = database_functions.baze_values(baze)
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
         zaloge = Zaloga.objects.all()
-        skupno_stevilo = 0
-        skupna_cena = 0
-        for baza in baze:
-            skupno_stevilo += baza.skupno_stevilo
-            cena = baza.skupna_cena
-            if cena != None:
-                skupna_cena += cena 
+        print(values)
+        skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
+        skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
         slovar = {
             'zaloge':zaloge,
             'zaloga': zaloga,
             'tip': tip_baze,
-            'baze':baze,
+            'baze':values,
             'stranke':stranke,
             'skupno_stevilo':skupno_stevilo,
-            'skupna_cena':skupna_cena}
+            'skupna_cena':skupna_cena
+            }
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
         
 @login_required
@@ -235,7 +237,9 @@ def izbris_baze(request,zaloga, tip_baze, pk):
 def baza(request,zaloga, tip_baze, pk):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk=zaloga)
-        baza = Baza.objects.get(pk = pk)
+        baza_query = Baza.objects.filter(pk = pk)
+        baza = baza_query[0]
+        baza_values = database_functions.baze_values(baza_query)[0]
         if baza.status == "aktivno":
             dosedanje_kupljene = None
             if baza.tip == "vele_prodaja":
@@ -251,12 +255,13 @@ def baza(request,zaloga, tip_baze, pk):
                 'razlicni_radiusi':zaloga.vrni_razlicne_radiuse,
                 'sestavine':zaloga.vrni_zalogo,
                 'tipi': zaloga.vrni_tipe,
-                "dosedanje_kupljene": dosedanje_kupljene}
+                "dosedanje_kupljene": dosedanje_kupljene,
+                "values": baza_values}
             return pokazi_stran(request, 'baza/baza.html',slovar)
         elif baza.status == "veljavno":
-            return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
+            return pokazi_stran(request, 'baza/baza.html',{"values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
         elif baza.status == "zaklenjeno":
-            return pokazi_stran(request, 'baza/baza.html',{'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
+            return pokazi_stran(request, 'baza/baza.html',{ "values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
 
 def poskus(request):
     print("tadej")
@@ -321,8 +326,10 @@ def arhiv(request,zaloga, tip_baze):
         pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
         zacetek = request.GET.get('zacetek', pred_mescem)
         konec = request.GET.get('konec', danes)
+        zaloga = Zaloga.objects.get(pk =zaloga)
         stranke = Stranka.objects.all()
         stranka = None
+        values = {}
         if tip_baze == "dnevna_prodaja":
             baze = Dnevna_prodaja.objects.filter(zaloga=zaloga,datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
         else:
@@ -331,5 +338,11 @@ def arhiv(request,zaloga, tip_baze):
             if tip_baze == "vele_prodaja" and stranka != "all":
                 stranka = int(stranka)
                 baze = baze.filter(stranka__id = stranka)
-        zaloga = Zaloga.objects.get(pk =zaloga)
-        return pokazi_stran(request, 'zaloga/arhiv_baz.html', {'zaloga':zaloga,'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})
+            baze = database_functions.baze_values(baze)
+        if tip_baze != "dnevna_prodaja":
+            values["stevilo_baz"] = baze.count()
+            values["skupno_stevilo"] = baze.aggregate(stevilo=Coalesce(Sum("skupno_stevilo"),0))["stevilo"]
+            values["skupna_cena"] = baze.aggregate(cena = Coalesce(Sum("koncna_cena"),0))["cena"]
+            values["skupna_cena_nakupa"] = baze.aggregate(cena=Coalesce(Sum("skupna_cena_nakupa"),0))["cena"]
+            values["skupen_zasluzek"] = baze.aggregate(cena=Coalesce(Sum("razlika"),0))["cena"]
+        return pokazi_stran(request, 'arhiv_baz/arhiv_baz.html', {'zaloga': zaloga,'values':values, 'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})

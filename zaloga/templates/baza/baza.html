@@ -38,7 +38,7 @@
 </style>
 
 {% include 'js/ajax_requests.html' %}
-{% include 'baza/bazno_okno.html' with baza=baza %}
+{% include 'baza/bazno_okno.html' with baza=baza values=values%}
 
 <div class="delovno_okno">
     {% if status != "zaklenjeno" %}
@@ -68,32 +68,24 @@
         {% endif %} 
         {% if status == "aktivno" %}
             <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
-            <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip baza.pk %}" method="POST">
+            <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip values.id %}" method="POST">
                 {% csrf_token %}
                 <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
                 <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
             </form>
-            <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip baza.pk %}" method="POST">
+            <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip values.id %}" method="POST">
                 {% csrf_token %}
                 <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
             </form>
             <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
             {% if tip == "inventura" %}
-                <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip baza.pk %}" method="GET">
+                <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip values.id %}" method="GET">
                     <input style="width:150px" type="submit" value="PDF Razlike">
                 </form>
             {% endif %}
         {% endif %}
     {% endif %}
-    <form class="nov_vnos inline vnosi" action="{% url 'pdf_baze' zaloga_pk tip baza.pk %}" method="GET">
-        <input style="width:150px" type="submit" value="PDF">
-        <select name="tip">
-            <option value="all"> All </option>
-            {% for tip in baza.razlicni_tipi %}
-                <option value="{{tip}}"> {{tip}} </option>
-            {% endfor %}
-        </select>
-    </form>
+    {% include 'forms/pdf_baze_form.html' with tip=tip baza=values.id zaloga=zaloga_pk select=True razlicni_tipi=baza.razlicni_tipi %}
 </div>
 
     
@@ -106,7 +98,7 @@
 {% endif %}
 
 {% if tip != "inventura" or status == "veljavno" or status == "zaklenjeno" %}
-    {% include 'baza/tabela_vnosov.html' with tip=tip status=status baza=baza slovar=slovar %}
+    {% include 'baza/tabela_vnosov.html' with tip=tip status=status values=values baza=baza slovar=slovar %}
 {% endif %}
 
 {% endblock %} 
@@ -114,7 +106,7 @@
 {% block javascript %}
     <script>
         function Uveljavi_bazo(gumb){
-            {% if baza.stevilo_vnosov == 0 %}
+            {% if values.stevilo_vnosov == 0 %}
                 alert('baza mora vsebovati vsaj en vnos');
                 return false;
             {% else %}
@@ -211,7 +203,7 @@
                 'dimenzija': dimenzija,
                 'tip':tip,
                 'stevilo':stevilo,
-                'pk': '{{baza.pk}}'
+                'pk': '{{values.id}}'
                 },
                 dataType: 'json',
                 success: function (data) {
@@ -224,7 +216,7 @@
         }
         function Spremeni_popust(){
             var popust = get_value('popust_value')
-            var pk = '{{baza.pk}}'
+            var pk = '{{values.id}}'
             SpremeniPopust(pk, popust, function(data){
                     set_innerHtml('popust', data.popust + ' %')
                     set_innerHtml('cena_popusta', data.cena_popusta + ' $')
@@ -234,7 +226,7 @@
         }
         function Spremeni_prevoz(){
             var prevoz = get_value('prevoz_value')
-            var pk = '{{baza.pk}}'
+            var pk = '{{values.id}}'
             SpremeniPrevoz(pk,prevoz,function (data) {
                     set_innerHtml('prevoz', data.prevoz + ' $')
                     set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')

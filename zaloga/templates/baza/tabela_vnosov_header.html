@@ -1,0 +1,22 @@
+{% load zaloga_exstras %}
+
+
+<tr class="header">
+    <th width="8%"> N. </th>
+    <th width="20%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+    <th width="12%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+    <th width="12%"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+    {% if tip == "vele_prodaja" %}
+        <th width="14%"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+        <th width="14%"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
+    {% endif %}
+    {% if tip == "prevzem" %}
+        <th width="14%"> Kupna cena: </th>
+        <th width="14%"> Prodajna cena: </th>
+    {% endif %} 
+    {% if tip != "prenos" or status == "aktivno" %}
+        {% if status != "zaklenjeno" %}
+        <th width="10%" > {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
+        {% endif %}
+    {% endif %}
+</tr>

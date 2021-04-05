@@ -1,0 +1,17 @@
+{% load zaloga_exstras %}
+
+<h1>
+{% if tip == 'prevzem' %}
+    {{slovar|keyvalue:'Arhiv prevzemov'|keyvalue:jezik}}
+{% elif tip == 'odpis' %}
+    {{slovar|keyvalue:'Arhiv odpisov'|keyvalue:jezik}}
+{% elif tip == 'prenos' %}
+    {{slovar|keyvalue:'Arhiv prenosov'|keyvalue:jezik}}
+{% elif tip == 'inventura' %}
+    {{slovar|keyvalue:'Arhiv inventur'|keyvalue:jezik}}
+{% elif tip == 'vele_prodaja' %}
+    {{slovar|keyvalue:'Arhiv vele prodaj'|keyvalue:jezik}}
+{% elif tip == 'dnevna_prodaja' %}
+    {{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}
+{% endif %}
+</h1>

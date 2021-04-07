@@ -1,5 +1,5 @@
 from django.db.models import IntegerField,FloatField,CharField
-from django.db.models import F,Value,Subquery, Count, OuterRef, Sum, When, Case
+from django.db.models import F,Value,Subquery, Count, OuterRef, Sum, When, Case, Q
 from django.db.models.functions import Concat,Cast, Coalesce, Round
 
 def vnosi_values(vnosi):
@@ -18,6 +18,13 @@ def vnosi_values(vnosi):
         .annotate(skupna_cena = Cast(F("cena_value") * F("stevilo"), output_field=FloatField())) \
         .annotate(skupna_cena_nakupa = Cast(F("cena_nakupa_value") * F("stevilo"), output_field=FloatField()))
 
+def dnevne_prodaje_values(prodaje):
+    return prodaje \
+        .annotate(stevilo_racunov = Count("baza",filter=Q(baza__status__in=["veljavno","zaklenjeno"]))) \
+        .annotate(skupno_stevilo = Coalesce(Sum("baza__vnos__stevilo", filter=Q(baza__status__in=["veljavno","zaklenjeno"])),0)) \
+        .annotate(skupna_cena = Coalesce(Sum("baza__vnos__cena", filter=Q(baza__status__in=["veljavno","zaklenjeno"])),0)) \
+        .annotate(koncna_cena = F("skupna_cena")) \
+        .values()
 
 def baze_values(baze):
     return baze.select_related("vnos") \

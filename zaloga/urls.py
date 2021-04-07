@@ -9,6 +9,7 @@ from .my_views import pviews
 
 ogled_patterns = [
     path('',views.baza, name="baza"),
+    path("nastavi_vnose_inventure/",views.nastavi_vnose_inventure,name="nastavi_vnose_inventure"),
     path('iz_datoteke/', views.vnosi_iz_datoteke, name='iz_datoteke'),
     path('uveljavi/', views.uveljavi_bazo, name='uveljavi_bazo'),
     path('pdf/', pdf_views.pdf_baze, name='pdf_baze'),

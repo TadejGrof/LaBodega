@@ -68,6 +68,12 @@
         {% endif %} 
         {% if status == "aktivno" %}
             <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
+            {% if tip == "inventura" %}
+                <form class="nov_vnos inline vnosi" action="{% url 'nastavi_vnose_inventure' zaloga_pk tip values.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="submit" class="vnosi" value="Nastavi zalogo">
+                </form>    
+            {% endif %}
             <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip values.id %}" method="POST">
                 {% csrf_token %}
                 <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>

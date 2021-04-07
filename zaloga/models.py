@@ -824,6 +824,7 @@ class Baza(models.Model):
             .values("dimenzija_tip").distinct()
         return []
 
+
     @property
     def vrni_vnose(self):
         return self.vnos_set.all()
@@ -959,6 +960,20 @@ class Baza(models.Model):
                 return self.skupna_cena - self.cena_popusta
         except:
             return None
+
+    def nastavi_vnose_inventure(self):
+        vnosi = []
+        vnos_set = self.vnos_set.all()
+        for sestavina in self.zaloga.sestavina_set.all():
+            for tip in self.zaloga.vrni_tipe:
+                if not vnos_set.filter(dimenzija=sestavina.dimenzija,tip=tip[0]).exists():
+                    vnosi.append(Vnos(
+                        baza=self,
+                        dimenzija=sestavina.dimenzija,
+                        tip=tip[0],
+                        stevilo = getattr(sestavina,tip[0])
+                    ))
+        Vnos.objects.bulk_create(vnosi)
 
 ###################################################################################################
 

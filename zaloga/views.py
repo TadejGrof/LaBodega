@@ -307,6 +307,12 @@ def spremeni_ceno_nakupa(request,zaloga,tip_baze,pk):
         baza.save()
         return redirect("baza",zaloga=zaloga,tip_baze=tip_baze,pk=pk)
 
+def nastavi_vnose_inventure(request,zaloga,tip_baze,pk):
+    if request.method == "POST":
+        baza = Baza.objects.get(pk = pk)
+        baza.nastavi_vnose_inventure()
+        return redirect("baza",zaloga=zaloga,tip_baze=tip_baze,pk=pk)
+
 @login_required
 def uveljavi_bazo(request,zaloga, tip_baze, pk):
     if request.method == "POST":
@@ -332,6 +338,7 @@ def arhiv(request,zaloga, tip_baze):
         values = {}
         if tip_baze == "dnevna_prodaja":
             baze = Dnevna_prodaja.objects.filter(zaloga=zaloga,datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
+            baze = database_functions.dnevne_prodaje_values(baze)
         else:
             baze = Baza.objects.filter(zaloga=zaloga,tip=tip_baze,status__in =['veljavno','zaklenjeno'],datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
             stranka = request.GET.get('stranka','all')
@@ -339,10 +346,12 @@ def arhiv(request,zaloga, tip_baze):
                 stranka = int(stranka)
                 baze = baze.filter(stranka__id = stranka)
             baze = database_functions.baze_values(baze)
-        if tip_baze != "dnevna_prodaja":
+        try:
             values["stevilo_baz"] = baze.count()
             values["skupno_stevilo"] = baze.aggregate(stevilo=Coalesce(Sum("skupno_stevilo"),0))["stevilo"]
             values["skupna_cena"] = baze.aggregate(cena = Coalesce(Sum("koncna_cena"),0))["cena"]
             values["skupna_cena_nakupa"] = baze.aggregate(cena=Coalesce(Sum("skupna_cena_nakupa"),0))["cena"]
             values["skupen_zasluzek"] = baze.aggregate(cena=Coalesce(Sum("razlika"),0))["cena"]
+        except:
+            pass
         return pokazi_stran(request, 'arhiv_baz/arhiv_baz.html', {'zaloga': zaloga,'values':values, 'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})

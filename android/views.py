@@ -6,7 +6,9 @@ from django.db.models import F
 from django.contrib.auth import authenticate as auth
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def authenticate(request):
     json= {"authanticated":False}
     if request.method == "POST":

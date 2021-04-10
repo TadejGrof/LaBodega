@@ -3,9 +3,22 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from zaloga.models import Dimenzija
 from django.db.models import F
+from django.contrib.auth import authenticate as auth
+from django.contrib.auth.models import User
 
 def authenticate(request):
-    return HttpResponse("true")
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = auth(username=username,password=password)
+        json = {
+            "username":username,
+            "password":password,
+            "authenticated":False,
+        }
+        if user is not None:
+            json["authenticated"] = True
+    return JsonResponse(json,safe=False)
 
 def dimenzije(request):
     dimenzije = list(Dimenzija.objects.all().values()\

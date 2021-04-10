@@ -7,15 +7,13 @@ from django.contrib.auth import authenticate as auth
 from django.contrib.auth.models import User
 
 def authenticate(request):
+    json= {"authanticated":False}
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = request.POST.get("username","")
+        password = request.POST.get("password","")
         user = auth(username=username,password=password)
-        json = {
-            "username":username,
-            "password":password,
-            "authenticated":False,
-        }
+        json["username"] = username
+        json["password"] = password
         if user is not None:
             json["authenticated"] = True
     return JsonResponse(json,safe=False)

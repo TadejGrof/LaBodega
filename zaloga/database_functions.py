@@ -22,7 +22,7 @@ def dnevne_prodaje_values(prodaje):
     return prodaje \
         .annotate(stevilo_racunov = Count("baza",filter=Q(baza__status__in=["veljavno","zaklenjeno"]))) \
         .annotate(skupno_stevilo = Coalesce(Sum("baza__vnos__stevilo", filter=Q(baza__status__in=["veljavno","zaklenjeno"])),0)) \
-        .annotate(skupna_cena = Coalesce(Sum("baza__vnos__cena", filter=Q(baza__status__in=["veljavno","zaklenjeno"])),0)) \
+        .annotate(skupna_cena = Coalesce(Sum(Cast(F("baza__vnos__cena") * F("baza__vnos__stevilo"),output_field=FloatField()), filter=Q(baza__status__in=["veljavno","zaklenjeno"])),0)) \
         .annotate(koncna_cena = F("skupna_cena")) \
         .values()
 

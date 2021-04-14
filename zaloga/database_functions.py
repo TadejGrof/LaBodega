@@ -47,7 +47,7 @@ def baze_values(baze):
         .annotate(skupna_cena_nakupa = Sum(F("vnos__stevilo") * Coalesce(F("vnos__cena_nakupa"),0), output_field=FloatField())) \
         .annotate(razlika = F("skupna_cena") - F("skupna_cena_nakupa")) \
         .annotate(cena_popusta = Round(F("skupna_cena") * Coalesce(F("popust"),0) / Value(100), output_field=FloatField())) \
-        .annotate(cena_prevoza = Round(F("skupno_stevilo") * Coalesce(F("prevoz"),0) / Value(100), output_field=FloatField())) \
+        .annotate(cena_prevoza = Round(F("skupno_stevilo") * Coalesce(F("prevoz"),0), output_field=FloatField())) \
         .annotate(koncna_cena = F("skupna_cena") - F("cena_popusta") + F("cena_prevoza")) \
         .values()
 

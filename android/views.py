@@ -35,3 +35,18 @@ def dimenzije(request):
 def get_csrf(request):
     csrf = get_token(request)
     return HttpResponse(csrf)
+
+def cenik(request):
+    zaloga = Zaloga.objects.first()
+    tip_prodaje = "vele_prodaja"
+    nacin = "prodaja"
+    cenik = Cena.objects.all().filter(sestavina__zaloga = zaloga, prodaja=tip_prodaje, nacin = nacin).values("cena","tip").annotate(dimenzija = F("sestavina__dimenzija__dimenzija"))
+    cenik_json = {}
+    for cena in cenik:
+        dimenzija = cena["dimenzija"]
+        tip = cena["tip"]
+        if dimenzija in cenik_json:
+            cenik_json[dimenzija][tip] = cena["cena"]
+        else:
+            cenik_json[dimenzija] = {tip:cena["cena"]}
+    print(cenik_json)

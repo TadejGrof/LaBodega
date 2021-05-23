@@ -160,8 +160,10 @@ def baze(request,zaloga,tip_baze):
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
         zaloge = Zaloga.objects.all()
         print(values)
+        print("DELAM")
         skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
         skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
+        skupen_ladijski_prevoz = values.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
         slovar = {
             'zaloge':zaloge,
             'zaloga': zaloga,
@@ -169,7 +171,8 @@ def baze(request,zaloga,tip_baze):
             'baze':values,
             'stranke':stranke,
             'skupno_stevilo':skupno_stevilo,
-            'skupna_cena':skupna_cena
+            'skupna_cena':skupna_cena,
+            'skupen_ladijski_prevoz': skupen_ladijski_prevoz
             }
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
         
@@ -352,6 +355,8 @@ def arhiv(request,zaloga, tip_baze):
             values["skupna_cena"] = baze.aggregate(cena = Coalesce(Sum("koncna_cena"),0))["cena"]
             values["skupna_cena_nakupa"] = baze.aggregate(cena=Coalesce(Sum("skupna_cena_nakupa"),0))["cena"]
             values["skupen_zasluzek"] = baze.aggregate(cena=Coalesce(Sum("razlika"),0))["cena"]
+            values["skupen_ladijski_prevoz"] = baze.aggregate(skupno=Sum("ladijski_prevoz_value"))["skupno"]
         except:
+            print("NAPAKA")
             pass
         return pokazi_stran(request, 'arhiv_baz/arhiv_baz.html', {'zaloga': zaloga,'values':values, 'baze': baze, 'tip': tip_baze,'zacetek':zacetek,'konec':konec,'stranka':stranka,'stranke':stranke})

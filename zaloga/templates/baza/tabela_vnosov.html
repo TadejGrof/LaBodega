@@ -7,7 +7,7 @@
     }
 </style>
 
-<div class="vnosi inline" style="width:80%;margin-top:2%">
+<div class="vnosi inline" style="width:80%;margin:2%">
     <table id="tabela_vnosov" style="vertical-align:top;" class="tabela_vnosov">
         {% include 'baza/tabela_vnosov_header.html' with tip=tip status=status jezik=jezik slovar=slovar %}
         {% for vnos in baza.vnosi_values %}
@@ -58,21 +58,23 @@
                 <td id="koncna_cena"> {{values.koncna_cena}} $ </td>
                 <td colspan="2" > </td>
             </tr>
-        {% elif tip == "prevzem" %}
-            <tr class="endrow">
-                <td> Ladijski prevoz: </td>
-                <td>  
-                    <div id="ladijski_prevoz" class="ladijski_prevoz"> {{values.ladijski_prevoz}} $</div>
-                    <input style="width:60%" type="text" class="ladijski_prevoz skrit" id="ladijski_prevoz_value" value="">
-                    <div class="ladijski_prevoz skrit inline">$</div>  
-                </td>
-                <td>   
-                    <button class="ladijski_prevoz" onclick="ToggleClass('.ladijski_prevoz','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                    <button class="ladijski_prevoz skrit" onclick="Spremeni_ladijski_prevoz()"> Ok </button>
-                    <button class="ladijski_prevoz skrit" onclick="ToggleClass('.ladijski_prevoz','skrit')"> X </button>
-                </td>
-            </tr>
+        
         {% else %}
+            {% if tip == "prevzem" %}
+                <tr class="endrow">
+                    <td colspan="3"> Skupni stroški: </td>
+                    <td colspan="2">  
+                        <div id="ladijski_prevoz" class="ladijski_prevoz"> {{values.ladijski_prevoz_value}} $</div>
+                        <input style="width:60%" type="text" class="ladijski_prevoz skrit" id="ladijski_prevoz_value" value="">
+                        <div class="ladijski_prevoz skrit inline">$</div>  
+                    </td>
+                    <td colspan="2">   
+                        <button class="ladijski_prevoz" onclick="ToggleClass('.ladijski_prevoz','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                        <button class="ladijski_prevoz skrit" onclick="Spremeni_ladijski_prevoz()"> Ok </button>
+                        <button class="ladijski_prevoz skrit" onclick="ToggleClass('.ladijski_prevoz','skrit')"> X </button>
+                    </td>
+                </tr>
+            {% endif %}
             <tr class="skrit">
                 <td colspan="3"> Delno število: </td>
                 <td id="delno_stevilo"> </td>
@@ -96,9 +98,6 @@
                 {% if status != "zaklenjeno" %}
                     <td> </td>
                 {% endif %}
-            </tr>
-            <tr>
-                <td> Ladijski prevoz: </td>
             </tr>
             {% endif %}
         {% endif %}

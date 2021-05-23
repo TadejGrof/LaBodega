@@ -203,7 +203,7 @@ class Zaloga(models.Model):
     
     @property
     def vrni_tipe(self):
-        return TIPI_SESTAVINE
+        return [[tip,""] for tip in self.tipi_sestavin]
 
     @property
     def tipi_stroskov(self):

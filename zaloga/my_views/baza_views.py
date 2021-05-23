@@ -72,6 +72,20 @@ def izbrisi_vnos(request):
         data.update({'action':'izbris'})
     return JsonResponse(data)
     
+def spremeni_ladijski_prevoz(request):
+    if request.method=="POST":
+        pk = int(request.POST.get('pk'))
+        baza = Baza.objects.get(pk=pk)
+        prevoz = request.POST.get('ladijski_prevoz',0)
+        try:
+            prevoz = float(prevoz)
+        except:
+            prevoz = 0
+        baza.ladijski_prevoz = prevoz
+        baza.save()
+        data = podatki_baze(baza)
+    return JsonResponse(data) 
+
 def spremeni_popust(request):
     if request.method=="POST":
         pk = int(request.POST.get('pk'))
@@ -192,4 +206,5 @@ def podatki_baze(baza):
     data['koncna_cena'] = str(baza.koncna_cena)
     data['skupna_cena'] = str(baza.skupna_cena)
     data['skupno_stevilo'] = str(baza.skupno_stevilo)
+    data['ladijski_prevoz'] = str(baza.ladijski_prevoz)
     return data

@@ -46,6 +46,23 @@
             }
         }); 
     }
+
+    function SpremeniLadijskiPrevoz(baza, prevoz, funkcija){
+            $.ajax({
+                url: '{% url "spremeni_ladijski_prevoz" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'ladijski_prevoz': prevoz,
+                'pk': baza,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    funkcija(data)
+                }
+            });  
+        }
+
     function SpremeniPopust(baza, popust, funkcija){
             $.ajax({
                 url: '{% url "spremeni_popust" %}',
@@ -61,6 +78,7 @@
                 }
             });  
         }
+
     function SpremeniPrevoz(baza, prevoz, funkcija){
         $.ajax({
             url: '{% url "spremeni_prevoz" %}',

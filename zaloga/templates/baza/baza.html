@@ -220,6 +220,15 @@
                 }
             }); 
         }
+        function Spremeni_ladijski_prevoz(){
+            var prevoz = get_value('ladijski_prevoz_value')
+            var pk = '{{values.id}}'
+            SpremeniLadijskiPrevoz(pk, prevoz, function(data){
+                    set_innerHtml('ladijski_prevoz', data.ladijski_prevoz + ' $')
+                    ToggleClass('.ladijski_prevoz','skrit')
+                })
+        }
+        
         function Spremeni_popust(){
             var popust = get_value('popust_value')
             var pk = '{{values.id}}'

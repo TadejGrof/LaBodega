@@ -58,6 +58,20 @@
                 <td id="koncna_cena"> {{values.koncna_cena}} $ </td>
                 <td colspan="2" > </td>
             </tr>
+        {% elif tip == "prevzem" %}
+            <tr class="endrow">
+                <td> Ladijski prevoz: </td>
+                <td>  
+                    <div id="ladijski_prevoz" class="ladijski_prevoz"> {{values.ladijski_prevoz}} $</div>
+                    <input style="width:60%" type="text" class="ladijski_prevoz skrit" id="ladijski_prevoz_value" value="">
+                    <div class="ladijski_prevoz skrit inline">$</div>  
+                </td>
+                <td>   
+                    <button class="ladijski_prevoz" onclick="ToggleClass('.ladijski_prevoz','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                    <button class="ladijski_prevoz skrit" onclick="Spremeni_ladijski_prevoz()"> Ok </button>
+                    <button class="ladijski_prevoz skrit" onclick="ToggleClass('.ladijski_prevoz','skrit')"> X </button>
+                </td>
+            </tr>
         {% else %}
             <tr class="skrit">
                 <td colspan="3"> Delno število: </td>
@@ -82,6 +96,9 @@
                 {% if status != "zaklenjeno" %}
                     <td> </td>
                 {% endif %}
+            </tr>
+            <tr>
+                <td> Ladijski prevoz: </td>
             </tr>
             {% endif %}
         {% endif %}

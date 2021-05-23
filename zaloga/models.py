@@ -571,7 +571,8 @@ class Baza(models.Model):
     prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
     zalogaPrenosa = models.IntegerField(default=None,null=True,blank=True)
     cena = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
-
+    ladijski_prevoz = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
+    
     @property 
     def getZalogaPrenosa(self):
         return Zaloga.objects.get(id=self.zalogaPrenosa)

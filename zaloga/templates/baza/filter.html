@@ -21,7 +21,7 @@
     <select id="tip_box">
         <option value="all"> All </option>
         {% for tip in tipi %}
-            <option value="{{tip.0}}"> {{tip.1}} </option>
+            <option value="{{tip.0}}"> {{tip.0}} </option>
         {% endfor %}
     </select>
     <button onclick="Filtriraj()"> {{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}} </button>

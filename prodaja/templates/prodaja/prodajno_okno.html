@@ -71,9 +71,9 @@
                 <select style="width:40%;height:15%;display:inline-block" id="tip" name="tip" form="nov_vnos" onchange="Pokazi_zalogo()">
                     {% for tip in zaloga.vrni_tipe %}
                         {% if tip.0 == "W" %}
-                            <option value="{{tip.0}}" selected> {{tip.1}} </option>
+                            <option value="{{tip.0}}" selected> {{tip.0}} </option>
                         {% else %}
-                            <option value="{{tip.0}}"> {{tip.1}} </option>
+                            <option value="{{tip.0}}"> {{tip.0}} </option>
                         {% endif %}
                     {% endfor %}
                 </select>

@@ -580,6 +580,15 @@ class Baza(models.Model):
     def __str__(self):
         return self.title
     
+    @property
+    def skupna_prodajna_cena_vnosov(self):
+        cenik = self.zaloga.cenik()
+        cena = 0
+        for vnos in self.vnos_set.all().values("stevilo","dimenzija__dimenzija","tip"):
+            cena += vnos["stevilo"] * cenik[vnos["dimenzija__dimenzija"]][vnos["tip"]]
+        return cena
+        
+
     #def save(self, *args, **kwargs):
     #    baza = Baza.objects.get(pk = self.pk)
     #    print(baza.prevoz)

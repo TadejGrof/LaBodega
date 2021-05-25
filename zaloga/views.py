@@ -243,6 +243,9 @@ def baza(request,zaloga, tip_baze, pk):
         baza_query = Baza.objects.filter(pk = pk)
         baza = baza_query[0]
         baza_values = database_functions.baze_values(baza_query)[0]
+        if tip_baze == "prevzem":
+            skupna_prodajna_cena = baza.skupna_prodajna_cena_vnosov
+            baza_values["razlika"] = baza_values["razlika"] + skupna_prodajna_cena
         if baza.status == "aktivno":
             dosedanje_kupljene = None
             if baza.tip == "vele_prodaja":
@@ -252,6 +255,7 @@ def baza(request,zaloga, tip_baze, pk):
                 'baza':baza,
                 'vnosi':baza.inventurni_vnosi,
                 'tip':tip_baze,
+                "skupna_prodajna_cena":skupna_prodajna_cena,
                 'status':"aktivno",
                 'uveljavljeni_vnosi': baza.uveljavljeni_vnosi,
                 'na_voljo':zaloga.na_voljo,

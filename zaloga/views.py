@@ -9,7 +9,7 @@ from django.db.models.functions import Coalesce
 import io
 import datetime
 from django.contrib.auth.decorators import login_required
-import json 
+import json
 from . import funkcije
 from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
@@ -175,7 +175,7 @@ def baze(request,zaloga,tip_baze):
             'skupen_ladijski_prevoz': skupen_ladijski_prevoz
             }
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
-        
+
 @login_required
 def nova_baza(request,zaloga,tip_baze):
     if request.method == "POST":
@@ -243,6 +243,7 @@ def baza(request,zaloga, tip_baze, pk):
         baza_query = Baza.objects.filter(pk = pk)
         baza = baza_query[0]
         baza_values = database_functions.baze_values(baza_query)[0]
+        skupna_prodajna_cena = None
         if tip_baze == "prevzem":
             skupna_prodajna_cena = baza.skupna_prodajna_cena_vnosov
             baza_values["razlika"] = baza_values["razlika"] + skupna_prodajna_cena
@@ -268,7 +269,7 @@ def baza(request,zaloga, tip_baze, pk):
         elif baza.status == "veljavno":
             return pokazi_stran(request, 'baza/baza.html',{"values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
         elif baza.status == "zaklenjeno":
-            return pokazi_stran(request, 'baza/baza.html',{ "values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})   
+            return pokazi_stran(request, 'baza/baza.html',{ "values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})
 
 def poskus(request):
     print("tadej")

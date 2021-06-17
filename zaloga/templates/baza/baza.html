@@ -38,7 +38,11 @@
 </style>
 
 {% include 'js/ajax_requests.html' %}
-{% include 'baza/bazno_okno.html' with baza=baza values=values%}
+{% include 'baza/bazno_okno.html' %}
+
+{% if tip == "vele_prodaja" %}
+    {% include "baza/placilno_okno.html" %}
+{% endif %}
 
 <div class="delovno_okno">
     {% if status != "zaklenjeno" %}

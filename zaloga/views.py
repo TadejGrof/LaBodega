@@ -217,6 +217,7 @@ def nova_baza(request,zaloga,tip_baze):
                 title = title,
                 popust = 0,
                 prevoz = 0,
+                placilo = 0,
                 author = request.user,
                 tip = tip_baze)
         elif tip_baze == 'inventura' or tip_baze == "odpis":
@@ -232,7 +233,24 @@ def izbris_baze(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         baza = Baza.objects.get(pk=pk)
         baza.delete()
-        return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
+        return redirect('baze', zaloga = zaloga, tip_baze=tip_baze) 
+
+#######################################################################################################
+
+def dolgovi(request, zaloga):
+    if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk=zaloga)
+        vele_prodaje = Baza.objects.filter(tip="vele_prodaja", status__in = ["veljavno", "zaklenjeno"])
+        dolgovi = database_functions.baze_values(vele_prodaje).filter(placano=False)
+        return pokazi_stran(request, 'dolgovi/dolgovi.html',{'dolgovi':dolgovi})
+        
+def poravnava_dolga(request, zaloga, baza):
+    baza = Baza.objects.filter(pk=baza)
+    baza_values = database_functions.baze_values(baza)[0]
+    baza = baza.first()
+    baza.placilo = baza_values["koncna_cena"]
+    baza.save()
+    return redirect("dolgovi", zaloga=zaloga)
 
 #######################################################################################################
 
@@ -301,6 +319,19 @@ def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
             ))
     Vnos.objects.bulk_create(vnosi)
     return redirect('baza',zaloga=zaloga.pk, tip_baze = tip_baze, pk = pk)
+
+def spremeni_placilo(request,zaloga, tip_baze, pk):
+    if request.method=="POST":
+        baza = Baza.objects.get(pk=pk)
+        try:
+            placilo = float(request.POST.get("placilo"))
+            if not placilo > 0:
+                placilo = 0
+        except:
+            placilo = 0
+        baza.placilo = placilo
+        baza.save()
+        return redirect("baza",zaloga=zaloga,tip_baze=tip_baze,pk=pk)
 
 def spremeni_ceno_nakupa(request,zaloga,tip_baze,pk):
     if request.method == "POST":

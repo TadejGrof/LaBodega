@@ -1,0 +1,46 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+
+<style>
+
+    div.tabela_dolgov{
+        width:80%;
+        margin-top:5%;
+        text-align:center;
+        margin-bottom:5%;
+    }
+</style>
+<div class="vnosi inline tabela_dolgov">
+
+    <table class="tabela_vnosov">
+        <tr>
+            <th> Baza: </th>
+            <th> Stranka: </th>
+            <th> Cena: </th>
+            <th> Placano: </th>
+            <th> Dolg: </th>
+            <th colspan="2"> Ogled: </th>
+        </tr>
+        {% for baza in dolgovi %}
+            <tr>
+                <td> {{baza.title}} </td>
+                <td> {{baza.ime_stranke}} $ </td>
+                <td> {{baza.koncna_cena}} $ </td>
+                <td> {{baza.placilo}} $ </td>
+                <td> {{baza.dolg}} $ </td>
+                <td> 
+                    <form action="{% url 'poravnava_dolga' zaloga_pk baza.id %}" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" value="Poravnaj">
+                    </form>
+                </td>
+                <td> {% include 'forms/baza_form.html' with baza=baza.id tip=baza.tip zaloga=zaloga_pk %} </td>  
+            </tr>
+        {% endfor %}
+    </table>
+
+</div>
+{% endblock %}

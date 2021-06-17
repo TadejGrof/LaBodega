@@ -1,5 +1,13 @@
 {% load zaloga_exstras %}
 
+<style>
+    td.green {
+        background-color: lightgreen;
+    }
+    td.red {
+        background-color: red;
+    }
+</style>
 <tr>
     {% if tip == "vele_prodaja" %}
         <td> {{baza.title}} </td>
@@ -7,6 +15,7 @@
         <td> {{baza.datum}} </td>
         <td> {{baza.skupno_stevilo}} </td>
         <td> {{baza.koncna_cena}} $</td>
+        {% if baza.placano %} <td class="green"> {% else %} <td class="red"> {% endif %} {{baza.dolg}} $</td> 
         <td> {% include 'forms/baza_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %} </td>
         <td> {% include 'forms/pdf_baze_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk select=False %} </td>
     {% elif tip == "dnevna_prodaja" %}

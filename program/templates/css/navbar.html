@@ -253,6 +253,7 @@
             {% endif %}
             {% if perms.prodaja.view_vele_prodaja %}
                 <a href="{% url 'arhiv_baz' zaloga_pk 'vele_prodaja' %}">{{slovar|keyvalue:'Arhiv vele prodaj'|keyvalue:jezik}}</a>
+                <a href="{% url 'dolgovi' zaloga_pk %}"> Pregled dolgov </a>
             {% endif %}
             <a href="{% url 'cenik_prodaje' zaloga_pk 'vele_prodaja' %}">{{slovar|keyvalue:'Cenik vele prodaje'|keyvalue:jezik}}</a>
         </div>

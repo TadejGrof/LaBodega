@@ -1,0 +1,28 @@
+{% load zaloga_exstras %}
+
+<style>
+    div.placilo{
+        width:10%;
+    }
+    input.placilo{
+        width:10%;
+    }
+    div.koncna_cena{
+        width:10%;
+        margin-left:0%;
+    }
+    div.dolg{
+        width:20%;
+    }
+
+</style>
+<div>
+    <div class="inline placilo"> Placilo: </div>
+    <input class="inline placilo" type="text" form="sprememba_placila" value="{{values.placilo}}" name="placilo"> 
+    $ / {{values.koncna_cena}} $
+    <div class="inline dolg"> Dolg: {{values.dolg}} $ </div>
+    <form class="inline" id="sprememba_placila" action="{% url 'spremeni_placilo' zaloga_pk tip values.id %}" method="POST">
+        {% csrf_token %}
+        <input class="button" type="submit" class="vnosi" value="Spremeni placilo">
+    </form> 
+</div>

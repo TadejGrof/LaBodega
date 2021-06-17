@@ -15,6 +15,7 @@ ogled_patterns = [
     path('pdf/', pdf_views.pdf_baze, name='pdf_baze'),
     path('pdf/razlika', pdf_views.pdf_razlike, name="pdf_razlike"),
     path('spremeni_ceno_nakupa/',views.spremeni_ceno_nakupa, name="spremeni_ceno_nakupa"),
+    path('spremeni_placilo/', views.spremeni_placilo, name="spremeni_placilo")
 ]
 
 baza_patterns = [
@@ -82,11 +83,17 @@ ajax_patterns = [
     path('izbrisi_racun/', baza_views.izbrisi_racun, name="izbrisi_racun")
 ]
 
+dolgovi_patterns = [
+    path("", views.dolgovi, name="dolgovi"),
+    path("poravnava_dolga/<int:baza>/", views.poravnava_dolga, name="poravnava_dolga")
+]
+
 urlpatterns = [
     path('poskus/',views.poskus,name="poskus"),
     path('<int:zaloga>/pregled_zaloge/', zaloga_views.pregled_zaloge, name='pregled_zaloge'),
     path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),
     path('<int:zaloga>/pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
+    path('<int:zaloga>/dolgovi', include(dolgovi_patterns)),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
     path('pregled_stroskov/', include(stroski_patterns)),
     path('strosek/', include(strosek_patterns)),

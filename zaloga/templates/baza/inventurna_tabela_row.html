@@ -1,0 +1,19 @@
+<tr id="{{sestavina.id}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
+    <input type="text" class="skrit" id="pk_{{sestavina.id}}">
+    <td class="dimenzija"> {{sestavina.dimenzija}} </td>
+    <td class="tip"> {{sestavina.tip}} </td>
+    <td class="stevilo">
+        <div class="{{sestavina.id}} skrit" id="stevilo_{{sestavina.id}}"></div>
+        <input class="{{sestavina.id}} stevilo" id="stevilo_value_{{sestavina.id}}" type="text">
+    </td>
+    <td class="skrit inventura zaloga"> {{sestavina.stanje}} </td>
+    <td class="razlika skrit razlika"> </td>
+    <td class="skrit na_voljo"> {{sestavina.na_voljo}} </td>
+    <td>
+        <button class="{{sestavina.id}} novo" onclick="Nov_Vnos('{{sestavina.id}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
+        <button class="{{sestavina.id}} skrit" onclick="ToggleClass('.{{sestavina.id}}','skrit');ToggleClass('.{{sestavina.id}}.novo','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+        <button class="{{sestavina.id}} skrit" onclick="Izbrisi_vnos(get_value('pk_{{sestavina.id}}'))"> X </button>
+        <button class="{{sestavina.id}} sprememba skrit" onclick="Spremeni_Vnos('{{sestavina.id}}')"> Ok </button>
+        <button class="{{sestavina.id}} sprememba skrit" onclick="ToggleClass('.{{sestavina.id}}','skrit');ToggleClass('.{{sestavina.id}}.novo','skrit')"> <- </button>     
+    </td> 
+</tr>

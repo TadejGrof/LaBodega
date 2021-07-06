@@ -14,43 +14,9 @@
 
 <div class="inventurna_tabela vnosi inline">
     <table class="tabela_vnosov"  id="inventurna_tabela" >
-        <tr class="header">
-            <th width="30%"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
-            <th width="15%"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
-            <th width="15%"> {{slovar|keyvalue:'Vnos'|keyvalue:jezik}}: </th>
-            <th width="10%" class="skrit inventura"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
-            <th width="10%" class="skrit razlika"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
-            <th width="10%" class="skrit naroceno"> Naroceno: </th>
-            <th width="10%" class="skrit na_voljo"> {{slovar|keyvalue:'Na voljo'|keyvalue:jezik}}: </th>
-            <th width="20%" > {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}: </th>  
-        </tr>
+        {% include "./inventurna_tabela_header.html" %}
         {% for sestavina in sestavine %}
-            {% if sestavina.vneseno %}
-                <tr id="{{sestavina.id}}" class="vrstica {{podatki.radius}} {{podatki.tip}} vneseno">
-            {% else %}
-                <tr id="{{sestavina.id}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
-            {% endif %}
-            
-                <input type="text" class="skrit" id="pk_{{sestavina.id}}">
-                <td> {{sestavina.dimenzija}} </td>
-                <td> {{sestavina.tip}} </td>
-                <td>
-                    <div class="{{sestavina}} skrit" id="stevilo_{{sestavina}}"></div>
-                    <input class="{{sestavina}} stevilo" id="stevilo_value_{{sestavina}}" type="text">
-                </td>
-                <td id="zaloga_{{sestavina}}" class="skrit inventura"> {{podatki.zaloga}} </td>
-                <td id="razlika_{{sestavina}}" class="razlika skrit"> </td>
-                {% with dimenzija=sestavina|replace %}
-                <td id="na_voljo_{{sestavina}}" class="skrit na_voljo"> {{na_voljo|keyvalue:dimenzija}} </td>
-                {% endwith %}
-                <td>
-                    <button class="{{sestavina}} novo" onclick="Nov_Vnos('{{sestavina}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
-                    <button class="{{sestavina}} skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                    <button class="{{sestavina}} skrit" onclick="Izbrisi_vnos(get_value('pk_{{sestavina}}'))"> X </button>
-                    <button class="{{sestavina}} sprememba skrit" onclick="Spremeni_Vnos('{{sestavina}}')"> Ok </button>
-                    <button class="{{sestavina}} sprememba skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> <- </button>     
-                </td> 
-            </tr>
+            {% include "./inventurna_tabela_row.html" %}
         {% endfor %}
     </table>
 </div>
@@ -87,12 +53,10 @@
             ToggleClass('.' + dimenzija_tip + '.novo', 'skrit')
         }
     }
-    function Nov_Vnos(dimenzija_tip){
-        var dimenzija = dimenzija_tip.split('_')[0]
-        var tip = dimenzija_tip.split('_')[1]
-        var stevilo = get_value('stevilo_value_' + dimenzija_tip)
+    function Nov_Vnos(sestavina_id){
+        var stevilo = get_value('stevilo_value_' + sestavina_id)
         if (stevilo != ""){
-            Nov_vnos(dimenzija,tip,stevilo)
+            Nov_vnos(sestavina_id,stevilo)
         }
     }
     function Shrani_vse(gumb){

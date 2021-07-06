@@ -223,7 +223,7 @@ def baza(request,zaloga, tip_baze, pk):
             'status':baza.status,
             'vnosi': baza.vnos_set.all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
-            'sestavine':VnosZaloge.objects.filter(sestavina__in = zaloga.sestavine.all(), zaloga=zaloga).all_values(),
+            'sestavine':zaloga.sestavine.all().all_values(),
             'tipi': zaloga.tipi_sestavin.all(),
             "values": baza_values}
         return pokazi_stran(request, 'baza/baza.html',slovar)

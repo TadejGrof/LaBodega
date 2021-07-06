@@ -16,7 +16,7 @@ from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
-from .model_queries import VnosZalogeQuerySet, VnosQuerySet
+from .model_queries import VnosZalogeQuerySet, VnosQuerySet, SestavinaQuerySet
 
 
 TIPI_SESTAVINE = (
@@ -100,6 +100,8 @@ class Dimenzija(models.Model):
 class Sestavina(models.Model):
     dimenzija = models.ForeignKey(Dimenzija, on_delete=models.CASCADE)
     tip = models.ForeignKey(Tip,default=None,null=True,blank=True,on_delete=models.CASCADE)
+
+    objects = SestavinaQuerySet.as_manager()
 
     class Meta:
         ordering = ['zaloga','dimenzija','tip']

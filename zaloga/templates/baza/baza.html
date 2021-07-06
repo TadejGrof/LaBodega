@@ -53,18 +53,18 @@
         {% else %}
             {% if perms.zaloga.add_vnos %}
                 <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-                <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
+                <select class="nov_vnos skrit" style="width:15%" id="sestavina">
                     {% for sestavina in sestavine %}
-                        <option value="{{sestavina.dimenzija_id}}"> {{sestavina.dimenzija}} </option>
+                        <option value="{{sestavina.id}}"> {{sestavina.dim}} </option>
                     {% endfor %}
                 </select>
                 <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
                 <select id="tip" class="nov_vnos skrit">
                     {% for tip in tipi %}
-                        <option value="{{tip.id}}"> {{tip.kratko}} </option>
+                        <option value="{{tip.id}}"> {{tip.kratko}}  </option>
                     {% endfor %}
                 </select>
-                <button class="nov_vnos skrit" onclick="nov_vnos()"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+                <button class="nov_vnos skrit" onclick="Nov_vnos(get_value('sestavina'), get_value('stevilo'))"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
                 <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
             {% endif %}
             <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
@@ -205,14 +205,13 @@
                 }
             }); 
         }
-        function Nov_vnos(dimenzija,tip,stevilo){
+        function Nov_vnos(sestavina,stevilo){
             $.ajax({
                 url: '{% url "nov_vnos" %}',
                 method: 'POST',
                 data: {
                 'csrfmiddlewaretoken': '{{csrf_token}}',
-                'dimenzija': dimenzija,
-                'tip':tip,
+                'sestavina':sestavina,
                 'stevilo':stevilo,
                 'pk': '{{values.id}}'
                 },

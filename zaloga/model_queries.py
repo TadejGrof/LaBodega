@@ -103,7 +103,15 @@ class VnosZalogeQuerySet(models.QuerySet):
             .annotate(dimenzija_id = F("sestavina__dimenzija__id")) \
             .annotate(tip_id = F("sestavina__tip__id")) \
             .values()
-        
+
+class SestavinaQuerySet(models.QuerySet):
+    def all_values(self):
+        return self.annotate(dim = F("dimenzija__dimenzija")) \
+            .annotate(radij = F("dimenzija__radius")) \
+            .annotate(kratek_tip = F("tip__kratko")) \
+            .annotate(dolgi_tip = F("tip__dolgo")) \
+            .values()
+          
 class VnosQuerySet(models.QuerySet):
     use_for_related_fields = True
 

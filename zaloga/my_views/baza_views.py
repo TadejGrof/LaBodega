@@ -31,10 +31,8 @@ def spremeni_vnos(request):
 
 def nov_vnos(request):
     if request.method == "POST":
-        dimenzija = Dimenzija.objects.get(id=int(request.POST.get("dimenzija")))
         stevilo = int(request.POST.get('stevilo'))
-        tip = Tip.objects.get(id=int(request.POST.get('tip')))
-        sestavina = Sestavina.objects.get(dimenzija = dimenzija,tip = tip)
+        sestavina = Sestavina.objects.get(pk=int(request.POST.get("sestavina")))
         pk = int(request.POST.get('pk'))
         baza = Baza.objects.get(pk = pk)
         zaloga = baza.zaloga

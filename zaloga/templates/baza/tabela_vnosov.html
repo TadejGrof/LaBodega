@@ -113,10 +113,8 @@
             ToggleClass('.' + pk, 'skrit')
         }
         function nov_vnos(){
-            var dimenzija = get_selected('dimenzija')
             var stevilo = get_value('stevilo')
-            var tip = get_selected('tip')
-            Nov_vnos(dimenzija,tip,stevilo)
+            Nov_vnos(sestavina,stevilo)
         }
         function Vstavi_vrstico(data){
             var table = document.getElementById('tabela_vnosov')

@@ -15,16 +15,15 @@
             }
         }); 
     }
-    function NovVnos(baza, dimenzija, tip, stevilo, funkcija){
+    function NovVnos(baza, sestavina, stevilo, funkcija){
         $.ajax({
             url: '{% url "nov_vnos" %}',
             method: 'POST',
             data: {
             'csrfmiddlewaretoken': '{{csrf_token}}',
             'pk': baza,
-            'dimenzija': dimenzija,
+            'sestavina': sestavina,
             'stevilo': stevilo,
-            'tip': tip
             },
             dataType: 'json',
             success: function (data) {

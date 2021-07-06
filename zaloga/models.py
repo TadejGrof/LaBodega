@@ -75,235 +75,12 @@ TIPI_STROSKOV = (
 )
 
 
-class Zaloga(models.Model):
-    title = models.CharField(default="skladisce", max_length=20)
-    tipi_prodaje = models.CharField(default='["vele_prodaja"]', max_length=50)
-    tipi_sestavine = models.CharField(default='["Y","W","JP","JP50","JP70"]', max_length=50)
+class Tip(models.Model):
+    kratko = models.CharField(max_length=10,default="")
+    dolgo = models.CharField(max_length=10,default="")
 
     def __str__(self):
-        return self.title
-
-    @property
-    def tipi_prodaj(self):
-        return json.loads(self.tipi_prodaje)
-
-    @property
-    def tipi_sestavin(self):
-        return json.loads(self.tipi_sestavine)
-           
-    @property
-    def danes(self):
-        return datetime.today().strftime('%Y-%m-%d')
-
-    @property
-    def dimenzija_tip_zaloga(self):
-        zaloga = self.zaloga
-        dimenzija_tip = {}
-        for dimenzija in zaloga:
-            for tip in zaloga[dimenzija]:
-                dimenzija_tip.update({dimenzija + '_' + tip : zaloga[dimenzija][tip]})
-        return dimenzija_tip
-
-    @property
-    def zaloga(self):
-        dimenzije = self.vrni_slovar_dimenzij(True)
-        zaloga = {}
-        for sestavina in self.sestavina_set.all().values():
-            dimenzija = dimenzije[sestavina['dimenzija_id']]
-            zaloga.update({dimenzija:{}})
-            for tip in self.tipi_sestavin:
-                zaloga[dimenzija].update({tip:sestavina[tip]})
-        return zaloga
-
-    @property            
-    def rezervirane(self):
-        rezervirane = {}
-        for baza in self.baza_set.all().filter(status="aktivno", tip__in =  ["vele_prodaja","prenos"]):
-            for vnos in baza.vnos_set.all().values('dimenzija__dimenzija','stevilo','tip'):
-                dimenzija = vnos['dimenzija__dimenzija']
-                stevilo = vnos['stevilo']
-                tip = vnos['tip']
-                dimenzija_tip = dimenzija + '_' + tip
-                if dimenzija_tip in rezervirane:
-                    rezervirane[dimenzija_tip] += stevilo
-                else:
-                    rezervirane[dimenzija_tip] = stevilo
-        return rezervirane
-
-    @property
-    def na_voljo(self):
-        zaloga = self.dimenzija_tip_zaloga
-        rezervirane = self.rezervirane
-        for sestavina in rezervirane:
-            zaloga[sestavina] -= rezervirane[sestavina]
-        return zaloga
-
-    @property
-    def vrni_razlicne_radiuse(self):
-        razlicni_radiusi = []
-        for radius in self.sestavina_set.all().values('dimenzija__radius').distinct().order_by('dimenzija__radius'):
-                razlicni_radiusi.append(radius['dimenzija__radius'])
-        return razlicni_radiusi
-
-    def ponastavi_zalogo(self):
-        for sestavina in self.sestavina_set.all():
-            for tip in self.vrni_tipe:
-                setattr(sestavina,tip[0],0)
-            sestavina.save()
-
-    def cenik(self,tip='vele_prodaja'):
-        cene = {}
-        cenik = self.sestavina_set.all().prefetch_related('cena_set').filter(cena__prodaja=tip).values(
-            'dimenzija__dimenzija',
-            'pk',
-            'cena',
-            'cena__tip',
-            'cena__cena')
-        for cena in cenik:
-            dimenzija = cena['dimenzija__dimenzija']
-            tip = cena['cena__tip']
-            cena = cena['cena__cena']
-            if dimenzija in cene:
-                if not tip in cene[dimenzija]:
-                    cene[dimenzija].update({tip:float(cena)})
-            else:
-                    cene.update({dimenzija:{tip:float(cena)}})
-        return cene
-
-    def vrni_slovar_dimenzij(self, obratno = False):
-        slovar = {}
-        dimenzije = self.sestavina_set.values('dimenzija_id','dimenzija__dimenzija')
-        if obratno:
-            for dimenzija in dimenzije:
-                slovar.update({dimenzija['dimenzija_id']:dimenzija['dimenzija__dimenzija']})
-        else: 
-            for dimenzija in dimenzije:
-                slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
-        return slovar
-
-    def vrni_top_10(self,radius="all"):
-        sestavine = []
-        radiusi = self.vrni_razlicne_radiuse
-        tipi = self.vrni_tipe
-        if radius in radiusi:
-            sestavine_radiusa = self.sestavina_set.all().filter(dimenzija__radius = radius)
-            for tip in tipi:
-                for sestavina in sestavine_radiusa.order_by('-' + tip[0])[:10].values(tip[0],'dimenzija__dimenzija'):
-                    sestavine.append((sestavina[tip[0]],tip[0],sestavina['dimenzija__dimenzija']))
-            sestavine.sort()
-            sestavine = sestavine[::-1][:10]
-        else:
-            sestavine_all = self.sestavina_set.all()
-            for tip in tipi:
-                for sestavina in sestavine_all.order_by('-' + tip[0])[:10].values(tip[0],'dimenzija__dimenzija'):
-                    sestavine.append((sestavina[tip[0]],tip[0],sestavina['dimenzija__dimenzija']))
-            sestavine.sort()
-            sestavine = sestavine[::-1][:10]
-        return [{'dimenzija__dimenzija':sestavina[2],sestavina[1]:sestavina[0],'tip':sestavina[1]} for sestavina in sestavine]
-    
-    @property
-    def vrni_tipe(self):
-        return [[tip,""] for tip in self.tipi_sestavin]
-
-    @property
-    def tipi_stroskov(self):
-        return TIPI_STROSKOV
-
-    @property
-    def drzave(self):
-        return DRZAVE
-    
-    @property
-    def posiljatelji(self):
-        return POSILJATELJI
-
-    def vrni_dimenzijo(self,radius,height,width):
-        special = False
-        if "C" in width:
-            special = True
-            width = width[:-1]
-        return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
- 
-    @property
-    def vrni_zalogo(self):
-        return self.sestavina_set.all().order_by("dimenzija")\
-        .values().annotate(radius = F("dimenzija__radius"),dim = F("dimenzija__dimenzija"))
-
-
-    @property
-    def vrni_sestavine(self):
-        return self.sestavina_set.all()
-
-    @property
-    def zaklep_zaloge(self):
-        return self.zaklep_set.all().first()
-
-    @property
-    def datum_zaklepa(self):
-        return self.zaklep_zaloge.datum
-
-    def zakleni_zalogo(self,datum):
-        if datum > self.datum_zaklepa:
-            zaklep_json = {}
-            for sestavina in self.sestavina_set.all():
-                pk = sestavina.pk
-                zaklep_json[pk] = {}
-                for tip in self.tipi_sestavin:
-                    zaklep_json[pk][tip] = sestavina.zaloga_na_datum(datum,tip)
-            Zaklep.objects.create(zaloga = self, datum = datum,stanja_json = json.dumps(zaklep_json))
-        else:
-            print("IZBERI DATUM PO PREJŠNJEM ZAKLEPU")
-
-class Zaklep(models.Model):
-    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
-    datum = models.DateField(default=now)
-    stanja_json = models.TextField(default="{}")
-
-    class Meta:
-        ordering = ['-datum']
-
-    @property
-    def stanja(self):
-        return json.loads(self.stanja_json)
-
-    def vrni_stanje(self,sestavina,tip):
-        stanja = self.stanja
-        return stanja[str(sestavina.pk)][tip]
-
-    def remove_key(self,key):
-        stanja = self.stanja
-        stanja.pop(key,None)
-        self.stanja_json = json.dumps(stanja)
-        self.save()
-
-    def nastavi_stanje(self,sestavina,tip,stanje = 0):
-        stanja = self.stanja
-        if str(sestavina.pk) in stanja:
-            stanja[str(sestavina.pk)][tip] = stanje
-        else:
-            stanja[str(sestavina.pk)] = {tip:stanje}
-        self.stanja_json = json.dumps(stanja)
-        self.save()
-        return stanja
-
-@receiver(post_save, sender=Zaklep)
-def create_zaklep(sender, instance, created, **kwargs):
-    if created:
-        baze = instance.zaloga.baza_set.all().filter(status = "veljavno", datum__lte = instance.datum)
-        for baza in baze:
-            baza.status = "zaklenjeno"
-        Baza.objects.bulk_update(baze,["status"])
-
-
-class Zaposleni(models.Model):
-    user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)
-    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
-    ime = models.CharField(default="/",max_length=20)
-    priimek = models.CharField(default="/",max_length=20)
-    davcna = models.CharField(default="/", max_length=30)
-    naslov = models.OneToOneField(Naslov, default=None, on_delete=models.CASCADE, null=True, blank=True)
-    telefon = models.CharField(default="/", max_length=20)
-    mail = models.CharField(default="/", max_length=40)
+        return self.kratko
 
 class Dimenzija(models.Model):
     dimenzija = models.CharField(default="", max_length=20)
@@ -318,58 +95,18 @@ class Dimenzija(models.Model):
     def __str__(self):
         return self.dimenzija
 
-##################################################################################################
 class Sestavina(models.Model):
-    zaloga = models.ForeignKey(Zaloga,default=1, on_delete=models.CASCADE)
     dimenzija = models.ForeignKey(Dimenzija, on_delete=models.CASCADE)
-    Y = models.IntegerField(default = 0)
-    W = models.IntegerField(default = 0)  
-    JP = models.IntegerField(default = 0)
-    JP50 = models.IntegerField(default = 0)
-    JP70 = models.IntegerField(default = 0)
+    tip = models.ForeignKey(Tip,default=None,null=True,blank=True,on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['zaloga','dimenzija']
-
-    def cena(self,prodaja,tip):
-        if prodaja == "vele_prodaja" or prodaja == "dnevna_prodaja":
-            return self.cena_set.all().get(tip=tip, prodaja = prodaja).cena
-        else:
-            return None
-
-    def nastavi_novo_ceno(self, prodaja, tip, nova_cena):
-        cena = self.cena_set.all().get(tip=tip,prodaja=prodaja)
-        cena.cena = nova_cena
-        cena.save()
-        
-    def spremeni_stevilo(self,stevilo,tip,save=True):
-        try:
-            stevilo = getattr(self,tip) + stevilo
-            setattr(self,tip,stevilo)
-        except:
-            print("NAPAKA PRI SPREMEMBI STEVILA ZA SESTAVINO: " + str(self.dimenzija) + " tipa: " + tip)
-        if save:
-            self.save()
-
-    def prodaja(self,tip_baze,tip,zacetek,konec):
-        spremembe = self.sprememba_set.all().filter(baza__tip = tip_baze, tip=tip, baza__datum__gte = zacetek, baza__datum__lte = konec)
-        cena = 0
-        stevilo = 0
-        for sprememba in spremembe:
-            popust = 0
-            if tip_baze == "vele_prodaja":
-                popust = sprememba.baza.popust
-            for vnos in sprememba.vnos_set.all().values('stevilo','cena'):
-                stevilo += vnos['stevilo']
-                cena += round(float(vnos['stevilo'] * float(vnos['cena']) * ((100 - popust) / 100)))
-        return stevilo, cena
+        ordering = ['zaloga','dimenzija','tip']
 
     def __str__(self):
-        return self.dimenzija.dimenzija
-
-    @property
-    def prijazna_dimenzija(self):
-        return self.dimenzija.dimenzija.replace('/','-')
+        try:
+            return self.dimenzija.dimenzija + "_" + self.tip.kratko
+        except:
+            return self.dimenzija.dimenzija
 
     def nastavi_iz_sprememb(self,tip):
         zaklep = self.zaloga.zaklep_zaloge
@@ -433,28 +170,6 @@ class Sestavina(models.Model):
                 zaporedna_stanja.append(stanje)
         return zaporedna_stanja
 
-@receiver(post_save, sender=Zaloga)
-def create_zaloga(sender, instance, created, **kwargs):
-    if created:
-        for dimenzija in Dimenzija.objects.all():
-            Sestavina.objects.create(zaloga=instance,dimenzija=dimenzija)
-
-@receiver(post_save, sender=Dimenzija)
-def create_dimenzija(sender, instance, created, **kwargs):
-    if created:
-        for zaloga in Zaloga.objects.all():
-            sestavina = Sestavina.objects.create(zaloga = zaloga, dimenzija = instance)
-
-@receiver(post_save, sender=Sestavina)
-def create_sestavina(sender, instance, created, **kwargs):
-    if created:
-        zaloga = instance.zaloga
-        for prodaja in zaloga.tipi_prodaj:
-            for tip in zaloga.tipi_sestavin:
-                Cena.objects.create(sestavina = instance, prodaja = prodaja, tip = tip, nacin="prodaja")
-
-###################################################################################################
-
 class Cena(models.Model):
     sestavina = models.ForeignKey(Sestavina, default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=0)
@@ -463,6 +178,157 @@ class Cena(models.Model):
     prodaja = models.CharField(max_length=15, choices=TIPI_PRODAJE, null=True, blank=True, default=None)
     drzava = models.CharField(max_length=15, choices=DRZAVE, null=True,blank=True,default=None)
     
+class Zaloga(models.Model):
+    title = models.CharField(default="skladisce", max_length=20)
+    tipi_prodaje = models.CharField(default='["vele_prodaja"]', max_length=50)
+    tipi_sestavine = models.CharField(default='["Y","W","JP","JP50","JP70"]', max_length=50)
+    tipi_sestavin = models.ManyToManyField(Tip)
+    sestavine = models.ManyToManyField(Sestavina)
+    cenik = models.ManyToManyField(Cena)
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def tipi_prodaj(self):
+        return json.loads(self.tipi_prodaje)
+
+    @property
+    def danes(self):
+        return datetime.today().strftime('%Y-%m-%d')
+
+    @property
+    def vrni_razlicne_radiuse(self):
+        razlicni_radiusi = []
+        for radius in self.sestavine.values('dimenzija__radius').distinct().order_by('dimenzija__radius'):
+                razlicni_radiusi.append(radius['dimenzija__radius'])
+        return razlicni_radiusi
+
+
+    @property
+    def vrni_tipe(self):
+        return [tip.kratko for tip in self.tipi_sestavin.all()]
+
+    @property
+    def tipi_stroskov(self):
+        return TIPI_STROSKOV
+
+    @property
+    def drzave(self):
+        return DRZAVE
+    
+    @property
+    def posiljatelji(self):
+        return POSILJATELJI
+
+    def vrni_dimenzijo(self,radius,height,width):
+        special = False
+        if "C" in width:
+            special = True
+            width = width[:-1]
+        return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
+ 
+    @property
+    def vrni_zalogo(self):
+        return self.sestavina_set.all().order_by("dimenzija")\
+        .values().annotate(radius = F("dimenzija__radius"),dim = F("dimenzija__dimenzija"))
+
+    @property
+    def vrni_sestavine(self):
+        return self.sestavina_set.all()
+
+    @property
+    def zaklep_zaloge(self):
+        return self.zaklep_set.all().first()
+
+    @property
+    def datum_zaklepa(self):
+        return self.zaklep_zaloge.datum
+
+
+class Zaklep(models.Model):
+    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
+    datum = models.DateField(default=now)
+    stanja_json = models.TextField(default="{}")
+
+    class Meta:
+        ordering = ['-datum']
+
+    @property
+    def stanja(self):
+        return json.loads(self.stanja_json)
+
+    def vrni_stanje(self,sestavina,tip):
+        stanja = self.stanja
+        return stanja[str(sestavina.pk)][tip]
+
+    def remove_key(self,key):
+        stanja = self.stanja
+        stanja.pop(key,None)
+        self.stanja_json = json.dumps(stanja)
+        self.save()
+
+    def nastavi_stanje(self,sestavina,tip,stanje = 0):
+        stanja = self.stanja
+        if str(sestavina.pk) in stanja:
+            stanja[str(sestavina.pk)][tip] = stanje
+        else:
+            stanja[str(sestavina.pk)] = {tip:stanje}
+        self.stanja_json = json.dumps(stanja)
+        self.save()
+        return stanja
+
+@receiver(post_save, sender=Zaklep)
+def create_zaklep(sender, instance, created, **kwargs):
+    if created:
+        baze = instance.zaloga.baza_set.all().filter(status = "veljavno", datum__lte = instance.datum)
+        for baza in baze:
+            baza.status = "zaklenjeno"
+        Baza.objects.bulk_update(baze,["status"])
+
+
+class Zaposleni(models.Model):
+    user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)
+    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
+    ime = models.CharField(default="/",max_length=20)
+    priimek = models.CharField(default="/",max_length=20)
+    davcna = models.CharField(default="/", max_length=30)
+    naslov = models.OneToOneField(Naslov, default=None, on_delete=models.CASCADE, null=True, blank=True)
+    telefon = models.CharField(default="/", max_length=20)
+    mail = models.CharField(default="/", max_length=40)
+
+##################################################################################################
+
+
+@receiver(post_save, sender=Tip)
+def create_tip(sender, instance, created, **kwargs):
+    if created:
+        for dimenzija in Dimenzija.objects.all():
+            Sestavina.objects.create(dimenzija=dimenzija,tip=instance)
+
+@receiver(post_save, sender=Dimenzija)
+def create_dimenzija(sender, instance, created, **kwargs):
+    if created:
+        for tip in Tip.objects.all():
+            sestavina = Sestavina.objects.create(dimenzija=instance,tip=tip)
+
+@receiver(post_save, sender=Sestavina)
+def create_sestavina(sender, instance, created, **kwargs):
+    if created:
+        for zaloga in Zaloga.objects.all():
+            VnosZaloge.objects.create(zaloga=zaloga,sestavina=instance)        
+
+class VnosZaloge(models.Model):
+    zaloga = models.ForeignKey(Zaloga, default=1,on_delete=models.CASCADE)
+    sestavina = models.ForeignKey(Sestavina,default=1,on_delete=models.CASCADE)
+    stanje = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['zaloga','sestavina']
+
+###################################################################################################
+
+
 class Kontejner(models.Model):
     stevilka = models.CharField(default="", max_length=20)
     posiljatelj = models.CharField(default="", max_length=20, choices=POSILJATELJI)
@@ -1038,9 +904,10 @@ class Sprememba(models.Model):
         return self.baza.title
 
 class Vnos(models.Model):
+    sestavina = models.ForeignKey(Sestavina,default=None,null=True,blank=True, on_delete=models.CASCADE)
     dimenzija = models.ForeignKey(Dimenzija,default=0,on_delete=models.CASCADE)
     tip = models.CharField(default="Y", choices=TIPI_SESTAVINE, max_length=10)
-    stevilo = models.IntegerField()
+    stevilo = models.IntegerField(default=1)
     baza = models.ForeignKey(Baza,default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
     sprememba = models.ForeignKey(Sprememba,default=None,null=True,blank=True,on_delete=models.CASCADE)

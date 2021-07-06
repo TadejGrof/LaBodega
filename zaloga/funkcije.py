@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 from program.models import Program
-from zaloga.models import Zaloga
+from zaloga.models import Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos
 import json
 
 def nastavi_cene():
@@ -152,4 +152,35 @@ def nova_zaloga(ime,tipi,prodaje):
     tipi = json.dumps(tipi)
     prodaje = json.dumps(prodaje)
     Zaloga.objects.create(title=ime,tipi_sestavine=tipi,tipi_prodaje=prodaje)
+    
+def ustvari_tipe():
+    for tip in TIPI_SESTAVINE:
+        if not Tip.objects.filter(kratko=tip[0]).exists():
+            Tip.objects.create(kratko=tip[0],dolgo=tip[1])
+
+def pretvori_sestavine():
+    for sestavina in Sestavina.objects.all().filter(tip=None):
+        for tip in TIPI_SESTAVINE:
+            vnos_zaloge = VnosZaloge.objects.get(sestavina__tip__kratko=tip[0],zaloga=sestavina.zaloga,sestavina__dimenzija=sestavina.dimenzija)
+            vnos_zaloge.stanje = getattr(sestavina,tip[0])
+            vnos_zaloge.save()
+
+def pretvori_vnose():
+    vnosi = []
+    for vnos in Vnos.objects.all():
+        try:
+            vnos.sestavina = Sestavina.objects.get(dimenzija=vnos.dimenzija, tip=Tip.objects.get(kratko=vnos.tip))
+            vnosi.append(vnos)
+        except:
+            print(vnos.tip)
+            if vnos.tip == "70%":
+                vnos.sestavina = Sestavina.objects.get(dimenzija=vnos.dimenzija, tip=Tip.objects.get(kratko="JP70"))
+                vnosi.append(vnos)
+    Vnos.objects.bulk_update(vnosi,["sestavina"])
+
+def pretvorba():
+    ustvari_tipe()
+    pretvori_sestavine()
+    pretvori_vnos()
+    
     

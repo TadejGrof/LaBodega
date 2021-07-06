@@ -26,56 +26,13 @@ from . import database_functions
 def pregled_zaloge(request,zaloga):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk = zaloga)
-        cenik = zaloga.cenik('vele_prodaja')
-        sestavine = filtriraj_sestavine(request, zaloga)
-        nicelne = request.GET.get('nicelne','true')
-        tipi = []
-        for tip in zaloga.tipi_sestavin:
-            if request.GET.get(tip,"true") == "true":
-                tipi.append(tip)
-        sestavine = sestavine.values(
-            'dimenzija__dimenzija',
-            'pk',
-            'Y',
-            'W',
-            'JP',
-            'JP50',
-            'JP70',
-        )
+        vnosi_zaloge = VnosZaloge.objects.filter(zaloga=zaloga)
+        sestavine = vnosi_zaloge.all_values()
         if nicelne == "false":
-            ne_prazne = []
-            for sestavina in sestavine:
-                for tip in tipi:
-                    if sestavina[tip] != 0:
-                        ne_prazne.append(sestavina)
-                        break
-            sestavine = ne_prazne
-        cene = {}
-        skupno = 0
-        vrednost = 0
-        for sestavina in sestavine:
-            dimenzija = sestavina['dimenzija__dimenzija']
-            for tip in tipi:
-                stevilo = sestavina[tip]
-                cena = cenik[dimenzija][tip]
-                skupno += stevilo
-                vrednost += cena * stevilo
-                if dimenzija in cene:
-                    if not tip in cene[dimenzija]:
-                        cene[dimenzija].update({tip:stevilo * cena})
-                else:
-                    cene.update({dimenzija:{tip:stevilo * cena}})
+            sestavine = sestavine.exclude(stanje=0)
         slovar = {
             'zaloga':zaloga,
-            'sestavine':sestavine,
-            'tipi':tipi,
-            'radius':radius,
-            'height':height,
-            'width':width,
-            'skupno':skupno,
-            'nicelne': nicelne,
-            'cene':cene,
-            'vrednost':vrednost
+            'sestavine':sestavine
         }
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 

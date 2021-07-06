@@ -40,21 +40,11 @@ def home_page(request):
 
     tip = request.GET.get('tip','all')
     radius = request.GET.get('radius','all')
-    if tip == "all":
-        sestavine = zaloga.vrni_top_10(radius)
-    elif radius == "all":
-        sestavine = zaloga.sestavina_set.all().order_by('-' + tip)[:10].values('dimenzija__dimenzija',tip)
-        for sestavina in sestavine:
-            sestavina.update({'tip':tip})
-    else:
-        sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius).order_by('-' + tip)[:10].values('dimenzija__dimenzija',tip)
-        for sestavina in sestavine:
-            sestavina.update({'tip':tip})
+    
     danasnja_prodaja = Dnevna_prodaja.objects.filter(zaloga = zaloga, datum = datetime.date.today()).first()
     slovar = {
         'dnevna_prodaja':danasnja_prodaja,
         'stranke':stranke,
-        'sestavine':sestavine,
         'tip':tip,
         'zaloga':zaloga,
         'zaloga_pk': zaloga.pk,

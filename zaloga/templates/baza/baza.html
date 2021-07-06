@@ -55,7 +55,7 @@
                 <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
                 <select class="nov_vnos skrit" style="width:15%" id="sestavina">
                     {% for sestavina in sestavine %}
-                        <option value="{{sestavina.id}}"> {{sestavina.dim}} </option>
+                        <option value="{{sestavina.id}}"> {{sestavina.naziv_dimenzije}} </option>
                     {% endfor %}
                 </select>
                 <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
@@ -104,7 +104,7 @@
 {% endif %}
 
 
-{% if status == "aktivno" and false %}
+{% if status == "aktivno" %}
     {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
 {% endif %}
 

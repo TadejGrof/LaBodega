@@ -64,7 +64,7 @@ class CenaQuerySet(models.QuerySet):
 class SestavinaQuerySet(models.QuerySet):
     def zaloga_values(self, zaloga):
         return self \
-        .annotate(zaloga=Sum(Case(
+        .annotate(stanje=Sum(Case(
             When(vnoszaloge__zaloga=zaloga,then=F("vnoszaloge__stanje")),
             default=Value(0),
             output_field=IntegerField())))
@@ -72,8 +72,9 @@ class SestavinaQuerySet(models.QuerySet):
     def vnosi_values(self,vnosi):
         return self \
             .annotate(vnesena = Exists(vnosi)) \
-            .annotate(stevilo_vnosa=Coalesce(Subquery(vnosi.values("stevilo")[:1]),0))
-
+            .annotate(stevilo_vnosa=Coalesce(Subquery(vnosi.values("stevilo")[:1]),0)) \
+            .annotate(pk_vnosa = Coalesce(Subquery(vnosi.values("pk")[:1]),0))
+            
     def cenik_values(self,zaloga):
         return self.annotate(cena=Sum(Case(
             When(cena__zaloga=zaloga,then=F("cena__cena")),
@@ -84,7 +85,7 @@ class SestavinaQuerySet(models.QuerySet):
         return self \
         .annotate(naziv_dimenzije = F("dimenzija__dimenzija")) \
         .annotate(kratek_tip = F("tip__kratko")) \
-        .annotate(radij_dimenzije = F("dimenzija__radij")) \
+        .annotate(radij_dimenzije = F("dimenzija__radius")) \
         .values()
 
     def filtriraj(self,sestavina_filter):
@@ -104,14 +105,6 @@ class VnosZalogeQuerySet(models.QuerySet):
             .annotate(tip_id = F("sestavina__tip__id")) \
             .values()
 
-class SestavinaQuerySet(models.QuerySet):
-    def all_values(self):
-        return self.annotate(dim = F("dimenzija__dimenzija")) \
-            .annotate(radij = F("dimenzija__radius")) \
-            .annotate(kratek_tip = F("tip__kratko")) \
-            .annotate(dolgi_tip = F("tip__dolgo")) \
-            .values()
-          
 class VnosQuerySet(models.QuerySet):
     use_for_related_fields = True
 

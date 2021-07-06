@@ -33,24 +33,25 @@
             ToggleClass('.inventura', 'skrit')
         {% endif %}
         {% for sestavina in sestavine %}
-            {% if sestavina in vnosi %}
-                var stevilo = "{{vnosi|keyvalue:sestavina|keyvalue:'stevilo'}}"
-                var pk = "{{vnosi|keyvalue:sestavina|keyvalue:'pk'}}"
-                set_innerHtml('stevilo_{{sestavina|replace}}',stevilo)
-                set_value('pk_{{sestavina|replace}}', pk)
-                ToggleClass('.{{sestavina|replace}}','skrit')
-                ToggleClass('.{{sestavina|replace}}.sprememba','skrit')
+            {% if sestavina.vnesena %}
+                var stevilo = "{{sestavina.stevilo_vnosa}}"
+                var pk = "{{sestavina.pk_vnosa}}"
+                set_innerHtml('stevilo_{{sestavina.id}}',stevilo)
+                set_value('pk_{{sestavina.id}}', pk)
+                ToggleClass('.{{sestavina.id}}','skrit')
+                ToggleClass('.{{sestavina.id}}.sprememba','skrit')
             {% endif %}
         {% endfor %}
     });
-    function Spremeni_Vnos(dimenzija_tip){
-        var pk = get_value('pk_' + dimenzija_tip)
-        var stevilo = get_value('stevilo_value_' + dimenzija_tip)
+
+    function Spremeni_Vnos(sestavina_id){
+        var pk = get_value('pk_' + sestavina_id)
+        var stevilo = get_value('stevilo_value_' + sestavina_id)
         var cena = ""
         if (stevilo != "" ){
             Spremeni_vnos(pk,stevilo,cena)
-            ToggleClass('.' + dimenzija_tip, 'skrit')
-            ToggleClass('.' + dimenzija_tip + '.novo', 'skrit')
+            ToggleClass('.' + sestavina_id, 'skrit')
+            ToggleClass('.' + sestavina_id + '.novo', 'skrit')
         }
     }
     function Nov_Vnos(sestavina_id){
@@ -62,15 +63,13 @@
     function Shrani_vse(gumb){
         gumb.disabled = true;
         {% for sestavina in sestavine %}
-            {% with podatki=sestavine|keyvalue:sestavina sestavina=sestavina|replace %}
-                var stevilo = get_value('stevilo_value_{{sestavina}}')
-                var pk = get_value('pk_{{sestavina}}')
-                if (stevilo != "" && pk != ""){
-                    Spremeni_Vnos('{{sestavina}}')
-                } else if ( stevilo != "" && pk == ""){
-                    Nov_Vnos('{{sestavina}}')
-                }
-            {% endwith %}
+            var stevilo = get_value('stevilo_value_{{sestavina.id}}')
+            var pk = get_value('pk_{{sestavina.id}}')
+            if (stevilo != "" && pk != ""){
+                Spremeni_Vnos('{{sestavina.id}}')
+            } else if ( stevilo != "" && pk == ""){
+                Nov_Vnos('{{sestavina.id}}')
+            }
         {% endfor %}
         setTimeout(() => { gumb.disabled = false }, 2000);
     }

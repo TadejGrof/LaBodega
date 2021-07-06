@@ -221,9 +221,9 @@ def baza(request,zaloga, tip_baze, pk):
             'baza':baza,
             'tip':tip_baze,
             'status':baza.status,
-            'vnosi': baza.vnos_set.all_values(),
+            'vnosi': baza.vnos_set.all().all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
-            'sestavine':zaloga.sestavine.all().all_values(),
+            'sestavine':zaloga.sestavine.all().all_values().vnosi_values(baza.vnos_set.all()).zaloga_values(zaloga),
             'tipi': zaloga.tipi_sestavin.all(),
             "values": baza_values}
         return pokazi_stran(request, 'baza/baza.html',slovar)

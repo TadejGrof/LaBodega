@@ -45,9 +45,9 @@
             </form>
         </div>
         <div style="display:block;margin-top:1%">
-            {% for tip in zaloga.tipi_sestavin %}
-                {{tip}}:
-                <select style="width:5%" form="filter" name="{{tip}}">
+            {% for tip in zaloga.tipi_sestavin.all %}
+                {{tip.kratko}}:
+                <select style="width:5%" form="filter" name="{{tip.kratko}}">
                     {% if tip in tipi %}
                         <option value="true" selected> Yes </option>
                         <option value="false"> No </option>
@@ -127,19 +127,17 @@
                 {% endif %}
             </tr>
                 {% for sestavina in sestavine %}
-                    {% for tip in tipi %}
-                        <tr class="vrstica vrstica_{{tip}}">
-                            <td> {{sestavina.dimenzija__dimenzija}} </td>
-                            <td> {{ tip }} </td>
-                            <td> {{sestavina|keyvalue:tip}} </td>
-                            <td> {{cene|keyvalue:sestavina.dimenzija__dimenzija|keyvalue:tip}}$</td>
-                            <td>
-                                <form action="{% url 'pregled_prometa' tip sestavina.pk %}" method="GET">
-                                    <input type="submit" value="{{slovar|keyvalue:'Pregled prometa'|keyvalue:jezik}}">
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                    <tr class="vrstica vrstica_{{tip}}">
+                        <td> {{sestavina.dimenzija}} </td>
+                        <td> {{sestavina.tip}} </td>
+                        <td> {{sestavina.stanje}} </td>
+                        <td> </td>
+                        <td>
+                            <form action="{% url 'pregled_prometa' zaloga.id sestavina.id %}" method="GET">
+                                <input type="submit" value="{{slovar|keyvalue:'Pregled prometa'|keyvalue:jezik}}">
+                            </form>
+                        </td>
+                    </tr>
                 {% endfor %}
         </table>
     </div>

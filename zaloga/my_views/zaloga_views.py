@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
+from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, VnosZaloge
 from ..models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
@@ -15,7 +15,7 @@ from django.urls import reverse
 def pregled_zaloge(request,zaloga):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk = zaloga)
-        sestavine = zaloga.sestavina_set.all()
+        sestavine = zaloga.sestavine.all()
         radius = request.GET.get('radius','R12')
         height = request.GET.get('height','all')
         width = request.GET.get('width', 'all')
@@ -29,61 +29,25 @@ def pregled_zaloge(request,zaloga):
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = True)
             else:
                 sestavine = sestavine.filter(dimenzija__width=width, dimenzija__special = False)
-        tipi_prodaje = zaloga.tipi_prodaj
-        if 'vele_prodaja' in tipi_prodaje:
-            cenik = zaloga.cenik('vele_prodaja')
-        else:
-            cenik = zaloga.cenik('dnevna_prodaja')
         nicelne = request.GET.get('nicelne','true')
         rezervirane = request.GET.get('rezervirane','false')
         tipi = []
-        for tip in zaloga.tipi_sestavin:
-            if request.GET.get(tip,"true") == "true":
-                tipi.append(tip)
-        sestavine = sestavine.values(
-            'dimenzija__dimenzija',
-            'pk',
-            'Y',
-            'W',
-            'JP',
-            'JP50',
-            'JP70',
-        )
+        for tip in zaloga.tipi_sestavin.all():
+            if request.GET.get(tip.kratko,"true") == "true":
+                tipi.append(tip.kratko)
+        sestavine = sestavine.filter(tip__kratko__in=tipi)
+        vnosi_zaloge = VnosZaloge.objects.all().filter(sestavina__in=sestavine).all_values()
         if nicelne == "false":
-            ne_prazne = []
-            for sestavina in sestavine:
-                for tip in tipi:
-                    if sestavina[tip] != 0:
-                        ne_prazne.append(sestavina)
-                        break
-            sestavine = ne_prazne
-        cene = {}
-        skupno = 0
-        vrednost = 0
-        for sestavina in sestavine:
-            dimenzija = sestavina['dimenzija__dimenzija']
-            for tip in tipi:
-                stevilo = sestavina[tip]
-                cena = cenik[dimenzija][tip]
-                skupno += stevilo
-                vrednost += cena * stevilo
-                if dimenzija in cene:
-                    if not tip in cene[dimenzija]:
-                        cene[dimenzija].update({tip:stevilo * cena})
-                else:
-                    cene.update({dimenzija:{tip:stevilo * cena}})
+            vnosi_zaloge = vnosi_zaloge.exclude(stanje=0) 
         slovar = {
             'zaloga':zaloga,
-            'sestavine':sestavine,
+            'sestavine': vnosi_zaloge,
             'tipi':tipi,
             'radius':radius,
             'height':height,
             'width':width,
-            'skupno':skupno,
             'nicelne': nicelne,
             'rezervirane': rezervirane,
-            'cene':cene,
-            'vrednost':vrednost
         }
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 

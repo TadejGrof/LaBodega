@@ -16,6 +16,8 @@ from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
+from .model_queries import VnosZalogeQuerySet
+
 
 TIPI_SESTAVINE = (
         ('Y','Yellow'),
@@ -323,6 +325,8 @@ class VnosZaloge(models.Model):
     sestavina = models.ForeignKey(Sestavina,default=1,on_delete=models.CASCADE)
     stanje = models.IntegerField(default=0)
     
+    objects = VnosZalogeQuerySet.as_manager()
+
     class Meta:
         ordering = ['zaloga','sestavina']
 

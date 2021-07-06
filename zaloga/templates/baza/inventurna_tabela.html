@@ -20,19 +20,20 @@
             <th width="15%"> {{slovar|keyvalue:'Vnos'|keyvalue:jezik}}: </th>
             <th width="10%" class="skrit inventura"> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
             <th width="10%" class="skrit razlika"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </th>
+            <th width="10%" class="skrit naroceno"> Naroceno: </th>
             <th width="10%" class="skrit na_voljo"> {{slovar|keyvalue:'Na voljo'|keyvalue:jezik}}: </th>
             <th width="20%" > {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}: </th>  
         </tr>
         {% for sestavina in sestavine %}
-            {% with podatki=sestavine|keyvalue:sestavina sestavina=sestavina|replace %}
-            {% if podatki.kupljena %}
-            <tr id="{{sestavina}}" class="vrstica {{podatki.radius}} {{podatki.tip}} kupljena">
+            {% if sestavina.vneseno %}
+                <tr id="{{sestavina.id}}" class="vrstica {{podatki.radius}} {{podatki.tip}} vneseno">
             {% else %}
-            <tr id="{{sestavina}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
+                <tr id="{{sestavina.id}}" class="vrstica {{podatki.radius}} {{podatki.tip}}">
             {% endif %}
-                <input type="text" class="skrit" id="pk_{{sestavina}}">
-                <td> {{podatki.dimenzija}} </td>
-                <td> {{podatki.tip}} </td>
+            
+                <input type="text" class="skrit" id="pk_{{sestavina.id}}">
+                <td> {{sestavina.dimenzija}} </td>
+                <td> {{sestavina.tip}} </td>
                 <td>
                     <div class="{{sestavina}} skrit" id="stevilo_{{sestavina}}"></div>
                     <input class="{{sestavina}} stevilo" id="stevilo_value_{{sestavina}}" type="text">
@@ -50,7 +51,6 @@
                     <button class="{{sestavina}} sprememba skrit" onclick="ToggleClass('.{{sestavina}}','skrit');ToggleClass('.{{sestavina}}.novo','skrit')"> <- </button>     
                 </td> 
             </tr>
-            {% endwith %}
         {% endfor %}
     </table>
 </div>

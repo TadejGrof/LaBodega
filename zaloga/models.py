@@ -16,7 +16,7 @@ from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
-from .model_queries import VnosZalogeQuerySet
+from .model_queries import VnosZalogeQuerySet, VnosQuerySet
 
 
 TIPI_SESTAVINE = (
@@ -232,7 +232,7 @@ class Zaloga(models.Model):
  
     @property
     def vrni_zalogo(self):
-        return self.sestavina_set.all().order_by("dimenzija")\
+        return self.sestavine.all().order_by("dimenzija")\
         .values().annotate(radius = F("dimenzija__radius"),dim = F("dimenzija__dimenzija"))
 
     @property
@@ -450,15 +450,6 @@ class Baza(models.Model):
 
     def __str__(self):
         return self.title
-    
-    @property
-    def skupna_prodajna_cena_vnosov(self):
-        cenik = self.zaloga.cenik()
-        cena = 0
-        for vnos in self.vnos_set.all().values("stevilo","dimenzija__dimenzija","tip"):
-            cena += vnos["stevilo"] * cenik[vnos["dimenzija__dimenzija"]][vnos["tip"]]
-        return cena
-        
 
     #def save(self, *args, **kwargs):
     #    baza = Baza.objects.get(pk = self.pk)
@@ -651,13 +642,6 @@ class Baza(models.Model):
                 except:
                     continue
         self.save()
-
-    def razlicni_tipi(self):
-        tipi = []
-        for vnos in self.vnos_set.all().values('tip'):
-            if not vnos['tip'] in tipi:
-                tipi.append(vnos['tip'])
-        return tipi
 
     def dodaj_vnos(self,dimenzija,tip,stevilo,cena_nakupa = None,cena_prodaje = None):
         vnos = Vnos.objects.create(dimenzija=dimenzija,tip=tip,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
@@ -909,13 +893,13 @@ class Sprememba(models.Model):
 
 class Vnos(models.Model):
     sestavina = models.ForeignKey(Sestavina,default=None,null=True,blank=True, on_delete=models.CASCADE)
-    dimenzija = models.ForeignKey(Dimenzija,default=0,on_delete=models.CASCADE)
-    tip = models.CharField(default="Y", choices=TIPI_SESTAVINE, max_length=10)
     stevilo = models.IntegerField(default=1)
     baza = models.ForeignKey(Baza,default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
     sprememba = models.ForeignKey(Sprememba,default=None,null=True,blank=True,on_delete=models.CASCADE)
     cena_nakupa = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
+
+    objects = VnosQuerySet.as_manager()
 
     @property
     def skupna_cena(self):
@@ -937,61 +921,23 @@ class Vnos(models.Model):
         self.cena = cena
         self.save()
 
-    def vrni_sestavino(self):
-        return Sestavina.objects.get(zaloga = self.baza.zaloga, dimenzija = self.dimenzija)
+    def spremeni_stevilo(self,stevilo):
+        razlika = self.stevilo - stevilo
+        if razlika != 0:
+            self.stevilo = stevilo
+            self.save()
+        if self.baza.status == "veljavno":
+            self.baza.zaloga.nastavi_iz_vnosov(self.sestavina)
 
-    def doloci_spremembo(self,sprememba):
-        self.sprememba = sprememba
-        self.save()
+    def spremeni_tip(self,tip):
+        if tip != self.tip:
+            nova_sestavina = Sestavina.objects.get(dimenzija=self.sestavina.dimenzija,tip=tip)
+            stara_sestavina = self.sestavina
+            self.sestavina = nova_sestavina
+            self.save()
+        if self.baza.status == "veljavno":
+            self.baza.zaloga.nastavi_iz_vnosov([nova_sestavina,stara_sestavina])
 
-    def ustvari_spremembo(self,sestavina = None):
-        if sestavina == None:
-            sestavina = self.vrni_sestavino()
-        if self.baza.tip == "inventura":
-            self.sprememba = Sprememba.objects.create(
-                zaloga = self.baza.zaloga,
-                baza = self.baza,
-                stanje = self.stevilo,
-                tip = self.tip,
-                sestavina = sestavina 
-            )
-        else:
-            self.sprememba = Sprememba.objects.create(
-                baza = self.baza,
-                zaloga = self.baza.zaloga,
-                stevilo = self.stevilo,
-                tip = self.tip,
-                sestavina = sestavina 
-            )
-            
-        self.save()
-
-@receiver(post_save, sender=Vnos)
-def create_vnos(sender, instance, created, **kwargs):
-    if created:
-        if instance.baza.status == "veljavno":
-            sestavina = Sestavina.objects.get(zaloga = instance.baza.zaloga,dimenzija = instance.dimenzija)
-            instance.ustvari_spremembo(sestavina)
-            print('nov_veljaven_vnos')
-
-@receiver(post_save, sender=Vnos)
-def change_vnos(sender,instance,created,**kwargs):
-    if not created:
-        if instance.baza.status=="veljavno":
-            if instance.baza.tip == "inventura":
-                sestavina = Sestavina.objects.get(
-                    zaloga = instance.baza.zaloga,
-                    dimenzija = instance.dimenzija)
-                sprememba = Sprememba.objects.filter(
-                    baza = instance.baza,
-                    sestavina = sestavina,
-                    tip = instance.tip
-                ).first()
-                sprememba.stanje = instance.stevilo
-                sprememba.save()
-            else:
-                instance.sprememba.nastavi_iz_vnosov() 
-    
 @receiver(post_delete, sender=Vnos)
 def delete_vnos(sender,instance,**kwargs):
     baza = instance.baza

@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 from program.models import Program
-from zaloga.models import Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos
+from zaloga.models import Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
 import json
 
 def nastavi_cene():
@@ -182,5 +182,24 @@ def pretvorba():
     ustvari_tipe()
     pretvori_sestavine()
     pretvori_vnos()
+
+def pretvori_cene():
+    z1 = Zaloga.objects.first()
+    z2 = Zaloga.objects.all()[1]
+    
+    for sestavina in Sestavina.objects.all().exclude(tip=None):
+        cena = Cena.objects.create(prodaja="vele_prodaja",sestavina=sestavina)
+        cene = Cena.objects.all().filter(prodaja="vele_prodaja",sestavina__tip=None,sestavina__dimenzija = sestavina.dimenzija,tip=sestavina.tip.kratko).exclude(cena=0)
+        if len(cene) > 0:
+            cena.cena = cene.first().cena
+            cena.save()
+        z1.cenik.add(cena)
+        cena = Cena.objects.create(prodaja="dnevna_prodaja",sestavina=sestavina)
+        cene = Cena.objects.all().filter(prodaja="dnevna_prodaja",sestavina__tip=None,sestavina__dimenzija = sestavina.dimenzija,tip=sestavina.tip.kratko).exclude(cena=0)
+        if len(cene) > 0:
+            cena.cena = cene.first().cena
+            cena.save()
+        z2.cenik.add(cena)
+
     
     

@@ -48,20 +48,20 @@
     {% if status != "zaklenjeno" %}
         {% if tip == "inventura" %}
             <button onclick="Izracunaj_razliko()"> Razlika </button>
-            <button onclick="Preklici_razliko()"> Preklici razliko </button>
+            <button oncli   ck="Preklici_razliko()"> Preklici razliko </button>
             <button id="shrani_vse" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% else %}
             {% if perms.zaloga.add_vnos %}
                 <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
                 <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
-                    {% for dimenzija in program.vrni_dimenzije %}
-                        <option value="{{dimenzija.0}}"> {{dimenzija.0}} </option>
+                    {% for sestavina in sestavine %}
+                        <option value="{{sestavina.dimenzija_id}}"> {{sestavina.dimenzija}} </option>
                     {% endfor %}
                 </select>
                 <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
                 <select id="tip" class="nov_vnos skrit">
-                    {% for tip in zaloga.vrni_tipe %}
-                        <option value="{{tip.0}}"> {{tip.1}} </option>
+                    {% for tip in tipi %}
+                        <option value="{{tip.id}}"> {{tip.kratko}} </option>
                     {% endfor %}
                 </select>
                 <button class="nov_vnos skrit" onclick="nov_vnos()"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
@@ -103,7 +103,8 @@
     {% include 'baza/filter.html' with tip=tip tipi=tipi radiusi=razlicni_radiusi slovar=slovar dosedanje_kupljene=dosedanje_kupljene %}
 {% endif %}
 
-{% if status == "aktivno" %}
+
+{% if status == "aktivno" and false %}
     {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
 {% endif %}
 

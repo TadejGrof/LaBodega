@@ -1,34 +1,30 @@
 {% load zaloga_exstras %}
 
-<tr class="vrstica {{vnos.dimenzija__radius}} {{vnos.tip}} kupljena" id="vrstica_{{vnos.pk}}">
+<tr class="vrstica {{vnos.radij}} {{vnos.tip_id}} kupljena" id="vrstica_{{vnos.id}}">
     <td class="index"> {{index}}. </td>
-    <td > {{ vnos.dimenzija__dimenzija }} </td>
+    <td > {{ vnos.dimenzija }} </td>
     <td class="tip">
         {{ vnos.tip }}
     </td>
     <td class="stevilo">
-        <div id="stevilo_{{vnos.pk}}" class="{{vnos.pk}}">{{vnos.stevilo}}</div>
-        <input class="{{vnos.pk}} skrit input" type="number" min=1 max="999" id="stevilo_value_{{vnos.pk}}" placeholder="({{vnos.stevilo}})" autocomplete="off">
+        <div id="stevilo_{{vnos.id}}" class="{{vnos.id}}">{{vnos.stevilo}}</div>
+        <input class="{{vnos.id}} skrit input" type="number" min=1 max="999" id="stevilo_value_{{vnos.id}}" placeholder="({{vnos.stevilo}})" autocomplete="off">
     </td>
     {% if tip == "vele_prodaja" %}
         <td class="cena"> 
-            <div id="cena_{{vnos.pk}}" class="{{vnos.pk}}">{{vnos.cena}} $</div>
-            <input class="{{vnos.pk}} skrit input" type="text" name="cena" id="cena_value_{{vnos.pk}}" placeholder="({{vnos.cena}} $)" autocomplete="off" pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
-            <div class="{{vnos.pk}} skrit inline"> $ </div>
+            <div id="cena_{{vnos.id}}" class="{{vnos.id}}">{{vnos.cena}} $</div>
+            <input class="{{vnos.id}} skrit input" type="text" name="cena" id="cena_value_{{vnos.id}}" placeholder="({{vnos.cena}} $)" autocomplete="off" pattern="[0-9][0-9]?\.{0,1}[0-9]{0,2}">
+            <div class="{{vnos.id}} skrit inline"> $ </div>
         </td>
-        <td id="cena_vnosa_{{vnos.pk}}"> {{vnos|skupna_cena}} $ </td>
-    {% endif %}
-    {% if tip == "prevzem" %}
-        <td class="cene"> {{vnos.cena_nakupa_value}} $ / {{vnos.skupna_cena_nakupa}} $ </td>
-        <td class="cene"> {{vnos.cena_value}} $ / {{vnos.skupna_cena}} $</td>
+        <td id="cena_vnosa_{{vnos.id}}"> {{vnos|skupna_cena}} $ </td>
     {% endif %}
     {% if tip != "prenos" or status == "aktivno" %}
         {% if status != "zaklenjeno" %}
             <td>
-                <button class="{{vnos.pk}}" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> E </button>
-                <button class="{{vnos.pk}}" onclick="Izbrisi_vnos('{{vnos.pk}}')"> X </button>
-                <button class="{{vnos.pk}} skrit"  onclick="spremeni_vnos('{{vnos.pk}}')"> Ok </button>
-                <button class="{{vnos.pk}} skrit" onclick="ToggleClass('.{{vnos.pk}}','skrit')"> X </button>
+                <button class="{{vnos.id}}" onclick="ToggleClass('.{{vnos.id}}','skrit')"> E </button>
+                <button class="{{vnos.id}}" onclick="Izbrisi_vnos('{{vnos.id}}')"> X </button>
+                <button class="{{vnos.id}} skrit"  onclick="spremeni_vnos('{{vnos.id}}')"> Ok </button>
+                <button class="{{vnos.id}} skrit" onclick="ToggleClass('.{{vnos.id}}','skrit')"> X </button>
             </td>
         {% endif %}
     {% endif %}

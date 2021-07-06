@@ -9,9 +9,9 @@
 
 <div class="vnosi inline" style="width:80%;margin:2%">
     <table id="tabela_vnosov" style="vertical-align:top;" class="tabela_vnosov">
-        {% include 'baza/tabela_vnosov_header.html' with tip=tip status=status jezik=jezik slovar=slovar %}
-        {% for vnos in baza.vnosi_values %}
-            {% include 'baza/tabela_vnosov_row.html' with zaloga=zaloga vnos=vnos index=forloop.counter tip=tip status=status jezik=jezik slovar=slovar %}
+        {% include 'baza/tabela_vnosov_header.html' %}
+        {% for vnos in vnosi %}
+            {% include 'baza/tabela_vnosov_row.html' with index=forloop.counter %}
         {% endfor %}
         {% if tip == "vele_prodaja" %}
             <tr class="endrow">
@@ -62,8 +62,8 @@
         {% else %}
             {% if tip == "prevzem" %}
                 <tr class="endrow">
-                    <td colspan="3"> Skupni stroški: </td>
-                    <td colspan="2">  
+                    <td colspan="2"> Skupni stroški: </td>
+                    <td colspan="1">  
                         <div id="ladijski_prevoz" class="ladijski_prevoz"> {{values.ladijski_prevoz_value}} $</div>
                         <input style="width:60%" type="text" class="ladijski_prevoz skrit" id="ladijski_prevoz_value" value="">
                         <div class="ladijski_prevoz skrit inline">$</div>  
@@ -81,19 +81,17 @@
                 <td> </td>
             </tr>
             <tr>
+                
                 <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
                 <td id="skupno_stevilo"> {{baza|skupno:"all"}} </td>
-                {% if tip == "prevzem" %}
-                    <td class="cena"> {{values.skupna_cena_nakupa}} $ </td>
-                    <td> {{skupna_prodajna_cena}} $ </td>
-                {% endif %}
-                {% if status != "zaklenjeno" %}
+            
+                {% if status != "zaklenjeno"  %}
                     <td> </td>
                 {% endif %}
             </tr>
             {% if tip == "prevzem" %}
             <tr>
-                <td colspan="4"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </td>
+                <td colspan="2"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </td>
                 <td colspan="2"> {{values.razlika}} $ </td>
                 {% if status != "zaklenjeno" %}
                     <td> </td>

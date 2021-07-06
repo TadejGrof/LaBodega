@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Sum
-from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
+from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, VnosZaloge
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
@@ -116,8 +116,6 @@ def baze(request,zaloga,tip_baze):
         values = database_functions.baze_values(baze)
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
         zaloge = Zaloga.objects.all()
-        print(values)
-        print("DELAM")
         skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
         skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
         skupen_ladijski_prevoz = values.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
@@ -218,33 +216,18 @@ def baza(request,zaloga, tip_baze, pk):
         baza_query = Baza.objects.filter(pk = pk)
         baza = baza_query[0]
         baza_values = database_functions.baze_values(baza_query)[0]
-        skupna_prodajna_cena = None
-        if tip_baze == "prevzem":
-            skupna_prodajna_cena = baza.skupna_prodajna_cena_vnosov
-            baza_values["razlika"] = baza_values["razlika"] + skupna_prodajna_cena
-        if baza.status == "aktivno":
-            dosedanje_kupljene = None
-            if baza.tip == "vele_prodaja":
-                dosedanje_kupljene = baza.dosedanje_kupljene_stranke
-            slovar = {
-                'zaloga': zaloga,
-                'baza':baza,
-                'vnosi':baza.inventurni_vnosi,
-                'tip':tip_baze,
-                "skupna_prodajna_cena":skupna_prodajna_cena,
-                'status':"aktivno",
-                'uveljavljeni_vnosi': baza.uveljavljeni_vnosi,
-                'na_voljo':zaloga.na_voljo,
-                'razlicni_radiusi':zaloga.vrni_razlicne_radiuse,
-                'sestavine':zaloga.vrni_zalogo,
-                'tipi': zaloga.vrni_tipe,
-                "dosedanje_kupljene": dosedanje_kupljene,
-                "values": baza_values}
-            return pokazi_stran(request, 'baza/baza.html',slovar)
-        elif baza.status == "veljavno":
-            return pokazi_stran(request, 'baza/baza.html',{"values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"veljavno"})
-        elif baza.status == "zaklenjeno":
-            return pokazi_stran(request, 'baza/baza.html',{ "values": baza_values,'zaloga': zaloga,'baza':baza,'tip':tip_baze, 'status':"zaklenjeno"})
+        slovar = {
+            'zaloga': zaloga,
+            'baza':baza,
+            'tip':tip_baze,
+            'status':baza.status,
+            'vnosi': baza.vnos_set.all_values(),
+            'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
+            'sestavine':VnosZaloge.objects.filter(sestavina__in = zaloga.sestavine.all(), zaloga=zaloga).all_values(),
+            'tipi': zaloga.tipi_sestavin.all(),
+            "values": baza_values}
+        return pokazi_stran(request, 'baza/baza.html',slovar)
+    
 
 def poskus(request):
     print("tadej")
@@ -256,24 +239,16 @@ def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
     seznam = funkcije.vnosi_iz_datoteke(request.FILES.get('datoteka'),zaloga)
     vnosi = []
     baza = Baza.objects.get(pk = pk)
-    if tip_baze == "vele_prodaja":
-        for vnos in seznam:
-            sestavina = Sestavina.objects.get(dimenzija_id=vnos['dimenzija_id'])
-            vnosi.append(Vnos(
-                    baza=baza,
-                    stevilo=vnos['stevilo'],
-                    tip=vnos['tip'],
-                    dimenzija_id=vnos['dimenzija_id'],
-                    cena=sestavina.cena('vele_prodaja',vnos['tip'])
-                ))
-    else:
-        for vnos in seznam:
-            vnosi.append(Vnos(
-                baza=baza,
-                stevilo=vnos['stevilo'],
-                tip=vnos['tip'],
-                dimenzija_id=vnos['dimenzija_id']
-            ))
+    for vnos in seznam:
+        sestavina = Sestavina.objects.get(tip__kratko=vnos["tip"],dimenzija_id=vnos['dimenzija_id'])
+        v = Vnos(
+            baza=baza,
+            stevilo=vnos['stevilo'],
+            sestavina = sestavina,
+        )
+        if tip_baze == "vele_prodaja":
+            v.cena = zaloga.cenik.all().get(sestavina=sestavina).cena    
+        vnosi.append(v)
     Vnos.objects.bulk_create(vnosi)
     return redirect('baza',zaloga=zaloga.pk, tip_baze = tip_baze, pk = pk)
 

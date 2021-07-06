@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
+from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, Tip, VnosZaloge
 from ..models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
@@ -17,12 +17,12 @@ def spremeni_vnos(request):
         tip = request.POST.get('tip')
         vnos = Vnos.objects.get(pk = int(request.POST.get('pk')))
         if stevilo and stevilo != "":
-            vnos.stevilo = int(stevilo)
+            vnos.spremeni_stevilo(int(stevilo))
         if tip and tip != "" :
-            vnos.tip = tip
+            vnos.spremeni_tip(Tip.objects.get(id=int(tip)))
         if cena and cena != "" :
             vnos.cena = float(cena)
-        vnos.save()
+            vnos.save()
         baza = vnos.baza
         data = podatki_vnosa(vnos)
         data.update(podatki_baze(baza))
@@ -31,28 +31,26 @@ def spremeni_vnos(request):
 
 def nov_vnos(request):
     if request.method == "POST":
-        dimenzija = dimenzija_iz_requesta(request)
+        dimenzija = Dimenzija.objects.get(id=int(request.POST.get("dimenzija")))
         stevilo = int(request.POST.get('stevilo'))
-        tip = request.POST.get('tip')
+        tip = Tip.objects.get(id=int(request.POST.get('tip')))
+        sestavina = Sestavina.objects.get(dimenzija = dimenzija,tip = tip)
         pk = int(request.POST.get('pk'))
         baza = Baza.objects.get(pk = pk)
         zaloga = baza.zaloga
         cena = None
-        if baza.tip == "vele_prodaja":
-            cena = Sestavina.objects.get(zaloga=zaloga,dimenzija__dimenzija=dimenzija).cena('vele_prodaja',tip)
-        elif baza.tip == "racun":
-            cena = Sestavina.objects.get(zaloga=zaloga,dimenzija__dimenzija=dimenzija).cena('dnevna_prodaja',tip)
+        if baza.tip == "vele_prodaja" or baza.tip == "racun":
+            cena = zaloga.cenik.all().get(sestavina=sestavina)
         vnos = Vnos.objects.create(
-            dimenzija = dimenzija,
+            sestavina = sestavina,
             stevilo = stevilo,
-            tip = tip,
             cena = cena,
             baza = baza)
-        vnosi = Vnos.objects.all().filter(baza=baza).order_by('dimenzija').values('pk','dimenzija__dimenzija')
+        vnosi = baza.vnos_set.all().order_by('sestavina').all_values()
         pk = vnos.pk
         index = 0
         for slovar in vnosi:
-            if slovar['pk'] == pk:
+            if slovar['id'] == pk:
                 break
             index += 1
         data = podatki_vnosa(vnos)
@@ -187,10 +185,10 @@ def podatki_vnosa(vnos):
     data['cena'] = str(vnos.cena)
     data['cena_vnosa'] = str(vnos.skupna_cena)
     data['stevilo'] = str(vnos.stevilo)
-    data['dimenzija'] = str(vnos.dimenzija)
-    data['varna_dimenzija'] = str(vnos.dimenzija).replace('/','-')
-    data['tip'] = vnos.tip
-    data['dolgi_tip'] =  vnos.get_tip_display()
+    data['dimenzija'] = str(vnos.sestavina.dimenzija.dimenzija)
+    data['varna_dimenzija'] = data["dimenzija"].replace('/','-')
+    data['tip'] = vnos.sestavina.tip.kratko
+    data['dolgi_tip'] =  vnos.sestavina.tip.dolgo
     return data
 
 def podatki_baze(baza):

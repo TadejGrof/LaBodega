@@ -100,14 +100,23 @@ class VnosZalogeQuerySet(models.QuerySet):
     def all_values(self):
         return self.annotate(dimenzija = F("sestavina__dimenzija__dimenzija")) \
             .annotate(tip = F("sestavina__tip__kratko")) \
+            .annotate(dimenzija_id = F("sestavina__dimenzija__id")) \
+            .annotate(tip_id = F("sestavina__tip__id")) \
             .values()
         
 class VnosQuerySet(models.QuerySet):
+    use_for_related_fields = True
+
     def all_values(self):
         return self.annotate(datum = F("baza__datum")) \
-            .annotate(tip = F("baza__proxy_name")) \
             .annotate(status = F("baza__status")) \
             .annotate(sprememba_zaloge = F("baza__sprememba_zaloge")) \
             .annotate(title = F("baza__title")) \
-            .order_by("datum","tip","sestavina") \
+            .annotate(radij = F("sestavina__dimenzija__radius")) \
+            .annotate(dimenzija = F("sestavina__dimenzija__dimenzija")) \
+            .annotate(dimenzija_id = F("sestavina__dimenzija__id")) \
+            .annotate(tip = F("sestavina__tip__kratko")) \
+            .annotate(dolgi_tip = F("sestavina__tip__dolgo")) \
+            .annotate(tip_id = F("sestavina__tip__id")) \
+            .order_by("datum","sestavina") \
             .values()

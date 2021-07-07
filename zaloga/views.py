@@ -165,7 +165,7 @@ def nova_baza(request,zaloga,tip_baze):
                 author = request.user,
                 zalogaPrenosa = zalogaPrenosa
             )
-        elif tip_baze == "vele_prodaja" or tip_baze == "narocilo":
+        elif tip_baze == "vele_prodaja":
             stranka = Stranka.objects.get(pk = int(request.POST.get('stranka')))
             Baza.objects.create(
                 zaloga_id = zaloga,
@@ -181,7 +181,8 @@ def nova_baza(request,zaloga,tip_baze):
                 zaloga_id = zaloga,
                 title=title,
                 author=request.user,
-                tip=tip_baze)
+                tip=tip_baze,
+                sprememba_zaloge=0)
         return redirect('baze', zaloga=zaloga, tip_baze=tip_baze)
 
 @login_required

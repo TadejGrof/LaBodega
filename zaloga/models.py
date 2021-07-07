@@ -208,6 +208,19 @@ class Zaloga(models.Model):
                 razlicni_radiusi.append(radius['dimenzija__radius'])
         return razlicni_radiusi
 
+    def nastavi_iz_vnosov(self,sestavina):
+        stanje = 0
+        vnosi = sestavina.vnos_set.all().filter(baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
+        for vnos in vnosi:
+            if vnos["sprememba_zaloge"] == 0:
+                stanje = vnos["stevilo"]
+            else:
+                stanje += vnos["stevilo"] * vnos["sprememba_zaloge"]
+        vnos_zaloge = self.vnoszaloge_set.all().get(sestavina=sestavina)
+        if vnos_zaloge.stanje != stanje:
+            vnos_zaloge.stanje = stanje
+            vnos_zaloge.save()
+            print("POPRAVLJAM VNOS ZALOGE ZA " + str(sestavina))
 
     @property
     def vrni_tipe(self):
@@ -475,62 +488,20 @@ class Baza(models.Model):
 
     def uveljavi_inventuro(self,delno = False):
         print("uveljavljam inventuro")
-        slovar_vnosov = {}
-        tipi_sestavin = self.zaloga.tipi_sestavin
-        sestavine = Sestavina.objects.filter(zaloga = self.zaloga)
-        slovar_sestavin = {}
-        for sestavina in sestavine.iterator():
-            slovar_sestavin[sestavina.dimenzija_id] = sestavina
-        vnosi = self.vnos_set.all()
+        vnosi_zaloge = []
+        for sestavina in self.zaloga.sestavine.all():
+            vnos = self.vnosi.filter(sestavina = sestavina).first()
+            if vnos == None and not delno:
+                vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
+                vnos_zaloge.stanje = 0
+                vnosi_zaloge.append(vnos_zaloge)
+            else if vnos != None:
+                vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
+                vnos_zaloge.stanje = vnos.stevilo
+                vnosi_zaloge.append(vnos_zaloge)
+        VnosZaloge.objects.bulk_update(vnosi_zaloge)
 
-        if not delno:
-            for sestavina in sestavine.values("dimenzija"):
-                for tip in tipi_sestavin:
-                    slovar_vnosov[str(sestavina["dimenzija"]) + "-" + tip] = None
-            for vnos in vnosi.values("dimenzija","tip","pk"):
-                slovar_vnosov[str(vnos["dimenzija"]) + "-" +vnos["tip"]] = vnos["pk"]
-            seznam_vnosov = []
-            for dimenzija_tip in slovar_vnosov:
-                if slovar_vnosov[dimenzija_tip] == None:
-                    dimenzija_tip = dimenzija_tip.split("-")
-                    dimenzija = int(dimenzija_tip[0])
-                    tip = dimenzija_tip[1]
-                    vnos = Vnos(
-                        dimenzija_id = dimenzija,
-                        tip = tip,
-                        baza = self,
-                        stevilo = 0
-                    )
-                    seznam_vnosov.append(vnos)
-            Vnos.objects.bulk_create(seznam_vnosov)
-        
-        spremembe = []
-        seznam_sestavin = []
-        for vnos in self.vnos_set.all().values():
-            sestavina = slovar_sestavin[vnos["dimenzija_id"]]
-            tip = vnos["tip"]
-            stevilo = vnos["stevilo"]
-            setattr(sestavina,tip,stevilo)
-            seznam_sestavin.append(sestavina)
-            spremembe.append(
-                Sprememba(
-                baza=self,
-                sestavina=sestavina,
-                tip=tip,
-                stanje=stevilo,
-                )
-            )
-        Sestavina.objects.bulk_update(seznam_sestavin,tipi_sestavin)
-        Sprememba.objects.bulk_create(spremembe)
-        spremembe = Sprememba.objects.filter(baza = self)
-        slovar_sprememb = {}
-        for sprememba in spremembe.values("sestavina__dimenzija","tip","pk"):
-            slovar_sprememb[str(sprememba["sestavina__dimenzija"]) + sprememba["tip"]] = sprememba["pk"]
-        for vnos in vnosi:
-            sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
-            vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
-        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"]) 
-
+           
     def uveljavi_prenos(self,cas = None):
         self.uveljavi_bazo()
         self.status = "zaklenjeno"
@@ -546,7 +517,7 @@ class Baza(models.Model):
         cenik_nakupa = self.zaloga.cenik()
         cenik_prodaje = self.getZalogaPrenosa.cenik("dnevna_prodaja")
         for vnos in self.vnos_set.all().iterator():
-            bazaPrenosa.dodaj_vnos(vnos.dimenzija,vnos.tip,vnos.stevilo,cenik_nakupa[vnos.dimenzija.dimenzija][vnos.tip],cenik_prodaje[vnos.dimenzija.dimenzija][vnos.tip])
+            bazaPrenosa.dodaj_vnos(vnos.sestavina,vnos.stevilo,cenik_nakupa[vnos.dimenzija.dimenzija][vnos.tip],cenik_prodaje[vnos.dimenzija.dimenzija][vnos.tip])
         bazaPrenosa.save()
         bazaPrenosa.uveljavi_bazo()
         bazaPrenosa.status = "zaklenjeno"
@@ -590,76 +561,23 @@ class Baza(models.Model):
             self.uveljavi_inventuro(delno)
         elif self.tip == "prenos":
             self.uveljavi_prenos()
-        elif self.tip == "racun":
-            self.uveljavi_racun()
         else:
             self.uveljavi_bazo()
 
     def uveljavi_bazo(self):
-        vnosi = self.vnos_set.all()
-        spremembe = []
-        seznam_sestavin = []
-        sestavine = Sestavina.objects.filter(zaloga = self.zaloga)
-        slovar_sestavin = {}
-        for sestavina in sestavine.iterator():
-            slovar_sestavin[sestavina.dimenzija_id] = sestavina
-        slovar_sprememb = { dimenzija_tip[0] : None for dimenzija_tip in vnosi.all().annotate(dimenzija_tip = Concat(Cast("dimenzija",CharField()),F("tip"))).values("dimenzija_tip").distinct().values_list("dimenzija_tip")}
-        for vnos in vnosi.values("dimenzija","stevilo","tip"):
-            sestavina = slovar_sestavin[vnos["dimenzija"]]
-            sestavina.spremeni_stevilo(self.sprememba_zaloge * vnos["stevilo"], vnos["tip"],False)
-            seznam_sestavin.append(sestavina)
-            dimenzija_tip = str(vnos["dimenzija"]) + vnos["tip"]
-            sprememba = slovar_sprememb[dimenzija_tip]
-            if not sprememba:
-                sprememba = Sprememba(
-                    sestavina = sestavina,
-                    tip = vnos["tip"],
-                    stevilo = vnos["stevilo"],
-                    baza = self)
-                spremembe.append(sprememba)
-                slovar_sprememb[dimenzija_tip] = sprememba
-            else:
-                sprememba.stevilo = sprememba.stevilo + vnos["stevilo"]
-        spremembe = Sprememba.objects.bulk_create(spremembe)
-        spremembe = Sprememba.objects.filter(baza = self)
-        for sprememba in spremembe.values("sestavina__dimenzija","tip","pk"):
-            slovar_sprememb[str(sprememba["sestavina__dimenzija"]) + sprememba["tip"]] = sprememba["pk"]
+        vnosi = self.vnos_set.all().order_by("sestavina")
+        vnosi_zaloge = []
         for vnos in vnosi:
-            sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
-            vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
-        Sestavina.objects.bulk_update(seznam_sestavin, self.zaloga.tipi_sestavin)
-        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])       
+            vnos_zaloge = vnos.sestavina.vnoszaloge_set.all().get(zaloge = self.zaloge)
+            vnos_zaloge.stanje = vnos_zaloge.stanje + vnos.stevilo * self.sprememba_zaloge
+            if vnosi_zaloge[-1] != vnos_zaloge:
+                vnosi_zaloge.append(vnos_zaloge)
+        VnosZaloge.objects.bulk_update(vnosi_zaloge,"stanje")  
 
-    def razveljavi(self):
-        if self.status == "veljavno":
-            self.status = "aktivno"
-            for vnos in self.vnos_set.all():
-                try:
-                    sestavina = vnos.sprememba.sestavina
-                    sprememba = vnos.sprememba
-                    vnos.sprememba = None
-                    vnos.save()
-                    sprememba.delete()
-                    sestavina.nastavi_iz_sprememb(vnos.tip)
-                except:
-                    continue
-        self.save()
-
-    def dodaj_vnos(self,dimenzija,tip,stevilo,cena_nakupa = None,cena_prodaje = None):
-        vnos = Vnos.objects.create(dimenzija=dimenzija,tip=tip,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
+    def dodaj_vnos(self,sestavina,stevilo,cena_nakupa = None,cena_prodaje = None):
+        vnos = Vnos.objects.create(sestavina=sestavina,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
         if self.status == 'veljavno':
-            sestavina = Sestavina.objects.get(dimenzija__dimenzija = dimenzija)
-            sprememba = Sprememba.objects.filter(baza=self, sestavina = sestavina, tip=tip).first()
-            if sprememba == None:
-                sprememba = Sprememba.objects.create(
-                    baza=self,
-                    sestavina=sestavina,
-                    tip=tip,
-                    stevilo=stevilo,
-                    )
-            else:
-                sprememba.dodaj_stevilo(vnos.stevilo)
-            sestavina.nastavi_iz_sprememb(tip)
+            self.zaloga.nastavi_iz_vnosov(sestavina)
         return vnos
 
     def doloci_cas(self,cas):
@@ -843,6 +761,12 @@ class Baza(models.Model):
         Vnos.objects.bulk_create(vnosi)
 
 ###################################################################################################
+class SpremembaZaloge:
+    def __init__(self):
+        self.vnosi = []
+        self.dnevna_prodaja = None
+        self.baza = None
+        self.stevilo = 0
 
 class Sprememba(models.Model):
     zaloga = models.ForeignKey(Zaloga, default=1, on_delete=models.CASCADE)
@@ -944,29 +868,7 @@ class Vnos(models.Model):
 def delete_vnos(sender,instance,**kwargs):
     baza = instance.baza
     if baza.status == "veljavno":
-        sestavina = Sestavina.objects.get(zaloga=baza.zaloga,dimenzija = instance.dimenzija)
-        if baza.tip == "racun":
-            sprememba = sestavina.sprememba_set.all().filter(baza__dnevna_prodaja=baza.dnevna_prodaja, tip=instance.tip).first()
-        else:
-            sprememba = sestavina.sprememba_set.all().filter(baza=baza, tip=instance.tip).first()
-        try:
-            if sprememba.vnos_set.all().count() == 0:
-                sprememba.delete()
-            else:
-                sprememba.nastavi_iz_vnosov()
-        except:
-            pass
-        print('brisem_vnos')
-
-@receiver(post_save, sender=Sprememba)
-def change_sprememba(sender,instance,**kwargs):
-    instance.sestavina.nastavi_iz_sprememb(instance.tip)
-    print('spreminjam_spremembo')
-
-@receiver(post_delete, sender=Sprememba)
-def delete_sprememba(sender,instance,**kwargs):
-    instance.sestavina.nastavi_iz_sprememb(instance.tip)
-    print('brisem_spremembo')
+        baza.zaloga.nastavi_iz_vnosov(vnos.sestavina)
 
 class Stroski_Group(models.Model):
     title = models.CharField(default="",max_length=20)

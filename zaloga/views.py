@@ -4,7 +4,7 @@ from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_pro
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
-from django.db.models import Sum
+from django.db.models import Sum, OuterRef
 from django.db.models.functions import Coalesce
 import io
 import datetime
@@ -119,6 +119,7 @@ def baze(request,zaloga,tip_baze):
         skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
         skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
         skupen_ladijski_prevoz = values.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
+        
         slovar = {
             'zaloge':zaloge,
             'zaloga': zaloga,
@@ -216,6 +217,10 @@ def baza(request,zaloga, tip_baze, pk):
         baza_query = Baza.objects.filter(pk = pk)
         baza = baza_query[0]
         baza_values = database_functions.baze_values(baza_query)[0]
+        vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
+        print(Vnos.objects.filter(baza=baza).values("sestavina"))
+        sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)
+        print(sestavine)
         slovar = {
             'zaloga': zaloga,
             'baza':baza,
@@ -223,7 +228,7 @@ def baza(request,zaloga, tip_baze, pk):
             'status':baza.status,
             'vnosi': baza.vnos_set.all().all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
-            'sestavine':zaloga.sestavine.all().all_values().vnosi_values(baza.vnos_set.all()).zaloga_values(zaloga),
+            'sestavine': sestavine,
             'tipi': zaloga.tipi_sestavin.all(),
             "values": baza_values}
         return pokazi_stran(request, 'baza/baza.html',slovar)

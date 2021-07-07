@@ -16,7 +16,7 @@
     <table class="tabela_vnosov"  id="inventurna_tabela" >
         {% include "./inventurna_tabela_header.html" %}
         {% for sestavina in sestavine %}
-            {% include "./inventurna_tabela_row.html" %}
+            {% include "./inventurna_tabela_row.html" with sestavina=sestavina %}
         {% endfor %}
     </table>
 </div>

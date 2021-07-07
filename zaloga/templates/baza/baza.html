@@ -104,13 +104,14 @@
 {% endif %}
 
 
-{% if status == "aktivno" %}
-    {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
+{% if tip != "inventura" or status == "veljavno" or status == "zaklenjeno" %}
+    {% include 'baza/tabela_vnosov.html' %}
 {% endif %}
 
-{% if tip != "inventura" or status == "veljavno" or status == "zaklenjeno" %}
-    {% include 'baza/tabela_vnosov.html' with tip=tip status=status values=values baza=baza slovar=slovar %}
+{% if status == "aktivno" %}
+    {% include 'baza/inventurna_tabela.html' %}
 {% endif %}
+
 
 {% endblock %} 
 
@@ -145,7 +146,6 @@
             set_innerHtml('stevilo_' + data.pk, data.stevilo)
             set_innerHtml('tip_' + data.pk, data.dolgi_tip)
             set_innerHtml('skupno_stevilo',data.skupno_stevilo)
-            set_innerHtml('stevilo_' + data.dimenzija + '_' + data.tip, data.stevilo)
             set_innerHtml('cena_' + data.pk, data.cena + ' $')
             set_innerHtml('cena_vnosa_' + data.pk, data.cena_vnosa + ' $')
             set_innerHtml('skupna_cena', data.skupna_cena + ' $')
@@ -154,20 +154,19 @@
             set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')
         }
         function Refresh_inventurna_tabela(data){
-            var dimenzija_tip = data.varna_dimenzija + '_' + data.tip
-            set_value('stevilo_value_'+ dimenzija_tip , '')
+            set_value('stevilo_value_'+ data.id , '')
             if ( data.action == "izbris" ){
-                set_value('pk_' + dimenzija_tip, "")
-                ToggleClass('.' + dimenzija_tip, 'skrit')
-                ToggleClass('.' + dimenzija_tip + '.sprememba', 'skrit')
+                set_value('pk_' + data.id, "")
+                ToggleClass('.' + data.id, 'skrit')
+                ToggleClass('.' + data.id + '.sprememba', 'skrit')
             } else if ( data.action == "novo" ) {
-                set_value('pk_' + dimenzija_tip, data.pk)
-                set_innerHtml('stevilo_' + dimenzija_tip, data.stevilo)
-                ToggleClass('.' + dimenzija_tip, 'skrit')
-                ToggleClass('.' + dimenzija_tip + '.sprememba', 'skrit')
+                set_value('pk_' + data.id, data.pk)
+                set_innerHtml('stevilo_' + data.id, data.stevilo)
+                ToggleClass('.' + data.id, 'skrit')
+                ToggleClass('.' + data.id + '.sprememba', 'skrit')
             } else{
-                set_value('pk_' + dimenzija_tip, data.pk)
-                set_innerHtml('stevilo_' + dimenzija_tip, data.stevilo)
+                set_value('pk_' + data.id, data.pk)
+                set_innerHtml('stevilo_' + data.id, data.stevilo)
             }       
         }
         function Izbrisi_vnos(pk){

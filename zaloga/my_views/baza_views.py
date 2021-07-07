@@ -179,12 +179,12 @@ def vrni_zalogo(request):
 ##############################################################################
 def podatki_vnosa(vnos):
     data = {}
+    data['id'] = str(vnos.sestavina.id)
     data['pk'] = str(vnos.pk)
     data['cena'] = str(vnos.cena)
     data['cena_vnosa'] = str(vnos.skupna_cena)
     data['stevilo'] = str(vnos.stevilo)
     data['dimenzija'] = str(vnos.sestavina.dimenzija.dimenzija)
-    data['varna_dimenzija'] = data["dimenzija"].replace('/','-')
     data['tip'] = vnos.sestavina.tip.kratko
     data['dolgi_tip'] =  vnos.sestavina.tip.dolgo
     return data

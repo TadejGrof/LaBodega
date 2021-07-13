@@ -218,6 +218,9 @@ class Zaloga(models.Model):
                 stanje += vnos["stevilo"] * vnos["sprememba_zaloge"]
         return stanje
 
+    def danasnja_prodaja(self):
+        return self.dnevna_prodaja_set.all().filter(datum=datetime.today()).first()
+
     def vrni_stanja(self,sestavina,zacetek,konec):
         zaporedna_stanja = []
         vnosi = sestavina.vnos_set.all().filter(baza__datum__gte=zacetek,baza__datum__lte=konec,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
@@ -458,6 +461,28 @@ class Dnevna_prodaja(models.Model):
                     'cas': racun.cas,
                 })
         return activity_log
+
+    def nov_racun(self,author=None):
+        baza = Baza.objects.create(
+            zaloga = self.zaloga,
+            title= "Aktiven racun",
+            tip='racun',
+            dnevna_prodaja = self,
+            popust = 0)
+        if author != None:
+            baza.author = author
+            baza.save()
+
+@receiver(post_save, sender=Dnevna_prodaja)
+def create_dnevna_prodaja(sender, instance, created, **kwargs):
+    if created:
+        instance.doloci_title()
+        Baza.objects.create(
+            zaloga = instance.zaloga,
+            title = "Aktiven racun",
+            tip='racun',
+            dnevna_prodaja = instance,
+            popust = 0 )
 
 class Baza(models.Model):
     author = models.ForeignKey(User,default=1, on_delete=models.CASCADE)

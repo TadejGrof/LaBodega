@@ -98,26 +98,14 @@
 
 {% include 'js/ajax_requests.html' %}
 
-{% if prodaja == None %}
-    <h1>
-        {{zaloga.danes}}
-    </h1>
-    <div class="ustvari_prodajo">
-        <form style="width:100%;height:100%;display:inline-block" action="{% url 'nova_dnevna_prodaja' zaloga.pk %}" method="POST">
-            {% csrf_token %}
-            <input style="width:60%;height:35%;font-size:150%" type="submit" value="{{slovar|keyvalue:'Nova dnevna prodaja'|keyvalue:jezik}}">
-        </form>
-    </div>
-{% else %}
-    <h1>
-        {{prodaja.title}} {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
-    </h1>
+<h1>
+    {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}: {{prodaja.datum|getDayOfWeek}}, {{prodaja.title}} 
+</h1>
 
-    {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
-    {% include 'prodaja/racuni.html' %}
-    {% include 'prodaja/prodane.html' %}
+{% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
+{% include 'prodaja/racuni.html' %}
+{% include 'prodaja/prodane.html' %}
 
-{% endif %}
 
 <script>
     function Uveljavi(button){

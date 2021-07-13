@@ -110,6 +110,7 @@
     {% endif %}
 
     {% if perms.zaloga.view_dnevna_prodaja and zaloga|ima_prodajo:"dnevna_prodaja" %}
+    {% if false %}
     <div class="cetrt dnevna_prodaja">
         {% if dnevna_prodaja == None %}
             <h1>
@@ -150,6 +151,7 @@
 
         {% endif %}
     </div>
+    {% endif %}
     {% endif %}
 
     {% if false %}

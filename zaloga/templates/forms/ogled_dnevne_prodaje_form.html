@@ -1,5 +1,5 @@
 {% load zaloga_exstras %}
 
-<form action="{% url 'ogled_dnevne_prodaje' zaloga prodaja %}" method="GET">
+<form action="{% url 'dnevna_prodaja' zaloga prodaja %}" method="GET">
     <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
 </form>

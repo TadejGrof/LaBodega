@@ -24,7 +24,7 @@
         <td> {{baza.skupno_stevilo}} </td>
         <td> {{baza.skupna_cena}} $ </td>
         {% if baza.tip == "Aktivno" %}
-            <td> {% include 'forms/ogled_dnevne_prodaje_form.html' with prodaja=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %}</td>
+            <td> {% include 'forms/ogled_dnevne_prodaje_form.html' with prodaja=baza.id zaloga=zaloga_pk %}</td>
         {% else %}
             <td class="red"> {{baza.tip}} </td>
         {% endif %}

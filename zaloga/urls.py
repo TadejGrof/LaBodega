@@ -58,14 +58,12 @@ cenik_patterns = [
     path('<str:baza>/spremeni_cene/', pviews.spremeni_cene, name='spremeni_cene'),
     path('<str:tip_prodaje>/pdf/', pdf_views.pdf_cenika, name='cenik_pdf'),
 ]
+
 dnevna_prodaja_patterns = [
-    path('', pviews.dnevna_prodaja, name="dnevna_prodaja"),
-    path('nova_prodaja/', pviews.nova_dnevna_prodaja, name="nova_dnevna_prodaja"),
-    path('nov_racun/', pviews.nov_racun, name="nov_racun"),
     path('uveljavi_racun/<int:pk_racuna>/', pviews.uveljavi_racun, name="uveljavi_racun"),
-    path('arhiv/ogled/<int:pk_prodaje>/', pviews.ogled_dnevne_prodaje, name='ogled_dnevne_prodaje'),
-    path('arhiv/ogled/<int:pk_prodaje>/pdf/<str:tip>/', pdf_views.pdf_dnevne_prodaje, name='pdf_dnevne_prodaje'),
-    path('arhiv/ogled/<int:pk_prodaje>/storniraj/<int:pk_racuna>/', pviews.storniraj_racun, name="storniraj_racun"),
+    path('starniraj_racun/<int:pk_racuna>/', pviews.storniraj_racun, name="storniraj_racun"),
+    path('ogled/<int:dnevna_prodaja>/', pviews.dnevna_prodaja, name='dnevna_prodaja'),
+    path('ogled/<int:dnevna_prodaja>/pdf/<str:tip>/', pdf_views.pdf_dnevne_prodaje, name='pdf_dnevne_prodaje'),   
 ]
 
 ajax_patterns = [

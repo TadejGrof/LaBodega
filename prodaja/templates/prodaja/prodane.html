@@ -6,7 +6,7 @@
         <form style="display:inline-block;width:10%;margin-left:1%;" action="{% url 'pdf_dnevne_prodaje' zaloga.pk prodaja.pk 'prodane' %}" method="GET">
             <input type="submit" value="PDF" style="width:100%">
         </form>
-        <form style="display:inline-block;width:5%;" action="{% url 'dnevna_prodaja' zaloga.pk %}" method="GET">
+        <form style="display:inline-block;width:5%;" action="{% url 'dnevna_prodaja' zaloga.pk prodaja.pk %}" method="GET">
             <input type="submit" value="{{slovar|keyvalue:'Osvezi'|keyvalue:jezik}}" style="width:100%">
         </form>
     </h2>
@@ -38,7 +38,7 @@
         <form style="display:inline-block;width:10%;margin-left:1%;" action="{% url 'pdf_dnevne_prodaje' zaloga.pk prodaja.pk 'activity_log' %}" method="GET">
             <input type="submit" value="PDF" style="width:100%">
         </form>
-        <form style="display:inline-block;width:5%;" action="{% url 'dnevna_prodaja' zaloga.pk %}" method="GET">
+        <form style="display:inline-block;width:5%;" action="{% url 'dnevna_prodaja' zaloga.pk  prodaja.pk %}" method="GET">
             <input type="submit" value="{{slovar|keyvalue:'Osvezi'|keyvalue:jezik}}" style="width:100%">
         </form>
     </h2>

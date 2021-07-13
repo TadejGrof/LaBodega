@@ -35,16 +35,15 @@ def pregled_zaloge(request,zaloga):
         for tip in zaloga.tipi_sestavin.all():
             if request.GET.get(tip.kratko,"true") == "true":
                 tipi.append(tip.kratko)
-        sestavine = sestavine.filter(tip__kratko__in=tipi)
-        vnosi_zaloge = VnosZaloge.objects.all().filter(sestavina__in=sestavine).all_values()
+        sestavine = sestavine.filter(tip__kratko__in=tipi).all_values().zaloga_values(zaloga)
         if nicelne == "false":
-            vnosi_zaloge = vnosi_zaloge.exclude(stanje=0) 
+            sestavine = sestavine.exclude(stanje=0)
         slovar = {
             'zaloga':zaloga,
-            'sestavine': vnosi_zaloge,
+            'sestavine': sestavine,
             'tipi':tipi,
             'radius':radius,
-            'height':height,
+            'height':height,    
             'width':width,
             'nicelne': nicelne,
             'rezervirane': rezervirane,
@@ -52,41 +51,33 @@ def pregled_zaloge(request,zaloga):
         return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
 
 @login_required
-def pregled_prometa(request,tip,pk):
+def pregled_prometa(request,zaloga,sestavina):
     if request.method == "GET":
-        sestavina = Sestavina.objects.get(pk=pk)
-        cene_prodaje = Cena.objects.filter(sestavina=sestavina, prodaja__in = ['dnevna_prodaja','vele_prodaja'], tip=tip)
+        zaloga = Zaloga.objects.get(pk=zaloga)
+        sestavina = Sestavina.objects.get(pk=sestavina)
         danes = datetime.date.today().strftime('%Y-%m-%d')
         pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
-        zacetek_sprememb = request.GET.get('zacetek_sprememb', pred_mescem)
-        konec_sprememb = request.GET.get('konec_sprememb', danes)
-        print("zacetek sprememb je:")
-        print(zacetek_sprememb)
-        spremembe = sestavina.sprememba_set.filter(baza__datum__gt = zacetek_sprememb, baza__datum__lte=konec_sprememb, tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
-        #spremembe = sestavina.sprememba_set.filter(tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
-        zaporedna_stanja = sestavina.vrni_stanja(tip,zacetek_sprememb,konec_sprememb)[::-1]
-        zacetek_dp = request.GET.get('zacetek_dp', pred_mescem)  
-        konec_dp = request.GET.get('konec_dp', danes)
-        zacetek_vp = request.GET.get('zacetek_vp', pred_mescem)
-        konec_vp = request.GET.get('konec_vp', danes)
-        dp_stevilo, dp_cena = sestavina.prodaja('racun',tip, zacetek_dp, konec_dp)
-        vp_stevilo, vp_cena = sestavina.prodaja('vele_prodaja',tip, zacetek_vp, konec_vp)
+        zacetek = request.GET.get('zacetek_sprememb', pred_mescem)
+        konec= request.GET.get('konec_sprememb', danes)
+        zaporedna_stanja = zaloga.vrni_stanja(sestavina,zacetek,konec)[::-1]
+        try:
+            if zaporedna_stanja[-1]["tip"] == "inventura":
+                zacetno_stanje = zaporedna_stanja[-1]["stanje"]
+            else:
+                zacetno_stanje = zaporedna_stanja[-1]["stanje"] - zaporedna_stanja[-1]["stevilo"]
+        except:
+            zacetno_stanje = 0
+        try:
+            koncno_stanje = zaporedna_stanja[0]["stanje"]
+        except:
+            koncno_stanje = 0
         slovar = {
-            'zaporedna_stanja': zaporedna_stanja,
-            'tip': tip,
+            'zacetno_stanje':zacetno_stanje,
+            'koncno_stanje':koncno_stanje,
+            'spremembe':zaporedna_stanja,
             'sestavina': sestavina,
-            'cene_prodaje':cene_prodaje,
-            'spremembe': spremembe,
-            'zacetek_sprememb': zacetek_sprememb,
-            'zacetek_dp': zacetek_dp,
-            'zacetek_vp': zacetek_vp,
-            'konec_sprememb': konec_sprememb,
-            'konec_dp': konec_dp,
-            'konec_vp': konec_vp,
-            'dp_stevilo': dp_stevilo,
-            'dp_cena': dp_cena,
-            'vp_stevilo': vp_stevilo,
-            'vp_cena': vp_cena
+            'zacetek_sprememb': zacetek,
+            'konec_sprememb': konec,
         }
     return pokazi_stran(request, 'zaloga/pregled_prometa.html', slovar)
 

@@ -53,9 +53,9 @@
         {% else %}
             {% if perms.zaloga.add_vnos %}
                 <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-                <select class="nov_vnos skrit" style="width:15%" id="sestavina">
-                    {% for sestavina in sestavine %}
-                        <option value="{{sestavina.id}}"> {{sestavina.naziv_dimenzije}} </option>
+                <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
+                    {% for dimenzija in dimenzije %}
+                        <option value="{{dimenzija.id}}"> {{dimenzija.dimenzija}} </option>
                     {% endfor %}
                 </select>
                 <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
@@ -64,10 +64,12 @@
                         <option value="{{tip.id}}"> {{tip.kratko}}  </option>
                     {% endfor %}
                 </select>
-                <button class="nov_vnos skrit" onclick="Nov_vnos(get_value('sestavina'), get_value('stevilo'))"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+                <button class="nov_vnos skrit" onclick="Nov_vnos_dimenzija_tip(get_value('dimenzija'), get_value('tip'), get_value('stevilo'))"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
                 <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
             {% endif %}
-            <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+            {% if status == "aktivno" %}
+                <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+            {% endif %}
             <button class="vnosi skrit" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% endif %} 
         {% if status == "aktivno" %}
@@ -201,6 +203,26 @@
                 success: function (data) {
                     Refresh_inventurna_tabela(data)
                     Refresh_tabela_vnosov(data)
+                }
+            }); 
+        }
+        function Nov_vnos_dimenzija_tip(dimenzija,tip,stevilo){
+            $.ajax({
+                url: '{% url "nov_vnos" %}',
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'dimenzija':dimenzija,
+                'tip':tip,
+                'stevilo':stevilo,
+                'pk': '{{values.id}}'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    Refresh_inventurna_tabela(data);
+                    Vstavi_vrstico(data);
+                    Refresh_tabela_vnosov(data);
+                    Nastavi_vrstice('tabela_vnosov','index')
                 }
             }); 
         }

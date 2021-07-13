@@ -19,7 +19,7 @@
     }
 </style>
 
-<form id="filter" action="{% url 'pregled_prometa' tip sestavina.pk %}" method="GET">
+<form id="filter" action="{% url 'pregled_prometa' zaloga.pk sestavina.pk %}" method="GET">
 
 </form>
 
@@ -27,7 +27,7 @@
     {{slovar|keyvalue:'Pregled prometa za'|keyvalue:jezik}}
      {{sestavina.dimenzija.dimenzija}}
      {{slovar|keyvalue:'tipa'|keyvalue:jezik}}
-     {{tip}}
+     {{sestavina.tip}}
 </h1>
 
 <h2> {{slovar|keyvalue:'Spremembe'|keyvalue:jezik}}: </h2>
@@ -40,7 +40,7 @@
     <table class="tabela_vnosov">
         <tr>    
             <td colspan="5">
-            {{slovar|keyvalue:'Trenutno stanje'|keyvalue:jezik}}: {{sestavina|stringvalue:tip}}
+            {{slovar|keyvalue:'Trenutno stanje'|keyvalue:jezik}}: {{koncno_stanje}}
             </td>
         </tr>
         <tr>
@@ -52,27 +52,32 @@
         </tr>
         {% for sprememba in spremembe %}
             <tr>
-                <td> {{sprememba.baza.datum}} </td>
-                {% if sprememba.baza.tip == 'racun' %}
-                <td> {{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}} </td>
-                <td> {{sprememba.baza.datum}} </td>
+                <td> {{sprememba.datum}} </td>
+                
+                <td> {{sprememba.tip_baze}} </td>
+                <td> {{sprememba.title_baze}} </td>
+                {% if sprememba.sprememba_zaloge == 0 %}
+                    <td> {{sprememba.stevilo}} </td>
+                {% elif sprememba.sprememba_zaloge == 1 %}
+                    <td> +{{sprememba.stevilo}} </td>
                 {% else %}
-                <td> {{sprememba.baza.tip}} </td>
-                <td> {{sprememba.baza.title}} </td>
+                    <td> -{{sprememba.stevilo}} </td>
                 {% endif %}
-                <td> {{sprememba.str_stevilo}} </td>
-                <td> {{zaporedna_stanja|index:forloop.counter0}} </td>
+                <td> {{sprememba.stanje}} </td>
             </tr>
         {% endfor %}
         </tr>
         <tr>
             <td colspan="5">
-            {{slovar|keyvalue:'Zacetno stanje'|keyvalue:jezik}}: {{zaporedna_stanja|zadnji}}
+            {{slovar|keyvalue:'Zacetno stanje'|keyvalue:jezik}}: 
+            {{zacetno_stanje}}
             </td>
+
         </tr>
     </table>
 </div>
 
+{% if false %}
 <div style="display:inline-block;width:45%">
     <h2> {{slovar|keyvalue:'Vele prodaja'|keyvalue:jezik}}: </h2>
     <div class="filter">
@@ -176,6 +181,7 @@
     </div>
 </div>
 
+{% endif %}
 <div style="height:5%">
 </div>
 

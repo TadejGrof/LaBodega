@@ -15,6 +15,23 @@
             }
         }); 
     }
+    function NovVnosDimenzijaTip(baza,dimenzija,tip,stevilo,funkcija){
+        $.ajax({
+            url: '{% url "nov_vnos" %}',
+            method: 'POST',
+            data: {
+            'csrfmiddlewaretoken': '{{csrf_token}}',
+            'dimenzija':dimenzija,
+            'tip':tip,
+            'stevilo':stevilo,
+            'pk': baza
+            },
+            dataType: 'json',
+            success: function (data) {
+            funkcija(data)
+            }
+        }); 
+    }
     function NovVnos(baza, sestavina, stevilo, funkcija){
         $.ajax({
             url: '{% url "nov_vnos" %}',

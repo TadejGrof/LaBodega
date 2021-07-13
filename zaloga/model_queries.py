@@ -74,7 +74,7 @@ class SestavinaQuerySet(models.QuerySet):
             .annotate(vnesena = Exists(vnosi)) \
             .annotate(stevilo_vnosa=Coalesce(Subquery(vnosi.values("stevilo")[:1]),0)) \
             .annotate(pk_vnosa = Coalesce(Subquery(vnosi.values("pk")[:1]),0))
-            
+
     def cenik_values(self,zaloga):
         return self.annotate(cena=Sum(Case(
             When(cena__zaloga=zaloga,then=F("cena__cena")),
@@ -111,6 +111,8 @@ class VnosQuerySet(models.QuerySet):
     def all_values(self):
         return self.annotate(datum = F("baza__datum")) \
             .annotate(status = F("baza__status")) \
+            .annotate(tip_baze = F("baza__tip")) \
+            .annotate(title_baze = F("baza__title")) \
             .annotate(sprememba_zaloge = F("baza__sprememba_zaloge")) \
             .annotate(title = F("baza__title")) \
             .annotate(radij = F("sestavina__dimenzija__radius")) \
@@ -119,5 +121,5 @@ class VnosQuerySet(models.QuerySet):
             .annotate(tip = F("sestavina__tip__kratko")) \
             .annotate(dolgi_tip = F("sestavina__tip__dolgo")) \
             .annotate(tip_id = F("sestavina__tip__id")) \
-            .order_by("datum","sestavina") \
+            .order_by("datum") \
             .values()

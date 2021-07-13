@@ -20,9 +20,14 @@
         <td> {% include 'forms/pdf_baze_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk select=False %} </td>
     {% elif tip == "dnevna_prodaja" %}
         <td> {{baza.title}} </td>
+        <td> {{baza.datum|getDayOfWeek}} </td>
         <td> {{baza.skupno_stevilo}} </td>
         <td> {{baza.skupna_cena}} $ </td>
-        <td> {% include 'forms/ogled_dnevne_prodaje_form.html' with prodaja=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %}</td>
+        {% if baza.tip == "Aktivno" %}
+            <td> {% include 'forms/ogled_dnevne_prodaje_form.html' with prodaja=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %}</td>
+        {% else %}
+            <td class="red"> {{baza.tip}} </td>
+        {% endif %}
     {% elif tip == "prevzem" %}
         <td> {{baza.title}} </td>
         <td> {{baza.datum}} </td>

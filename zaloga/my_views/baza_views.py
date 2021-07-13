@@ -32,17 +32,31 @@ def spremeni_vnos(request):
 def nov_vnos(request):
     if request.method == "POST":
         stevilo = int(request.POST.get('stevilo'))
-        sestavina = Sestavina.objects.get(pk=int(request.POST.get("sestavina")))
+        dimenzija = request.POST.get('dimenzija',None)
+        if dimenzija == None:
+            sestavina = Sestavina.objects.get(pk=int(request.POST.get("sestavina")))
+        else:
+            try:
+                sestavina = Sestavina.objects.get(
+                    dimenzija__id = int(dimenzija),
+                    tip__id = int(request.POST.get("tip"))
+                )
+            except:
+                sestavina = Sestavina.objects.get(
+                    dimenzija__dimenzija = dimenzija,
+                    tip__id = int(request.POST.get("tip"))
+                )
+        print(sestavina)
         pk = int(request.POST.get('pk'))
         baza = Baza.objects.get(pk = pk)
         zaloga = baza.zaloga
         cena = None
         if baza.tip == "vele_prodaja" or baza.tip == "racun":
-            cena = zaloga.cenik.all().get(sestavina=sestavina)
+            cena = zaloga.cenik.all().filter(sestavina=sestavina).first()
         vnos = Vnos.objects.create(
             sestavina = sestavina,
             stevilo = stevilo,
-            cena = cena,
+            cena = cena.cena,
             baza = baza)
         vnosi = baza.vnos_set.all().order_by('sestavina').all_values()
         pk = vnos.pk
@@ -169,7 +183,7 @@ def vrni_zalogo(request):
         dimenzija = request.GET.get('dimenzija')
         tip = request.GET.get('tip')
         zaloga = int(request.GET.get('zaloga'))
-        stevilo = getattr(Sestavina.objects.all().get(zaloga=zaloga,dimenzija__dimenzija=dimenzija),tip)
+        stevilo = VnosZaloge.objects.get(zaloga_id=zaloga,sestavina__dimenzija__dimenzija=dimenzija,sestavina__tip__id=tip).stanje
         data['zaloga'] = stevilo
     except:
         data['zaloga'] = 0

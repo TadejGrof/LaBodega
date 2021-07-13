@@ -1,5 +1,7 @@
 from django import template
 import json
+import datetime
+
 register = template.Library()
 
 @register.filter(name="ima_prodajo")
@@ -17,6 +19,12 @@ def razlika(value, index):
 @register.filter
 def zadnji(list):
     return list[-1] 
+
+@register.filter
+def getDayOfWeek(datum):
+    dnevi = ["Ponedeljek","Torek","Sreda","Četrtek","Petek","Sobota","Nedelja"]
+    return dnevi[datum.weekday()]
+
 
 #vele_prodaja.html
 @register.filter

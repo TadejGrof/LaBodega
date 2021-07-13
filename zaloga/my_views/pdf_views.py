@@ -18,40 +18,19 @@ from django.http import HttpResponse
 
 def pdf_zaloge(request,zaloga):
     zaloga = Zaloga.objects.get(pk = zaloga)
-    radius = request.GET.get('radius')
-    sestavine = zaloga.sestavina_set.all()
+    radij = request.GET.get('radius')
+    sestavine = zaloga.sestavine.all()
     nicelne = request.GET.get('nicelne','true')
     rezervirane = request.GET.get('rezervirane','false')
-    print(rezervirane)
-    na_voljo = zaloga.na_voljo
-    if radius != 'all':
-        sestavine = zaloga.sestavina_set.all().filter(dimenzija__radius = radius)
+    if radij != 'all':
+        sestavine = zaloga.sestavine.all().filter(dimenzija__radius = radij)
     tipi = []
-    for tip in zaloga.vrni_tipe:
-        if request.GET.get(tip[0]):
+    for tip in zaloga.tipi_sestavin.all():
+        if request.GET.get(tip.kratko):
             tipi.append(tip)
-    sestavine = sestavine.values(
-        'dimenzija__dimenzija',
-        'pk',
-        'Y',
-        'W',
-        'JP',
-        'JP50',
-        'JP70',
-    )
+    sestavine = sestavine.filter(tip__in=tipi).all_values().zaloga_values(zaloga)
     if nicelne == "false":
-        ne_prazne = []
-        for sestavina in sestavine:
-            for tip in tipi:
-                if sestavina[tip[0]] != 0:
-                    ne_prazne.append(sestavina)
-                    break
-        sestavine = ne_prazne
-    if rezervirane == "true":
-        for sestavina in sestavine:
-            for tip in tipi:
-                dimenzija_tip = sestavina['dimenzija__dimenzija'] + "_" + tip[0]
-                sestavina[tip[0]] = na_voljo[dimenzija_tip]
+        sestavine = sestavine.exclude(stanje=0)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="zaloga.pdf"'
     
@@ -63,29 +42,24 @@ def pdf_zaloge(request,zaloga):
     p.save()
     return response 
     
-def pdf_cenika(request,zaloga,tip_prodaje):
+def pdf_cenika(request,zaloga):
     radius = request.GET.get('radius',"all")
     zaloga = Zaloga.objects.get(pk=zaloga)
-    sestavine = zaloga.sestavina_set.all()
-    print(sestavine)
-    print(radius)
-    print(radius == "")
+    sestavine = zaloga.sestavine.all()
     if radius != 'all' and radius != "":
         sestavine = sestavine.filter(dimenzija__radius = radius)
     tipi = []
-    for tip in zaloga.vrni_tipe:
-        if request.GET.get(tip[0]):
+    for tip in zaloga.tipi_sestavin.all():
+        if request.GET.get(tip.kratko):
             tipi.append(tip)
+    sestavine = sestavine.filter(tip__in=tipi).cenik_values(zaloga)
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="cenik.pdf"'
     p = canvas.Canvas(response)
-
     p.translate(40,800)
-    if tip_prodaje == "vele_prodaja":
-        p.drawString(200,0,'Cenik vele prodaje')
-    elif tip_prodaje == "dnevna_prodaja":
-        p.drawString(200,0,'Cenik dnevne prodaje')
-    pdf.cenik(p,sestavine,tip_prodaje,tipi)
+    p.drawString(200,0,'Cenik prodaje')
+    pdf.cenik(p,sestavine,tipi)
     p.showPage()
     p.save()
     return response 
@@ -93,6 +67,10 @@ def pdf_cenika(request,zaloga,tip_prodaje):
 def pdf_baze(request,zaloga,tip_baze, pk):
     zaloga = Zaloga.objects.get(pk = zaloga)
     tip = request.GET.get('tip',"all")
+    try:
+        tip = Tip.objects.get(kratko=tip)
+    except:
+        tip = None
     baza = zaloga.baza_set.all().get(pk=pk)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="baza.pdf"'
@@ -134,49 +112,6 @@ def pdf_skupnega_pregleda(request,zaloga):
     p = canvas.Canvas(response)
     p.translate(40,850)
     pdf.tabela_baz(p,baze)
-    p.showPage()
-    p.save()
-    return response
-
-def pdf_porocila_prometa(request):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="porocilo.pdf"'
-    danes = datetime.date.today().strftime('%Y-%m-%d')
-    pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
-    od = request.GET.get('od',pred_mescem)
-    do = request.GET.get('do', danes)
-    stroski = Stroski_Group.objects.all().filter(datum__gte = od, datum__lte = do).order_by('-datum','-pk').prefetch_related('strosek_set')
-    vele_prodaje = Baza.objects.all().filter(tip="vele_prodaja",datum__gte=od,datum__lte=do,status="veljavno").order_by('-datum','-pk').prefetch_related('vnos_set')
-    dnevne_prodaje = Dnevna_prodaja.objects.all().filter(datum__gte=od,datum__lte=do).order_by('-datum','-pk')
-    promet = []
-    for strosek in stroski.iterator():
-        slovar = {
-            'tip':'Strosek',
-            'znesek':-float(strosek.skupni_znesek),
-            'title':strosek.title,
-            'datum':strosek.datum,
-        }
-        promet.append(slovar)
-    for vele_prodaja in vele_prodaje.iterator():
-        slovar = {
-            'tip':'Vele prodaja',
-            'znesek':float(vele_prodaja.koncna_cena),
-            'title':vele_prodaja.title,
-            'datum':vele_prodaja.datum,
-        }
-        promet.append(slovar)
-    for dnevna_prodaja in dnevne_prodaje.iterator():
-        slovar = {
-            'tip':'Dnevna prodaja',
-            'znesek':float(dnevna_prodaja.skupna_cena),
-            'title':dnevna_prodaja.title,
-            'datum':dnevna_prodaja.datum,
-        }
-        promet.append(slovar)
-    promet = sorted(promet,key = lambda i: (i['datum'],i['tip'],i['znesek']), reverse=True)
-    p = canvas.Canvas(response)
-    p.translate(40,850)
-    pdf.tabela_porocila(p,od,do,promet)
     p.showPage()
     p.save()
     return response

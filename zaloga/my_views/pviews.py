@@ -13,14 +13,12 @@ def dnevna_prodaja(request,zaloga):
     danes = timezone.localtime(timezone.now())
     danasnja_prodaja = Dnevna_prodaja.objects.filter(datum = danes).first()
     aktivni_racun = None
-    na_voljo = zaloga.na_voljo
     if danasnja_prodaja != None:
         aktivni_racun = danasnja_prodaja.aktivni_racun
-    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':True,'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
+    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':True,'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun})
 
 def nova_dnevna_prodaja(request,zaloga):
     if request.method == "POST":
-        print(zaloga)
         zaloga = Zaloga.objects.get(pk = zaloga)
         program = Program.objects.first()
         dnevna_prodaja = Dnevna_prodaja.objects.create(zaloga = zaloga)
@@ -73,10 +71,9 @@ def uveljavi_racun(request,zaloga,pk_racuna):
 
 def ogled_dnevne_prodaje(request,zaloga, pk_prodaje):
     zaloga = Zaloga.objects.get(pk=zaloga)
-    na_voljo = zaloga.na_voljo
     prodaja = Dnevna_prodaja.objects.get(pk = pk_prodaje)
     aktivni_racun = prodaja.aktivni_racun
-    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':False,'prodaja': prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
+    return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':False,'prodaja': prodaja, 'aktivni_racun': aktivni_racun})
 
 def storniraj_racun(request,zaloga,pk_prodaje,pk_racuna):
     racun = Baza.objects.get(pk = pk_r)

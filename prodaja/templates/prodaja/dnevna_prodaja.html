@@ -113,19 +113,9 @@
         {{prodaja.title}} {{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
     </h1>
 
-    {% if danasnja %}
-        {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
-        {% include 'prodaja/racuni.html' with racuni=racuni %}
-        {% include 'prodaja/prodane.html' with prodaja=prodaja %}
-    {% endif %}
-
-    
-
-    {% if not danasnja %}
-        {% include 'prodaja/prodane.html' with prodaja=prodaja %}
-        {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
-        {% include 'prodaja/racuni.html' with racuni=racuni %}
-    {% endif %}
+    {% include 'prodaja/prodajno_okno.html' with vnosi=aktivni_racun.vnosi_values racun=aktivni_racun %} 
+    {% include 'prodaja/racuni.html' %}
+    {% include 'prodaja/prodane.html' %}
 
 {% endif %}
 
@@ -266,7 +256,7 @@
         var stevilo = get_value('stevilo')
         var tip = get_selected('tip')
         var baza = '{{prodaja.aktivni_racun.pk}}'
-        NovVnos(baza,dimenzija,tip,stevilo, function(data){
+        NovVnosDimenzijaTip(baza,dimenzija,tip,stevilo, function(data){
             Vstavi_vrstico('tabela_vnosov', data.index, data)
             Nastavi_podatke(data)
             set_value('stevilo','')

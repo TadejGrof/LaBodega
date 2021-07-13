@@ -45,7 +45,6 @@ stroski_patterns = [
 
 porocilo_patterns = [
     path('porocilo_prometa',stroski_views.porocilo_prometa, name='porocilo_prometa'),
-    path('porocilo_prometa/pdf/',pdf_views.pdf_porocila_prometa, name="porocilo_prometa_pdf"),
     path('porocilo_prodaje',stroski_views.porocilo_prodaje, name='porocilo_prodaje'),
 ]
 
@@ -91,7 +90,7 @@ dolgovi_patterns = [
 urlpatterns = [
     path('poskus/',views.poskus,name="poskus"),
     path('<int:zaloga>/pregled_zaloge/', zaloga_views.pregled_zaloge, name='pregled_zaloge'),
-    path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),
+    path('<int:zaloga>/pregled_prometa/<int:sestavina>/', include(pregled_patterns)),
     path('<int:zaloga>/pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('<int:zaloga>/dolgovi', include(dolgovi_patterns)),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),

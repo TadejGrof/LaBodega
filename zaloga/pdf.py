@@ -44,9 +44,9 @@ def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, lev
     return top
 
 def tabela_zaloge(p, zaloga, sestavine, tipi, top=800, jezik = "spa"):
-    kratki_tipi = [tip[0] for tip in tipi]
-    dolgi_tipi = [tip[1] for tip in tipi]
-    data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi]
+    kratki_tipi = [tip.kratko for tip in tipi]
+    dolgi_tipi = [tip.dolgo for tip in tipi]
+    data=  [[slovar['Dimenzija'][jezik] + ":", slovar["Tip"][jezik] + ":", "Stanje:"]]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),
@@ -55,22 +55,18 @@ def tabela_zaloge(p, zaloga, sestavine, tipi, top=800, jezik = "spa"):
     top -= 3*VISINA_VRSTICE
     top = naslednja_vrstica(p,top)
     for sestavina in sestavine:
-        stanje = []
-        for tip in kratki_tipi:
-            stanje.append(sestavina[tip])
-        data= [[sestavina['dimenzija__dimenzija']] + stanje]
+        data= [[sestavina['naziv_dimenzije'], sestavina["kratek_tip"], str(sestavina["stanje"])]]
         style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                             ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
         tabela(p,data,style)
         top = naslednja_vrstica(p, top)
-    top = zaloga_skupno(p,zaloga,sestavine,kratki_tipi,top)
 
 def cenik(p,sestavine,tip_prodaje,tipi,top=800, jezik = "spa"):
-    kratki_tipi = [tip[0] for tip in tipi]
-    dolgi_tipi = [tip[1] for tip in tipi]
-    data=  [[slovar['Dimenzija'][jezik]] + dolgi_tipi]
+    kratki_tipi = [tip.kratko for tip in tipi]
+    dolgi_tipi = [tip.kratko for tip in tipi]
+    data=  [[slovar['Dimenzija'][jezik], "Tip:", "Cena:"]]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),
@@ -138,17 +134,17 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
                         ])
     tabela(p,data,style)
     top = naslednja_vrstica(p,top)
-    vnosi = baza.vnos_set.all().order_by("dimenzija")
-    if tip != "all":
-        vnosi = vnosi.filter(tip=tip)
+    vnosi = baza.vnos_set.all().order_by("sestavina")
+    if tip != None:
+        vnosi = vnosi.filter(sestavina__tip__kratko=tip)
     brezplacne = []
     for vnos in vnosi:
         if vnos.cena == 0:
             brezplacne.append(vnos)
         else:
             data = [[
-                vnos.dimenzija,
-                vnos.tip,
+                vnos.sestavina.dimenzija,
+                vnos.sestavina.tip,
                 vnos.stevilo,
                 str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/",
                 str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]]
@@ -324,7 +320,7 @@ def zadnja_vrstica_dnevne_prodaje(p,prodaja,top, jezik = "spa"):
     return naslednja_vrstica(p,top)
 
 def zadnja_vrstica_baze(p,baza,tip,top, jezik = "spa"):
-    if tip == "all":
+    if tip == None:
         skupno = baza.skupno_stevilo
     else:
         skupno = baza.skupnoStevilo(tip)
@@ -337,7 +333,7 @@ def zadnja_vrstica_baze(p,baza,tip,top, jezik = "spa"):
     return naslednja_vrstica(p,top)
 
 def zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne, jezik = "spa"):
-    if tip == "all":
+    if tip == None:
         skupno = baza.skupno_stevilo
     else:
         skupno = baza.skupnoStevilo(tip)
@@ -357,8 +353,8 @@ def zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     for vnos in brezplacne:
         data = [[
-            vnos.dimenzija,
-            vnos.tip,
+            vnos.sestavina.dimenzija,
+            vnos.sestavina.tip.kratko,
             vnos.stevilo,
             str(vnos.cena) + "$" if baza.tip == "vele_prodaja" else "/",
             str(vnos.skupna_cena) + "$" if baza.tip == "vele_prodaja" else "/"]]

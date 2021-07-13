@@ -219,14 +219,14 @@ def baza(request,zaloga, tip_baze, pk):
         baza = baza_query[0]
         baza_values = database_functions.baze_values(baza_query)[0]
         vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
-        print(Vnos.objects.filter(baza=baza).values("sestavina"))
         sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)
-        print(sestavine)
+        dimenzije = Dimenzija.objects.all().values("dimenzija","id")
         slovar = {
             'zaloga': zaloga,
             'baza':baza,
             'tip':tip_baze,
             'status':baza.status,
+            'dimenzije':dimenzije,
             'vnosi': baza.vnos_set.all().all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
             'sestavine': sestavine,

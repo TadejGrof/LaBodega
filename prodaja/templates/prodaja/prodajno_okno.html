@@ -14,8 +14,8 @@
                         <th width="20%"> Edit: </th>
                     </tr>
                     {% for vnos in vnosi %}
-                        <tr class="vnos" data-pk="{{vnos.pk}}" id="{{vnos.pk}}">
-                            <td> {{vnos.dimenzija__dimenzija}} </td>
+                        <tr class="vnos" data-pk="{{vnos.id}}" id="{{vnos.id}}">
+                            <td> {{vnos.dimenzija}} </td>
                             <td> {{vnos.tip}} </td>
                             <td>
                                 <div class="stevilo sprememba">
@@ -69,11 +69,11 @@
                 <label id="zaloga_div" style="width:30%;height:30%;text-align:center;font-size:5vh;display:inline-block"> Zaloga </label>
                 <div style="width:30%;height:15%;text-align:center;display:inline-block"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </div> 
                 <select style="width:40%;height:15%;display:inline-block" id="tip" name="tip" form="nov_vnos" onchange="Pokazi_zalogo()">
-                    {% for tip in zaloga.vrni_tipe %}
-                        {% if tip.0 == "W" %}
-                            <option value="{{tip.0}}" selected> {{tip.0}} </option>
+                    {% for tip in zaloga.tipi_sestavin.all %}
+                        {% if tip.kratko == "W" %}
+                            <option value="{{tip.id}}" selected> {{tip.kratko}} </option>
                         {% else %}
-                            <option value="{{tip.0}}"> {{tip.0}} </option>
+                            <option value="{{tip.id}}"> {{tip.kratko}} </option>
                         {% endif %}
                     {% endfor %}
                 </select>

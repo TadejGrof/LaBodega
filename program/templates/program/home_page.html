@@ -132,8 +132,8 @@
                 {% with dnevna_prodaja.prodane as prodane %}
                 {% for prodana in prodane %}
                     <tr>
-                        <td> {{prodane|keyvalue:prodana|keyvalue:'dimenzija'}} </td>
-                        <td> {{prodane|keyvalue:prodana|keyvalue:'tip'}} </td>
+                        <td> {{prodana.dimenzija}} </td>
+                        <td> {{prodana.tip}}</td>
                         <td> {{prodane|keyvalue:prodana|keyvalue:'stevilo'}} </td>
                     </tr>
                 {% endfor %}

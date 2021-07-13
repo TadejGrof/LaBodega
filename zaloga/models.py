@@ -104,7 +104,7 @@ class Sestavina(models.Model):
     objects = SestavinaQuerySet.as_manager()
 
     class Meta:
-        ordering = ['zaloga','dimenzija','tip']
+        ordering = ['dimenzija','tip']
 
     def __str__(self):
         try:
@@ -208,14 +208,30 @@ class Zaloga(models.Model):
                 razlicni_radiusi.append(radius['dimenzija__radius'])
         return razlicni_radiusi
 
-    def nastavi_iz_vnosov(self,sestavina):
+    def zaloga_na_datum(self,sestavina,datum):
         stanje = 0
-        vnosi = sestavina.vnos_set.all().filter(baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
+        vnosi = sestavina.vnos_set.all().filter(baza__datum__lte=datum,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
         for vnos in vnosi:
             if vnos["sprememba_zaloge"] == 0:
                 stanje = vnos["stevilo"]
             else:
                 stanje += vnos["stevilo"] * vnos["sprememba_zaloge"]
+        return stanje
+
+    def vrni_stanja(self,sestavina,zacetek,konec):
+        zaporedna_stanja = []
+        vnosi = sestavina.vnos_set.all().filter(baza__datum__gte=zacetek,baza__datum__lte=konec,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
+        stanje = self.zaloga_na_datum(sestavina,zacetek)
+        for vnos in vnosi:
+            if vnos["sprememba_zaloge"] == 0:
+                stanje = vnos["stevilo"]
+            else:
+                stanje += vnos["stevilo"] * vnos["sprememba_zaloge"]
+            vnos["stanje"] = stanje
+        return vnosi
+
+    def nastavi_iz_vnosov(self,sestavina):
+        stanje = self.zaloga_na_datum(sestavina,datetime.now())
         vnos_zaloge = self.vnoszaloge_set.all().get(sestavina=sestavina)
         if vnos_zaloge.stanje != stanje:
             vnos_zaloge.stanje = stanje
@@ -360,8 +376,8 @@ class Dnevna_prodaja(models.Model):
     prodaja = models.ForeignKey(Prodaja, default=1, on_delete=models.CASCADE)
     datum = models.DateField(default=timezone.now)
     title = models.CharField(default="", max_length=20)
-    tip = 'dnevna_prodaja'
-
+    tip = models.CharField(default="Aktivno",max_length=20,null=True,blank=True)
+    
     @property
     def stevilo_racunov(self):
         return self.racun_set.all().count()
@@ -373,6 +389,10 @@ class Dnevna_prodaja(models.Model):
     @property
     def aktivni_racun(self):
         return self.baza_set.all().filter(tip='racun', status = "aktivno").first()
+
+    @property
+    def dan(self):
+        return self.datum
 
     def doloci_title(self):
         dan = str(self.datum.day)
@@ -397,7 +417,7 @@ class Dnevna_prodaja(models.Model):
     
     @property
     def urejeni_vnosi(self):
-        return Vnos.objects.filter(baza__dnevna_prodaja = self, baza__status="veljavno").order_by('dimenzija')
+        return Vnos.objects.filter(baza__dnevna_prodaja = self, baza__status="veljavno")
 
     @property 
     def skupna_cena(self):
@@ -416,14 +436,13 @@ class Dnevna_prodaja(models.Model):
     @property
     def prodane(self):
         prodane = {}
-        for vnos in self.urejeni_vnosi:
-            dimenzija_vnos = str(vnos.dimenzija) + '-' + vnos.tip
-            if dimenzija_vnos in prodane:
-                prodane[dimenzija_vnos]['stevilo'] += vnos.stevilo
-                prodane[dimenzija_vnos]['cena'] += vnos.cena * vnos.stevilo
+        for vnos in self.urejeni_vnosi.order_by("sestavina"):
+            if vnos.sestavina in prodane:
+                prodane[vnos.sestavina]['stevilo'] += vnos.stevilo
+                prodane[vnos.sestavina]['cena'] += vnos.cena * vnos.stevilo
             else:
-                slovar = {'dimenzija':vnos.dimenzija.dimenzija, 'stevilo':vnos.stevilo,'tip':vnos.tip,'cena':vnos.cena * vnos.stevilo}
-                prodane.update({dimenzija_vnos:slovar})
+                slovar = {'stevilo':vnos.stevilo,'cena':vnos.cena * vnos.stevilo}
+                prodane.update({vnos.sestavina:slovar})
         return prodane
 
     @property
@@ -432,9 +451,9 @@ class Dnevna_prodaja(models.Model):
         for racun in self.racuni:
             for vnos in racun.vnos_set.all():
                 activity_log.append({
-                    'dimenzija':vnos.dimenzija,
+                    'dimenzija':vnos.sestavina.dimenzija,
                     'stevilo':vnos.stevilo,
-                    'tip':vnos.tip,
+                    'tip':vnos.sestavina.tip,
                     'cena':vnos.stevilo * vnos.cena,
                     'cas': racun.cas,
                 })
@@ -474,8 +493,8 @@ class Baza(models.Model):
 
     def skupnoStevilo(self,tip):
         skupno = 0
-        for vnos in self.vnosi_values:
-            if vnos["tip"] == tip:
+        for vnos in self.vnos_set.all().all_values():
+            if vnos["tip_id"] == tip.id:
                 skupno += vnos["stevilo"]
         return skupno
 
@@ -490,16 +509,16 @@ class Baza(models.Model):
         print("uveljavljam inventuro")
         vnosi_zaloge = []
         for sestavina in self.zaloga.sestavine.all():
-            vnos = self.vnosi.filter(sestavina = sestavina).first()
+            vnos = self.vnos_set.all().filter(sestavina = sestavina).first()
             if vnos == None and not delno:
                 vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
                 vnos_zaloge.stanje = 0
                 vnosi_zaloge.append(vnos_zaloge)
-            else if vnos != None:
+            elif vnos != None:
                 vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
                 vnos_zaloge.stanje = vnos.stevilo
                 vnosi_zaloge.append(vnos_zaloge)
-        VnosZaloge.objects.bulk_update(vnosi_zaloge)
+        VnosZaloge.objects.bulk_update(vnosi_zaloge,["stanje"])
 
            
     def uveljavi_prenos(self,cas = None):
@@ -514,10 +533,8 @@ class Baza(models.Model):
                 author = self.author,
                 zalogaPrenosa = self.zaloga.pk
             )
-        cenik_nakupa = self.zaloga.cenik()
-        cenik_prodaje = self.getZalogaPrenosa.cenik("dnevna_prodaja")
         for vnos in self.vnos_set.all().iterator():
-            bazaPrenosa.dodaj_vnos(vnos.sestavina,vnos.stevilo,cenik_nakupa[vnos.dimenzija.dimenzija][vnos.tip],cenik_prodaje[vnos.dimenzija.dimenzija][vnos.tip])
+            bazaPrenosa.dodaj_vnos(vnos.sestavina,vnos.stevilo)
         bazaPrenosa.save()
         bazaPrenosa.uveljavi_bazo()
         bazaPrenosa.status = "zaklenjeno"
@@ -568,11 +585,11 @@ class Baza(models.Model):
         vnosi = self.vnos_set.all().order_by("sestavina")
         vnosi_zaloge = []
         for vnos in vnosi:
-            vnos_zaloge = vnos.sestavina.vnoszaloge_set.all().get(zaloge = self.zaloge)
+            vnos_zaloge = vnos.sestavina.vnoszaloge_set.all().get(zaloga = self.zaloga)
             vnos_zaloge.stanje = vnos_zaloge.stanje + vnos.stevilo * self.sprememba_zaloge
-            if vnosi_zaloge[-1] != vnos_zaloge:
+            if len(vnosi_zaloge) == 0 or vnosi_zaloge[-1] != vnos_zaloge:
                 vnosi_zaloge.append(vnos_zaloge)
-        VnosZaloge.objects.bulk_update(vnosi_zaloge,"stanje")  
+        VnosZaloge.objects.bulk_update(vnosi_zaloge,["stanje"])  
 
     def dodaj_vnos(self,sestavina,stevilo,cena_nakupa = None,cena_prodaje = None):
         vnos = Vnos.objects.create(sestavina=sestavina,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
@@ -616,7 +633,7 @@ class Baza(models.Model):
 
     @property
     def vnosi_values(self):
-        return database_functions.vnosi_values(self.vrni_vnose) 
+        return self.vnos_set.all().all_values()
 
     @property
     def cena_nakupa(self):
@@ -749,15 +766,13 @@ class Baza(models.Model):
     def nastavi_vnose_inventure(self):
         vnosi = []
         vnos_set = self.vnos_set.all()
-        for sestavina in self.zaloga.sestavina_set.all():
-            for tip in self.zaloga.vrni_tipe:
-                if not vnos_set.filter(dimenzija=sestavina.dimenzija,tip=tip[0]).exists():
-                    vnosi.append(Vnos(
-                        baza=self,
-                        dimenzija=sestavina.dimenzija,
-                        tip=tip[0],
-                        stevilo = getattr(sestavina,tip[0])
-                    ))
+        for sestavina in self.zaloga.sestavine.all().zaloga_values(self.zaloga).all_values():
+            if not vnos_set.filter(sestavina__id=sestavina["id"]).exists():
+                vnosi.append(Vnos(
+                    baza=self,
+                    sestavina_id = sestavina["id"],
+                    stevilo = sestavina["stanje"]
+                ))
         Vnos.objects.bulk_create(vnosi)
 
 ###################################################################################################
@@ -868,7 +883,7 @@ class Vnos(models.Model):
 def delete_vnos(sender,instance,**kwargs):
     baza = instance.baza
     if baza.status == "veljavno":
-        baza.zaloga.nastavi_iz_vnosov(vnos.sestavina)
+        baza.zaloga.nastavi_iz_vnosov(instance.sestavina)
 
 class Stroski_Group(models.Model):
     title = models.CharField(default="",max_length=20)

@@ -48,7 +48,7 @@
             {% for tip in zaloga.tipi_sestavin.all %}
                 {{tip.kratko}}:
                 <select style="width:5%" form="filter" name="{{tip.kratko}}">
-                    {% if tip in tipi %}
+                    {% if tip.kratko in tipi %}
                         <option value="true" selected> Yes </option>
                         <option value="false"> No </option>
                     {% else %}
@@ -128,8 +128,8 @@
             </tr>
                 {% for sestavina in sestavine %}
                     <tr class="vrstica vrstica_{{tip}}">
-                        <td> {{sestavina.dimenzija}} </td>
-                        <td> {{sestavina.tip}} </td>
+                        <td> {{sestavina.naziv_dimenzije}} </td>
+                        <td> {{sestavina.kratek_tip}} </td>
                         <td> {{sestavina.stanje}} </td>
                         <td> </td>
                         <td>

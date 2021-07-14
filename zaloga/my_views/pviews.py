@@ -7,6 +7,7 @@ from django.utils import timezone
 from program.models import Program
 import json 
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
+from django.urls import reverse
 
 def dnevna_prodaja(request,zaloga,dnevna_prodaja):
     zaloga = Zaloga.objects.get(pk=zaloga)
@@ -44,6 +45,29 @@ def storniraj_racun(request,zaloga,pk_prodaje,pk_racuna):
 def ogled_racuna(request,zaloga, pk_racuna):
     racun = Racun.objects.get(pk = pk)
     return pokazi_stran(request, 'prodaja/ogled_racuna.html', {'racun':racun})
+
+def nastavi_praznik(request,zaloga, dnevna_prodaja):
+    prodaja = Dnevna_prodaja.objects.get(pk=dnevna_prodaja)
+    prodaja.tip = "Praznik"
+    prodaja.save()
+    return redirect("arhiv_baz",zaloga=zaloga, tip_baze="dnevna_prodaja")
+
+def dodaj_dnevne_prodaje(request,zaloga):
+    zacetek_str = request.POST.get('zacetek')
+    konec_str = request.POST.get('konec')
+    zacetek = datetime.datetime.strptime(zacetek_str,'%Y-%m-%d')
+    konec = datetime.datetime.strptime(konec_str,'%Y-%m-%d')
+    zaloga = Zaloga.objects.get(pk=zaloga)
+    prodaje = Dnevna_prodaja.objects.all().filter(zaloga=zaloga,datum__lte=konec, datum__gte=zacetek)
+    datum = zacetek
+    while datum <= konec:
+        if not prodaje.filter(datum=datum).exists():
+            Dnevna_prodaja.objects.create(zaloga=zaloga, datum=datum)
+        datum += datetime.timedelta(days=1)
+    url = reverse('arhiv_baz', args=[zaloga.pk,"dnevna_prodaja"])
+    url += "?zacetek=" + zacetek_str + "&konec=" + konec_str
+    print(url)
+    return redirect(url)
 
 ###########################################################################################
 ###########################################################################################

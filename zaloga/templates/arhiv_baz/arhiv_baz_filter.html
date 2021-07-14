@@ -19,4 +19,13 @@
         {% endif %}
         <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
     </form>
+
+    {% if tip == "dnevna_prodaja" %}
+        <form  action="{% url 'dodaj_dnevne_prodaje' zaloga_pk %}" method="POST">
+            {% csrf_token %}
+            <input type="date" class="skrit" value="{{zacetek}}" name="zacetek">
+            <input type="date" class="skrit" value="{{konec}}" name="konec">
+            <input type="submit" value="Dodaj prodaje">
+        </form>
+    {% endif %}
 </div>

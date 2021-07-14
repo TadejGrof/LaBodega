@@ -397,6 +397,14 @@ class Dnevna_prodaja(models.Model):
     def dan(self):
         return self.datum
 
+    def doloci_tip(self):
+        dan_v_tednu = self.datum.weekday()
+        if dan_v_tednu == 5 or dan_v_tednu == 6:
+            self.tip = "Vikend"
+        else:
+            self.tip = "Aktivno"
+        self.save()
+        
     def doloci_title(self):
         dan = str(self.datum.day)
         if len(dan) == 1:
@@ -477,6 +485,7 @@ class Dnevna_prodaja(models.Model):
 def create_dnevna_prodaja(sender, instance, created, **kwargs):
     if created:
         instance.doloci_title()
+        instance.doloci_tip()
         Baza.objects.create(
             zaloga = instance.zaloga,
             title = "Aktiven racun",

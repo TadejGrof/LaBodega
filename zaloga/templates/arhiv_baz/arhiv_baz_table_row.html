@@ -23,7 +23,7 @@
         <td> {{baza.skupno_stevilo}} </td>
         <td> {{baza.skupna_cena}} $ </td>
         <td> {% include 'forms/ogled_dnevne_prodaje_form.html' with prodaja=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %}</td>
-        {% if perms.admin.view_logentry %}
+        {% if perms.dnevna_prodaja.view_json %}
             <td>
                 <form action="{% url 'json_dnevne_prodaje' zaloga_pk baza.id %}">
                     <input type="submit" value="JSON">
@@ -56,7 +56,7 @@
         <td> {% include 'forms/baza_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk slovar=slovar jezik=jezik %} </td>  
         <td> {% include 'forms/pdf_baze_form.html' with tip=tip baza=baza.id zaloga=zaloga_pk select=False %} </td>
     {% endif %}
-    {% if tip != "dnevna_prodaja" and perms.admin.view_logentry %}
+    {% if tip != "dnevna_prodaja" and perms.baza.view_json %}
         <td>
             <form action="{% url 'json_baze' zaloga_pk baza.id %}">
                 <input type="submit" value="JSON">

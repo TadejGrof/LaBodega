@@ -477,6 +477,11 @@ class Dnevna_prodaja(models.Model):
     title = models.CharField(default="", max_length=20)
     tip = 'dnevna_prodaja'
 
+    class Meta:
+        permissions = [
+            ("view_json", "Can view JSON")
+        ]
+        
     @property
     def json(self):
         return {
@@ -584,6 +589,11 @@ class Baza(models.Model):
     ladijski_prevoz = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     placilo = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     
+    class Meta:
+        permissions = [
+            ("view_json", "Can view JSON")
+        ]
+
     @property
     def json(self):
         return {

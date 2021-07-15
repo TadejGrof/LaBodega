@@ -625,7 +625,7 @@ class Baza(models.Model):
                 vnosi_zaloge.append(vnos_zaloge)
         VnosZaloge.objects.bulk_update(vnosi_zaloge,["stanje"])  
 
-    def dodaj_vnos(self,sestavina,stevilo,cena_nakupa = None,cena_prodaje = None):
+    def dodaj_vnos(self,sestavina,stevilo,cena_prodaje = None,cena_nakupa = None,):
         vnos = Vnos.objects.create(sestavina=sestavina,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
         if self.status == 'veljavno':
             self.zaloga.nastavi_iz_vnosov(sestavina)

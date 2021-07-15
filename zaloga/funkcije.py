@@ -1,11 +1,38 @@
 import io
-from datetime import datetime
+import datetime
 import json 
 import os
 import shutil
 from program.models import Program
-from zaloga.models import Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
+from zaloga.models import Baza,Stranka,Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
 import json
+from django.contrib.auth.models import User
+
+def baza_from_json(baza_json):
+    if isinstance(baza_json,str):
+        baza_json = json.loads(baza_json)
+    baza = Baza.objects.create(
+        author = User.objects.all().get(id=baza_json['author']),
+        popust = baza_json['popust'],
+        prevoz = baza_json['prevoz'],
+        stranka = Stranka.objects.get(id=baza_json['stranka']) if baza_json['stranka'] != None else None,
+        sprememba_zaloge = baza_json['sprememba_zaloge'],
+        tip = baza_json['tip'],
+        title = baza_json['title'],
+        zaloga = Zaloga.objects.get(id=baza_json['zaloga']),
+        zalogaPrenosa = baza_json['zaloga_prenosa'],
+        status = baza_json['status'],
+        datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d')
+    )
+    for vnos in baza_json['vnosi']:
+        sestavina = Sestavina.objects.get(dimenzija_id=vnos['dimenzija'], tip__kratko=vnos['tip'])
+        stevilo = vnos['stevilo']
+        cena = vnos['cena']
+        baza.dodaj_vnos(sestavina,stevilo,cena)
+    return baza
+
+def dnevna_prodaja_from_json(prodaja_json):
+    return None
 
 def nastavi_cene():
     cene = []

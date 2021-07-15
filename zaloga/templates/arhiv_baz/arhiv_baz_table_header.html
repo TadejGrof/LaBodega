@@ -41,4 +41,7 @@
         <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th> 
         <th width="10%"> PDF: </th>
     {% endif %}
+    {% if perms.admin.view_logentry %}
+        <th width="10%"> JSON </th>
+    {% endif %}
 </tr>

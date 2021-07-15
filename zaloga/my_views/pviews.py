@@ -7,6 +7,10 @@ from django.utils import timezone
 from program.models import Program
 import json 
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
+from django.http import HttpResponse, JsonResponse
+
+def json_dnevne_prodaje(request, zaloga, dnevna_prodaja):
+    return JsonResponse(Dnevna_prodaja.objects.get(pk=dnevna_prodaja).json,safe=False)
 
 def dnevna_prodaja(request,zaloga):
     zaloga = Zaloga.objects.get(pk=zaloga)

@@ -478,6 +478,16 @@ class Dnevna_prodaja(models.Model):
     tip = 'dnevna_prodaja'
 
     @property
+    def json(self):
+        return {
+            'id':self.id,
+            'zaloga':self.zaloga.id,
+            'datum':str(self.datum),
+            'title':self.title,
+            'racuni':[racun.json for racun in self.baza_set.all()]
+        }
+
+    @property
     def stevilo_racunov(self):
         return self.racun_set.all().count()
 
@@ -574,6 +584,28 @@ class Baza(models.Model):
     ladijski_prevoz = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     placilo = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     
+    @property
+    def json(self):
+        return {
+            'tip':self.tip,
+            'sprememba_zaloge':self.sprememba_zaloge,
+            'author': self.author.id,
+            'id':self.id,
+            'zaloga':self.zaloga.id,
+            'datum': str(self.datum),
+            'title':self.title,
+            'status':self.status,
+            'popust':self.popust,
+            'cas':str(self.cas),
+            'prevoz': float(self.prevoz) if self.prevoz != None else None,
+            'kontejner': self.kontejner.id if self.kontejner != None else None,
+            'stranka': self.stranka.id if self.stranka != None else None,
+            'ladijski_prevot': float(self.ladijski_prevoz) if self.ladijski_prevoz != None else None,
+            'placilo': float(self.placilo) if self.placilo != None else None,
+            'zaloga_prenosa': self.zalogaPrenosa,
+            'vnosi':[vnos.json for vnos in self.vnos_set.all()]
+        }
+
     @property 
     def getZalogaPrenosa(self):
         return Zaloga.objects.get(id=self.zalogaPrenosa)
@@ -1045,6 +1077,16 @@ class Vnos(models.Model):
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
     sprememba = models.ForeignKey(Sprememba,default=None,null=True,blank=True,on_delete=models.CASCADE)
     cena_nakupa = models.DecimalField(decimal_places=2,max_digits=5,default=None,null=True,blank=True)
+
+    @property
+    def json(self):
+        return {
+            'dimenzija':self.dimenzija.id,
+            'tip':self.tip,
+            'stevilo':self.stevilo,
+            'cena':float(self.cena) if self.cena != None else None,
+            'cena_nakupa': float(self.cena_nakupa) if self.cena_nakupa != None else None
+        }
 
     @property
     def skupna_cena(self):

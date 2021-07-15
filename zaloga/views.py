@@ -15,7 +15,7 @@ from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
 from django.urls import reverse
 from .test import testiraj_stanja_zaklepov
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from . import database_functions
 
 #zaloga = Zaloga.objects.first()
@@ -363,6 +363,9 @@ def uveljavi_bazo(request,zaloga, tip_baze, pk):
 ############################################################################################
 ############################################################################################
 ############################################################################################
+@login_required
+def json_baze(request, zaloga, baza):
+    return JsonResponse(Baza.objects.get(pk=baza).json,safe=False)
 
 @login_required
 def arhiv(request,zaloga, tip_baze):

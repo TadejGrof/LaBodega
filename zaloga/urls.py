@@ -63,6 +63,7 @@ dnevna_prodaja_patterns = [
     path('', pviews.dnevna_prodaja, name="dnevna_prodaja"),
     path('nova_prodaja/', pviews.nova_dnevna_prodaja, name="nova_dnevna_prodaja"),
     path('nov_racun/', pviews.nov_racun, name="nov_racun"),
+    path('/json_dnevne_prodaje/<int:dnevna_prodaja>/', pviews.json_dnevne_prodaje, name="json_dnevne_prodaje"),
     path('uveljavi_racun/<int:pk_racuna>/', pviews.uveljavi_racun, name="uveljavi_racun"),
     path('arhiv/ogled/<int:pk_prodaje>/', pviews.ogled_dnevne_prodaje, name='ogled_dnevne_prodaje'),
     path('arhiv/ogled/<int:pk_prodaje>/pdf/<str:tip>/', pdf_views.pdf_dnevne_prodaje, name='pdf_dnevne_prodaje'),
@@ -101,6 +102,7 @@ urlpatterns = [
     path('<int:zaloga>/skupen_pregled_narocil/', include(skupen_pregled_patterns)),
     path('<int:zaloga>/dnevna_prodaja/',include(dnevna_prodaja_patterns)),
     path('<int:zaloga>/cenik/', include(cenik_patterns)),
+    path('<int:zaloga>/json_baze/<int:baza>/', views.json_baze, name="json_baze"),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
     

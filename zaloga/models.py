@@ -366,7 +366,6 @@ class VnosZaloge(models.Model):
 
 ###################################################################################################
 
-
 class Kontejner(models.Model):
     stevilka = models.CharField(default="", max_length=20)
     posiljatelj = models.CharField(default="", max_length=20, choices=POSILJATELJI)

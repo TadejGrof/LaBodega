@@ -468,6 +468,14 @@ class Kontejner(models.Model):
     posiljatelj = models.CharField(default="", max_length=20, choices=POSILJATELJI)
     drzava = models.CharField(default="", max_length=20, choices=DRZAVE)
 
+    @property
+    def json(self):
+        return {
+            'id':self.id,
+            'stevilka':self.stevilka,
+            "drzava": self.drzava,
+            "posiljatelj": self.posiljatelj
+        }
 ##################################################################################################
 
 class Dnevna_prodaja(models.Model):
@@ -608,9 +616,9 @@ class Baza(models.Model):
             'popust':self.popust,
             'cas':str(self.cas),
             'prevoz': float(self.prevoz) if self.prevoz != None else None,
-            'kontejner': self.kontejner.id if self.kontejner != None else None,
+            'kontejner': self.kontejner.json if self.kontejner != None else None,
             'stranka': self.stranka.id if self.stranka != None else None,
-            'ladijski_prevot': float(self.ladijski_prevoz) if self.ladijski_prevoz != None else None,
+            'ladijski_prevoz': float(self.ladijski_prevoz) if self.ladijski_prevoz != None else None,
             'placilo': float(self.placilo) if self.placilo != None else None,
             'zaloga_prenosa': self.zalogaPrenosa,
             'vnosi':[vnos.json for vnos in self.vnos_set.all()]

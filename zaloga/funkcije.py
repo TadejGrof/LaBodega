@@ -8,25 +8,43 @@ from zaloga.models import Baza,Kontejner,Stranka,Zaloga, TIPI_SESTAVINE, Sestavi
 import json
 from django.contrib.auth.models import User
 
+def baze_from_json(baze_json):
+    if isinstance(baze_json,str):
+        baze_json = json.loads(baze_json)
+    for baza_json in baze_json:
+        baza_from_json(baza_json)
+
+def dnevne_prodaje_from_json(prodaje_json):
+    if isinstance(prodaje_json,str):
+        prodaje_json = json.loads(prodaje_json):
+    for prodaja_json in prodaje_json:
+        dnevna_prodaja_from_json(prodaja_json)
+
+def exists_baza_from_json(baza_json):
+    return Baza.objects.filter(id = baza_json['id'], title = baza_json['title']).exists()
 
 def baza_from_json(baza_json):
     if isinstance(baza_json,str):
         baza_json = json.loads(baza_json)
-    baza = Baza.objects.create(
-        author = User.objects.all().get(id=baza_json['author']),
-        popust = baza_json['popust'],
-        prevoz = baza_json['prevoz'],
-        kontejner = kontejner_from_json(baza_json['kontejner']) if baza_json['kontejner'] != None else None,
-        stranka = Stranka.objects.get(id=baza_json['stranka']) if baza_json['stranka'] != None else None,
-        sprememba_zaloge = baza_json['sprememba_zaloge'],
-        tip = baza_json['tip'],
-        title = baza_json['title'],
-        zaloga = Zaloga.objects.get(id=baza_json['zaloga']),
-        zalogaPrenosa = baza_json['zaloga_prenosa'],
-        status = baza_json['status'],
-        datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d'),
-        placilo = baza_json['placilo']
-    )
+    if exists_baza_from_json(baza_json):
+        baza = Baza.objects.get(id=baza_json["id"])
+        baza.vnos_set.all().delete()
+    else:
+        baza = Baza.objects.create()
+    baza.author = User.objects.all().get(id=baza_json['author']),
+    baza.popust = baza_json['popust'],
+    baza.prevoz = baza_json['prevoz'],
+    baza.kontejner = kontejner_from_json(baza_json['kontejner']) if baza_json['kontejner'] != None else None,
+    baza.stranka = Stranka.objects.get(id=baza_json['stranka']) if baza_json['stranka'] != None else None,
+    baza.sprememba_zaloge = baza_json['sprememba_zaloge'],
+    baza.tip = baza_json['tip'],
+    baza.title = baza_json['title'],
+    baza.zaloga = Zaloga.objects.get(id=baza_json['zaloga']),
+    baza.zalogaPrenosa = baza_json['zaloga_prenosa'],
+    baza.status = baza_json['status'],
+    baza.datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d'),
+    baza.placilo = baza_json['placilo']
+    baza.save()
     for vnos in baza_json['vnosi']:
         sestavina = Sestavina.objects.get(dimenzija_id=vnos['dimenzija'], tip__kratko=vnos['tip'])
         stevilo = vnos['stevilo']
@@ -45,17 +63,16 @@ def dnevna_prodaja_from_json(prodaja_json):
     if isinstance(prodaja_json,str):
         prodaja_json = json.loads(prodaja_json)
     datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d')
-    prodaja = Dnevna_prodaja.objects.all().filter(datum=datum)
+    prodaja = Dnevna_prodaja.objects.all().filter(datum=datum).first()
     if prodaja == None:
         prodaja = Dnevna_prodaja.objects.create(
             datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d')
         )
-    prodaja.vnos_set.all().delete()
+    prodaja.baza_set.all().delete()
     for racun_json in prodaja_json["racuni"]:
         baza = baza_from_json(racun_json)
         baza.dnevna_prodaja = prodaja
         baza.save()
-
 
 def nastavi_cene():
     cene = []

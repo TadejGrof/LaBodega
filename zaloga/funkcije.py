@@ -16,33 +16,33 @@ def baze_from_json(baze_json):
 
 def dnevne_prodaje_from_json(prodaje_json):
     if isinstance(prodaje_json,str):
-        prodaje_json = json.loads(prodaje_json):
+        prodaje_json = json.loads(prodaje_json)
     for prodaja_json in prodaje_json:
         dnevna_prodaja_from_json(prodaja_json)
 
 def exists_baza_from_json(baza_json):
-    return Baza.objects.filter(id = baza_json['id'], title = baza_json['title']).exists()
+    return Baza.objects.filter(title = baza_json['title']).exists()
 
 def baza_from_json(baza_json):
     if isinstance(baza_json,str):
         baza_json = json.loads(baza_json)
     if exists_baza_from_json(baza_json):
-        baza = Baza.objects.get(id=baza_json["id"])
+        baza = Baza.objects.get(title=baza_json["title"])
         baza.vnos_set.all().delete()
     else:
         baza = Baza.objects.create()
-    baza.author = User.objects.all().get(id=baza_json['author']),
-    baza.popust = baza_json['popust'],
-    baza.prevoz = baza_json['prevoz'],
-    baza.kontejner = kontejner_from_json(baza_json['kontejner']) if baza_json['kontejner'] != None else None,
-    baza.stranka = Stranka.objects.get(id=baza_json['stranka']) if baza_json['stranka'] != None else None,
-    baza.sprememba_zaloge = baza_json['sprememba_zaloge'],
-    baza.tip = baza_json['tip'],
-    baza.title = baza_json['title'],
-    baza.zaloga = Zaloga.objects.get(id=baza_json['zaloga']),
-    baza.zalogaPrenosa = baza_json['zaloga_prenosa'],
-    baza.status = baza_json['status'],
-    baza.datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d'),
+    baza.author = User.objects.all().get(id=baza_json['author'])
+    baza.popust = baza_json['popust']
+    baza.prevoz = baza_json['prevoz']
+    baza.kontejner = kontejner_from_json(baza_json['kontejner']) if baza_json['kontejner'] != None else None
+    baza.stranka = Stranka.objects.get(id=baza_json['stranka']) if baza_json['stranka'] != None else None
+    baza.sprememba_zaloge = baza_json['sprememba_zaloge']
+    baza.tip = baza_json['tip']
+    baza.title = baza_json['title']
+    baza.zaloga = Zaloga.objects.get(id=baza_json['zaloga'])
+    baza.zalogaPrenosa = baza_json['zaloga_prenosa']
+    baza.status = baza_json['status']
+    baza.datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d')
     baza.placilo = baza_json['placilo']
     baza.save()
     for vnos in baza_json['vnosi']:

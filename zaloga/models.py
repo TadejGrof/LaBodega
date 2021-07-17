@@ -65,7 +65,6 @@ TIPI_BAZE = (
     ('racun','Racun'),
     ('narocilo','Narocilo'),
     ('prenos', 'Prenos med skladišči'),
-
 )
 
 TIPI_STROSKOV = (

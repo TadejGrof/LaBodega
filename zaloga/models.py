@@ -8,7 +8,7 @@ from django.utils import timezone
 from datetime import datetime
 import os
 from django.contrib.auth.models import User
-from prodaja.models import Prodaja, Stranka, Naslov
+from prodaja.models import Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.db.models.functions import Concat, Cast
@@ -374,7 +374,6 @@ class Kontejner(models.Model):
 
 class Dnevna_prodaja(models.Model):
     zaloga = models.ForeignKey(Zaloga, default=1, on_delete=models.CASCADE)
-    prodaja = models.ForeignKey(Prodaja, default=1, on_delete=models.CASCADE)
     datum = models.DateField(default=timezone.now)
     title = models.CharField(default="", max_length=20)
     tip = models.CharField(default="Aktivno",max_length=20,null=True,blank=True)

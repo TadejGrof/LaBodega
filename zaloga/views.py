@@ -368,6 +368,16 @@ def json_baze(request, zaloga, baza):
     return JsonResponse(Baza.objects.get(pk=baza).json,safe=False)
 
 @login_required
+def json_baz(request,zaloga,tip):
+    zacetek = datetime.datetime.strptime(request.GET.get("zacetek"),'%Y-%m-%d')
+    konec = datetime.datetime.strptime(request.GET.get("konec"),'%Y-%m-%d')
+    if tip == "dnevna_prodaja":
+        baze = Dnevna_prodaja.objects.filter(datum__lte=konec, datum__gte=zacetek)
+    else:
+        baze = Baza.objects.filter(datum__lte=konec, datum__gte=zacetek,tip=tip,status__in=["veljavno","aktivno"])
+    return HttpResponse(json.dumps([baza.json for baza in baze if request.GET.get(str(baza.id),False)]))
+
+@login_required
 def arhiv(request,zaloga, tip_baze):
     if request.method == "GET":
         danes = datetime.date.today().strftime('%Y-%m-%d')

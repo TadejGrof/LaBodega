@@ -1,7 +1,7 @@
 {% load zaloga_exstras %}
 
 <div class="filter" style="margin-top:3%">
-    <form action="{% url 'arhiv_baz' zaloga_pk tip %}" method="GET">
+    <form class="inline" action="{% url 'arhiv_baz' zaloga_pk tip %}" method="GET">
         {{slovar|keyvalue:'Od'|keyvalue:jezik}}: <input type="date" value="{{zacetek}}" name="zacetek">
         {{slovar|keyvalue:'Do'|keyvalue:jezik}}: <input type="date" value="{{konec}}" name="konec">
         {% if tip == "vele_prodaja" %}
@@ -19,4 +19,11 @@
         {% endif %}
         <input type="submit" value="{{slovar|keyvalue:'Filtriraj'|keyvalue:jezik}}">
     </form>
+    {% if perms.baza.view_json %}
+        <form id="json_baz" class="inline" action="{% url 'json_baz' zaloga_pk tip %}" method="GET">
+            <input type="submit" value="JSON BAZ">
+            <input type="date" hidden="hidden" name="zacetek" value={{zacetek}}>
+            <input type="date" hidden="hidden" name="konec" value={{konec}}>
+        </form>
+    {% endif %}
 </div>

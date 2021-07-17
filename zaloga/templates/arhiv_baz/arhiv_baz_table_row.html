@@ -9,6 +9,9 @@
     }
 </style>
 <tr>
+    {% if perms.admin.view_logentry %}
+        <td width="10%"> <input type="checkbox" form="json_baz" name="{{baza.id}}" > </td>
+    {% endif %}
     {% if tip == "vele_prodaja" %}
         <td> {{baza.title}} </td>
         <td> {{baza.naziv_stranke}} </td>

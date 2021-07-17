@@ -1,6 +1,9 @@
 {% load zaloga_exstras %}
 
 <tr class="header">
+    {% if perms.admin.view_logentry %}
+        <th width="10%"> JSON </th>
+    {% endif %}
     {% if tip == "vele_prodaja" %}
         <th width="13%">{{slovar|keyvalue:'Faktura'|keyvalue:jezik}}:</th>
         <th width="16%">{{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:</th>

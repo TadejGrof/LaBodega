@@ -102,6 +102,7 @@ urlpatterns = [
     path('<int:zaloga>/skupen_pregled_narocil/', include(skupen_pregled_patterns)),
     path('<int:zaloga>/dnevna_prodaja/',include(dnevna_prodaja_patterns)),
     path('<int:zaloga>/cenik/', include(cenik_patterns)),
+    path('<int:zaloga>/json_baz/<str:tip>/', views.json_baz, name="json_baz"),
     path('<int:zaloga>/json_baze/<int:baza>/', views.json_baze, name="json_baze"),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))

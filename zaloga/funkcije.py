@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 from program.models import Program
-from zaloga.models import Baza,Stranka,Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
+from zaloga.models import Baza,Kontejner,Stranka,Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
 import json
 from django.contrib.auth.models import User
 
@@ -16,7 +16,7 @@ def baza_from_json(baza_json):
         author = User.objects.all().get(id=baza_json['author']),
         popust = baza_json['popust'],
         prevoz = baza_json['prevoz'],
-        kontejen = kontejner_from_json(baza_json['kontejner']) if baza_json['kontejner'] != None else None,
+        kontejner = kontejner_from_json(baza_json['kontejner']) if baza_json['kontejner'] != None else None,
         stranka = Stranka.objects.get(id=baza_json['stranka']) if baza_json['stranka'] != None else None,
         sprememba_zaloge = baza_json['sprememba_zaloge'],
         tip = baza_json['tip'],
@@ -24,7 +24,8 @@ def baza_from_json(baza_json):
         zaloga = Zaloga.objects.get(id=baza_json['zaloga']),
         zalogaPrenosa = baza_json['zaloga_prenosa'],
         status = baza_json['status'],
-        datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d')
+        datum = datetime.datetime.strptime(baza_json['datum'],'%Y-%m-%d'),
+        placilo = baza_json['placilo']
     )
     for vnos in baza_json['vnosi']:
         sestavina = Sestavina.objects.get(dimenzija_id=vnos['dimenzija'], tip__kratko=vnos['tip'])
@@ -35,8 +36,8 @@ def baza_from_json(baza_json):
 
 def kontejner_from_json(kontejner_json):
     return Kontejner.objects.create(
-        stevilka = kontejner_json["stevilka"]
-        drzava = kontejner_json["drzava"]
+        stevilka = kontejner_json["stevilka"],
+        drzava = kontejner_json["drzava"],
         posiljatelj = kontejner_json["posiljatelj"]
     )
     

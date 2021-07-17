@@ -32,13 +32,13 @@ def vrni_slovar(request):
 def pokazi_stran(request, html, baze={}):
     je_stranka = False
     program = Program.objects.first()
-    zaloga = request.user.profil.aktivna_zaloga
+    zaloga = Zaloga.objects.get(id=request.user.profil.aktivna_zaloga)
     danasnja_prodaja = zaloga.danasnja_prodaja()
     print("DANJASNJA PRODAJA")
     print(danasnja_prodaja)
     if request.user.profil.stranka != None:
         je_stranka = True
-    slovar = {'danasnja_prodaja':danasnja_prodaja,'je_stranka':je_stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
+    slovar = {'zaloge':Zaloga.objects.all(),'danasnja_prodaja':danasnja_prodaja,'je_stranka':je_stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
     slovar.update(baze)
     if not 'zaloga' in baze:
         slovar.update({'zaloga':zaloga})

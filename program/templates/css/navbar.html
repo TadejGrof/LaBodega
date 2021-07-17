@@ -184,11 +184,11 @@
             <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
-        <button class="dropdown-btn"> {{user.profil.aktivna_zaloga.title}}
+        <button class="dropdown-btn"> {{zaloga.title}}
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            {% for skladisce in user.profil.dovoljene_zaloge.all %}
+            {% for skladisce in zaloge %}
                 <form id="myform_{{skladisce.pk}}" method="POST" action="{% url 'spremeni_zalogo' skladisce.pk %}">{% csrf_token %}</form>
                 <a href="#" onclick="document.getElementById('myform_{{skladisce.pk}}').submit()">{{skladisce.title}}</a>
             {% endfor %}  

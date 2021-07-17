@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from zaloga.models import Dimenzija,Sestavina, Zaloga
 from prodaja.models import Stranka
 from datetime import datetime
 
@@ -121,8 +120,7 @@ class Program(models.Model):
 class Profil(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     jezik =  models.CharField(default="spa",max_length=3, choices=JEZIKI)
-    aktivna_zaloga = models.ForeignKey(Zaloga, default=1, on_delete=models.CASCADE)
-    dovoljene_zaloge = models.ManyToManyField(Zaloga, related_name = "dovoljene")
+    aktivna_zaloga = models.IntegerField(default=0)
     stranka = models.OneToOneField(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
     celo_ime = models.CharField(default="",max_length=40)
     tip_banke = models.CharField(default="",max_length=40)
@@ -140,4 +138,20 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profil.save()
+
+class Drzava(models.Model):
+    naziv = models.CharField(max_length=30, default="")
+    kratica = models.CharField(max_length=5,default="")
+
+    def __str__(self):
+        return self.naziv
+        
+class Oseba(models.Model):
+    ime = models.CharField(max_length=3,default="/")
+    priimek = models.CharField(max_length=30,default="/")
+
+class Podjetje(models.Model):
+    naziv = models.CharField(max_length=30,default="/")
+    direktor = models.ForeignKey(Oseba, default=None,null=True,blank=True, on_delete=models.SET_NULL)
+    drzava = models.ForeignKey(Drzava,default=0,on_delete=models.CASCADE)
 

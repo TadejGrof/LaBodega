@@ -16,7 +16,7 @@ def ponastavi_zalogo(request):
 
 @login_required
 def home_page(request):
-    zaloga = request.user.profil.aktivna_zaloga
+    zaloga = Zaloga.objects.get(id=request.user.profil.aktivna_zaloga)
     prodaja = Prodaja.objects.first()
     stranke = prodaja.stranka_set.all().filter(status="aktivno").prefetch_related('baza_set').values(
         "pk",
@@ -68,7 +68,6 @@ def spremeni_jezik(request):
 @login_required
 def spremeni_zalogo(request, pk):
     if request.method == "POST":
-        zaloga = Zaloga.objects.get(pk = pk)
-        request.user.profil.aktivna_zaloga = zaloga
+        request.user.profil.aktivna_zaloga = pk
         request.user.save()
         return redirect('home_page')

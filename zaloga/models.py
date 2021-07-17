@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import datetime
 import os
 from django.contrib.auth.models import User
+from program.models import Drzava, Oseba, Podjetje
 from prodaja.models import Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
@@ -489,6 +490,12 @@ def create_dnevna_prodaja(sender, instance, created, **kwargs):
             tip='racun',
             dnevna_prodaja = instance,
             popust = 0 )
+
+class Dobavitelj(models.Model):
+    podjetje = models.OneToOneField(Podjetje,default=0,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.podjetje.naziv
 
 class Baza(models.Model):
     author = models.ForeignKey(User,default=1, on_delete=models.CASCADE)

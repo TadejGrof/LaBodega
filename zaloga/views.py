@@ -374,7 +374,11 @@ def json_baz(request,zaloga,tip):
     if tip == "dnevna_prodaja":
         baze = Dnevna_prodaja.objects.filter(datum__lte=konec, datum__gte=zacetek)
     else:
-        baze = Baza.objects.filter(datum__lte=konec, datum__gte=zacetek,tip=tip,status__in=["veljavno","aktivno"])
+        print(tip)
+        baze = Baza.objects.filter(datum__lte=konec, datum__gte=zacetek,tip=tip,status__in=["veljavno","zaklenjeno"])
+        print(baze)
+        print(baze)
+        print("TADEJ") if request.GET.get(str(baze[0].id)) else print("NAPAKA")
     return HttpResponse(json.dumps([baza.json for baza in baze if request.GET.get(str(baza.id),False)]))
 
 @login_required

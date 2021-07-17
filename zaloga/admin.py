@@ -1,10 +1,11 @@
 from django.contrib import admin
-from .models import Zaklep,Dimenzija, Sestavina, Zaloga, Vnos,Baza, Stroski_Group, Kontejner
+from .models import Zaklep,Dimenzija,Dobavitelj, Sestavina, Zaloga, Vnos,Baza, Stroski_Group, Kontejner
 from .models import TIPI_BAZE
 
 admin.site.register(Zaloga)
 admin.site.register(Dimenzija)
 admin.site.register(Sestavina)
+admin.site.register(Dobavitelj)
 
 class TipListFilter(admin.SimpleListFilter):
     title = ('tip baze')

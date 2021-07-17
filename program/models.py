@@ -145,7 +145,7 @@ class Drzava(models.Model):
 
     def __str__(self):
         return self.naziv
-        
+
 class Oseba(models.Model):
     ime = models.CharField(max_length=3,default="/")
     priimek = models.CharField(max_length=30,default="/")
@@ -155,3 +155,5 @@ class Podjetje(models.Model):
     direktor = models.ForeignKey(Oseba, default=None,null=True,blank=True, on_delete=models.SET_NULL)
     drzava = models.ForeignKey(Drzava,default=0,on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.naziv

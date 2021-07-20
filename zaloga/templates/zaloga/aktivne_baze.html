@@ -43,40 +43,25 @@
 
 <div class="okno">
     {% if tip == "prevzem" %}
-        <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
+        <table style="padding:1%;border:1px solid black" class="tabela_podatkov">
             <tr>
-                <th width="33%" colspan="2"> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}:</th>
-                <th width="42%" colspan="2">{{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}:</th>
-                <th width="25%" colspan="2"> User: </th>
+                <th width="50%" colspan="2"> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}:</th>
+                <th width="50%" colspan="2">{{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}:</th>
             </tr>
             <tr>
                 <td> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </td>
-                <td> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}} </td>
-                <td> {{slovar|keyvalue:'Stevilka'|keyvalue:jezik}} </td>
+                <td> {{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}: </td>
+                <td> {{slovar|keyvalue:'Stevilka'|keyvalue:jezik}}: </td>
                 <td> <input form="nova_baza" name="stevilka" type="text" required autocomplete="off"> </td>
-                <td> User: </td>
-                <td> {{user.username}} </td>
-            </tr>
-            <tr>
-                <td> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </td>
-                <td> {{program.naslednji_prevzem}} </td>
-                <td> {{slovar|keyvalue:'Izvor'|keyvalue:jezik}}: </td> 
-                <td>
-                    <select form="nova_baza" name="drzava">
-                        {% for drzava in zaloga.drzave %}
-                            <option value="{{drzava.0}}"> {{drzava.1}} </option>
-                        {% endfor %}
-                    </select>
-                </td>
             </tr>
             <tr>
                 <td> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
                 <td> {{zaloga.danes}} </td>
-                <td> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
-                <td> 
-                    <select form="nova_baza" name="posiljatelj">
-                        {% for posiljatelj in zaloga.posiljatelji %}
-                            <option value="{{posiljatelj.0}}"> {{posiljatelj.1}} </option>
+                <td> Dobavitelj: </td> 
+                <td>
+                    <select form="nova_baza" name="dobavitelj">
+                        {% for dobavitelj in dobavitelji %}
+                            <option value="{{dobavitelj.id}}"> {{dobavitelj.naziv}} </option>
                         {% endfor %}
                     </select>
                 </td>
@@ -228,7 +213,7 @@
                 <td> {{baza.naziv_stranke}} </td>
                 {% elif tip == "prevzem" %}
                 <td> {{baza.stevilka_kontejnerja}} </td>
-                <td> {{baza.drzava}} </td>
+                <td> {{baza.drzava_dobavitelja}} </td>
                 {% elif tip == "prenos" %}
                 <td> {{baza.zaloga_prenosa}} </td>
                 {% endif %}

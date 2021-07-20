@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Sum
-from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, VnosZaloge
+from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, VnosZaloge, Dobavitelj
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
@@ -112,23 +112,25 @@ def dodaj_dimenzijo(request):
 def baze(request,zaloga,tip_baze):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk = zaloga)
-        baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno')
-        values = database_functions.baze_values(baze)
+        baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno').all_values()
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
         zaloge = Zaloga.objects.all()
-        skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
-        skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
-        skupen_ladijski_prevoz = values.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
-        
+        skupno_stevilo = baze.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
+        skupna_cena = baze.aggregate(cena = Sum("koncna_cena"))["cena"]
+        skupen_ladijski_prevoz = baze.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
+        dobavitelji = None
+        if tip_baze == "prevzem":
+            dobavitelji = Dobavitelj.objects.all().all_values()
         slovar = {
             'zaloge':zaloge,
             'zaloga': zaloga,
             'tip': tip_baze,
-            'baze':values,
+            'baze':baze,
             'stranke':stranke,
             'skupno_stevilo':skupno_stevilo,
             'skupna_cena':skupna_cena,
-            'skupen_ladijski_prevoz': skupen_ladijski_prevoz
+            'skupen_ladijski_prevoz': skupen_ladijski_prevoz,
+            'dobavitelji':dobavitelji
             }
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
 

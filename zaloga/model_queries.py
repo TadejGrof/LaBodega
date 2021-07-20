@@ -4,11 +4,11 @@ from django.db.models import F,Value,Subquery, Count, OuterRef, Sum, When, Case,
 from django.db.models.functions import Concat,Cast, Coalesce, Round
 
 class BazaQuerySet(models.QuerySet):
-    def aktivne_baze(self, zaloga):
-        return self.filter(zaloga=zaloga, status="aktivno")
+    def aktivne_baze(self, tip, zaloga):
+        return self.filter(zaloga=zaloga,tip=tip, status="aktivno")
 
-    def cakajoce_baze(self, zaloga):
-        return self.filter(zaloga=zaloga, status="cakajoce")
+    def cakajoce_baze(self,tip, zaloga):
+        return self.filter(zaloga=zaloga,tip=tip, status="cakajoce")
 
     def author_values(self):
         return self \
@@ -17,12 +17,13 @@ class BazaQuerySet(models.QuerySet):
 
     def dobavitelj_values(self):
         return self \
-        .annotate(naziv_dobavitelja = Coalesce(F("dobavitelj__naziv"),Value(""))) \
-        .annotate(telefon_dobavitelja = Coalesce(F("dobavitelj__telefon"),Value(""))) \
-        .annotate(email_dobavitelja = Coalesce(F("dobavitelj__mail"),Value(""))) \
-        .annotate(ulica_dobavitelja = Coalesce(F("dobavitelj__ulica"),Value(""))) \
-        .annotate(status_dobavitelja = Coalesce(F("dobavitelj__status"),Value(""))) \
-        .annotate(davcna_dobavitelja = Coalesce(F("dobavitelj__davcna"),Value(""))) 
+        .annotate(naziv_dobavitelja = Coalesce(F("dobavitelj__podjetje__naziv"),Value(""))) \
+        .annotate(drzava_dobavitelja = Coalesce(F("dobavitelj__podjetje__drzava__naziv"),Value(""))) 
+        #.annotate(telefon_dobavitelja = Coalesce(F("dobavitelj__telefon"),Value(""))) \
+        #.annotate(email_dobavitelja = Coalesce(F("dobavitelj__mail"),Value(""))) \
+        #.annotate(ulica_dobavitelja = Coalesce(F("dobavitelj__ulica"),Value(""))) \
+        #.annotate(status_dobavitelja = Coalesce(F("dobavitelj__status"),Value(""))) \
+        #.annotate(davcna_dobavitelja = Coalesce(F("dobavitelj__davcna"),Value(""))) 
 
     def stranka_values(self):
         return self \
@@ -30,14 +31,14 @@ class BazaQuerySet(models.QuerySet):
         .annotate(telefon_stranke = Coalesce(F("stranka__telefon"),Value(""))) \
         .annotate(email_stranke = Coalesce(F("stranka__mail"),Value(""))) \
         .annotate(ime_stranke = Coalesce(F("stranka__ime"),Value(""))) \
-        .annotate(ulica_stranke = Coalesce(F("stranka__ulica"),Value(""))) \
         .annotate(status_stranke = Coalesce(F("stranka__status"),Value(""))) \
-        .annotate(davcna_stranke = Coalesce(F("stranka__davcna"),Value(""))) 
+        .annotate(davcna_stranke = Coalesce(F("stranka__davcna"),Value("")))
+        #.annotate(ulica_stranke = Coalesce(F("stranka__ulica"),Value(""))) \
 
     def skupno_values(self):
         return self \
         .annotate(skupno_stevilo = Coalesce(Sum("vnos__stevilo"),0)) \
-        .annotate(skupna_cena = Coalesce(Sum(F("vnos__stevilo") * Coalesce(F("vnos__cena_prodaje"),0), output_field=FloatField()),0)) \
+        .annotate(skupna_cena = Coalesce(Sum(F("vnos__stevilo") * Coalesce(F("vnos__cena"),0), output_field=FloatField()),0)) \
         .annotate(skupna_cena_nakupa = Sum(F("vnos__stevilo") * Coalesce(F("vnos__cena_nakupa"),0), output_field=FloatField())) \
         .annotate(razlika = F("skupna_cena") - F("skupna_cena_nakupa")) \
         .annotate(cena_popusta = Round(F("skupna_cena") * Coalesce(F("popust"),0) / Value(100), output_field=FloatField())) \
@@ -46,12 +47,19 @@ class BazaQuerySet(models.QuerySet):
 
     def all_values(self):
         return self \
-            .annotate(tip = F("proxy_name")) \
+            .annotate(stevilka_kontejnerja = Coalesce(F("kontejner__stevilka"),Value(""))) \
+            .annotate(ladijski_prevoz_value = Coalesce(F("ladijski_prevoz"),0)) \
             .dobavitelj_values() \
             .stranka_values() \
             .author_values() \
             .skupno_values() \
             .values() 
+
+class DobaviteljQuerySet(models.QuerySet):
+    def all_values(self):
+        return self \
+            .annotate(naziv=F("podjetje__naziv")) \
+            .values()
 
 class CenaQuerySet(models.QuerySet):
     def all_values(self):

@@ -17,7 +17,7 @@ from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
-from .model_queries import VnosZalogeQuerySet, VnosQuerySet, SestavinaQuerySet
+from .model_queries import VnosZalogeQuerySet, VnosQuerySet, SestavinaQuerySet, BazaQuerySet, DobaviteljQuerySet
 
 
 TIPI_SESTAVINE = (
@@ -492,6 +492,8 @@ def create_dnevna_prodaja(sender, instance, created, **kwargs):
 class Dobavitelj(models.Model):
     podjetje = models.OneToOneField(Podjetje,default=0,on_delete=models.CASCADE)
 
+    objects = DobaviteljQuerySet.as_manager()
+
     def __str__(self):
         return self.podjetje.naziv
 
@@ -503,6 +505,7 @@ class Baza(models.Model):
     status = models.CharField(default="aktivno",max_length=10)
     sprememba_zaloge = models.IntegerField(default = -1)
     tip = models.CharField(default="prevzem",max_length=20, choices=TIPI_BAZE)
+    stevilka = models.IntegerField
     dobavitelj = models.ForeignKey(Dobavitelj,null=True,default=None,blank=True, on_delete=models.CASCADE)
     kontejner = models.OneToOneField(Kontejner,null=True,default=None,blank=True, on_delete=models.CASCADE)
     popust = models.IntegerField(default = None, null=True, blank=True)
@@ -515,6 +518,8 @@ class Baza(models.Model):
     ladijski_prevoz = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     placilo = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     
+    objects = BazaQuerySet.as_manager()
+
     @property 
     def getZalogaPrenosa(self):
         return Zaloga.objects.get(id=self.zalogaPrenosa)

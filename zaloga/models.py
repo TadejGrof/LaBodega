@@ -501,11 +501,12 @@ class Baza(models.Model):
     author = models.ForeignKey(User,default=1, on_delete=models.CASCADE)
     title = models.CharField(default="",max_length=15)
     datum = models.DateField(default=timezone.now)
+    cas_uveljavitve = models.DateTimeField(default=timezone.now)
     zaloga = models.ForeignKey(Zaloga, default=1 ,on_delete=models.CASCADE)
     status = models.CharField(default="aktivno",max_length=10)
     sprememba_zaloge = models.IntegerField(default = -1)
     tip = models.CharField(default="prevzem",max_length=20, choices=TIPI_BAZE)
-    stevilka = models.IntegerField
+    stevilka = models.IntegerField(default=0)
     dobavitelj = models.ForeignKey(Dobavitelj,null=True,default=None,blank=True, on_delete=models.CASCADE)
     kontejner = models.OneToOneField(Kontejner,null=True,default=None,blank=True, on_delete=models.CASCADE)
     popust = models.IntegerField(default = None, null=True, blank=True)

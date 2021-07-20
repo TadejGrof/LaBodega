@@ -1,21 +1,22 @@
 from django.test import TestCase
 
-from .models import Zaloga, Sestavina, Dimenzija, Zaklep
+from program.models import Drzava
+from .models import Zaloga, Sestavina, Dimenzija, Zaklep, Dobavitelj, Baza
 
+def nastavi_dobavitelje():
+    prevzemi = Baza.objects.all().filter(tip="prevzem")
+    for prevzem in prevzemi:
+        if prevzem.kontejner != None:
+            upper = prevzem.kontejner.drzava.upper()
+            try:
+                drzava = Drzava.objects.get(kratica=upper)
+            except:
+                print(upper)
+                drazava = Drzava.objects.get(kratica="SLO")
+            try:
+                dobavitelj = Dobavitelj.objects.get(podjetje__drzava=drzava)
+                prevzem.dobavitelj = dobavitelj
+                prevzem.save()
+            except:
+                print("NAPAKA")
 
-def preveriZaklepZaloge():
-    for zaloga in Zaloga.objects.all():
-        zaklep = zaloga.zaklep_zaloge
-        stanja = zaklep.stanja
-        for sestavina in zaloga.sestavina_set.all():
-            if str(sestavina.pk) not in stanja:
-                print(sestavina.dimenzija.dimenzija)
-
-def preveriInNastaviZaklepZaloge():
-    for zaloga in Zaloga.objects.all():
-        zaklep = zaloga.zaklep_zaloge
-        stanja = zaklep.stanja
-        for sestavina in zaloga.sestavina_set.all():
-            if str(sestavina.pk) not in stanja:
-                for tip in zaloga.vrni_tipe:
-                    zaklep.nastavi_stanje(sestavina,tip[0])

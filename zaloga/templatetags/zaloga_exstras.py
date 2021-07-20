@@ -21,6 +21,10 @@ def zadnji(list):
     return list[-1] 
 
 @register.filter
+def datum(datetime):
+    return datetime.date()
+    
+@register.filter
 def getDayOfWeek(datum):
     dnevi = ["Ponedeljek","Torek","Sreda","Četrtek","Petek","Sobota","Nedelja"]
     return dnevi[datum.weekday()]

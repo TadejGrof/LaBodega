@@ -2,9 +2,9 @@
 
 <tr class="header">
     {% if tip == "vele_prodaja" %}
-        <th width="13%">{{slovar|keyvalue:'Faktura'|keyvalue:jezik}}:</th>
+        <th width="12%">{{slovar|keyvalue:'Faktura'|keyvalue:jezik}}:</th>
         <th width="16%">{{slovar|keyvalue:'Stranka'|keyvalue:jezik}}:</th>
-        <th width="18%">{{slovar|keyvalue:'Datum'|keyvalue:jezik}}:</th>
+        <th width="20%">{{slovar|keyvalue:'Datum'|keyvalue:jezik}}:</th>
         <th width="18%">{{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </th>
         <th width="18%">{{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:</th>
         <th width="18%"> Placano: </th>
@@ -23,17 +23,17 @@
         <th width="15%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>   
         <th width="15%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th> 
     {% elif tip == "prevzem" %}
-        <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
-        <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
-        <th width="12%">{{slovar|keyvalue:'Tip'|keyvalue:jezik}}:</th> 
+        <th width="24%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
+        <th width="16%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+        <th width="10%">{{slovar|keyvalue:'Tip'|keyvalue:jezik}}:</th> 
         <th width="12%">{{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}</th>  
-        <th width="12%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>
+        <th width="10%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>
         <th width="15%">Cena nakupa:</th> 
         <th width="15%">Cena prodaje:</th>
         <th width="15%"> Stroški: </th>     
         <th width="15%">Zasluzek:</th>     
-        <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
-        <th width="10%"> PDF: </th> 
+        <th width="8%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
+        <th width="8%"> PDF: </th> 
     {% elif tip == "inventura" %}
         <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
         <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th> 

@@ -319,12 +319,12 @@ def arhiv(request,zaloga, tip_baze):
             baze = Dnevna_prodaja.objects.filter(zaloga=zaloga,datum__gte=zacetek, datum__lte=konec).prefetch_related('baza_set').order_by('-datum')
             baze = database_functions.dnevne_prodaje_values(baze)
         else:
-            baze = Baza.objects.filter(zaloga=zaloga,tip=tip_baze,status__in =['veljavno','zaklenjeno'],datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-datum','-cas')
+            baze = Baza.objects.filter(zaloga=zaloga,tip=tip_baze,status__in =['veljavno','zaklenjeno'],datum__gte=zacetek, datum__lte=konec).prefetch_related('vnos_set','stranka').order_by('-cas_uveljavitve')
             stranka = request.GET.get('stranka','all')
             if tip_baze == "vele_prodaja" and stranka != "all":
                 stranka = int(stranka)
                 baze = baze.filter(stranka__id = stranka)
-            baze = database_functions.baze_values(baze)
+            baze = baze.all_values()
         try:
             values["stevilo_baz"] = baze.count()
             values["skupno_stevilo"] = baze.aggregate(stevilo=Coalesce(Sum("skupno_stevilo"),0))["stevilo"]

@@ -158,11 +158,9 @@ class Sestavina(models.Model):
 class Cena(models.Model):
     sestavina = models.ForeignKey(Sestavina, default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=0)
-    
+
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
-    tipi_prodaje = models.CharField(default='["vele_prodaja"]', max_length=50)
-    tipi_sestavine = models.CharField(default='["Y","W","JP","JP50","JP70"]', max_length=50)
     tipi_sestavin = models.ManyToManyField(Tip)
     sestavine = models.ManyToManyField(Sestavina)
     cenik = models.ManyToManyField(Cena)
@@ -180,10 +178,7 @@ class Zaloga(models.Model):
 
     @property
     def vrni_razlicne_radiuse(self):
-        razlicni_radiusi = []
-        for radius in self.sestavine.values('dimenzija__radius').distinct().order_by('dimenzija__radius'):
-                razlicni_radiusi.append(radius['dimenzija__radius'])
-        return razlicni_radiusi
+        return [value["dimenzija__radius"] for value in self.sestavine.values('dimenzija__radius').distinct().order_by('dimenzija__radius')]
 
     def zaloga_na_datum(self,sestavina,datum):
         stanje = 0
@@ -227,88 +222,13 @@ class Zaloga(models.Model):
         return TIPI_STROSKOV
 
     @property
-    def drzave(self):
-        return DRZAVE
-    
-    @property
-    def posiljatelji(self):
-        return POSILJATELJI
-
-    def vrni_dimenzijo(self,radius,height,width):
-        special = False
-        if "C" in width:
-            special = True
-            width = width[:-1]
-        return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
- 
-    @property
-    def vrni_zalogo(self):
-        return self.sestavine.all().order_by("dimenzija")\
-        .values().annotate(radius = F("dimenzija__radius"),dim = F("dimenzija__dimenzija"))
-
-    @property
     def vrni_sestavine(self):
         return self.sestavina_set.all()
 
-    @property
-    def zaklep_zaloge(self):
-        return self.zaklep_set.all().first()
-
-    @property
-    def datum_zaklepa(self):
-        return self.zaklep_zaloge.datum
-
-
-class Zaklep(models.Model):
-    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
-    datum = models.DateField(default=now)
-    stanja_json = models.TextField(default="{}")
-
-    class Meta:
-        ordering = ['-datum']
-
-    @property
-    def stanja(self):
-        return json.loads(self.stanja_json)
-
-    def vrni_stanje(self,sestavina,tip):
-        stanja = self.stanja
-        return stanja[str(sestavina.pk)][tip]
-
-    def remove_key(self,key):
-        stanja = self.stanja
-        stanja.pop(key,None)
-        self.stanja_json = json.dumps(stanja)
-        self.save()
-
-    def nastavi_stanje(self,sestavina,tip,stanje = 0):
-        stanja = self.stanja
-        if str(sestavina.pk) in stanja:
-            stanja[str(sestavina.pk)][tip] = stanje
-        else:
-            stanja[str(sestavina.pk)] = {tip:stanje}
-        self.stanja_json = json.dumps(stanja)
-        self.save()
-        return stanja
-
-@receiver(post_save, sender=Zaklep)
-def create_zaklep(sender, instance, created, **kwargs):
-    if created:
-        baze = instance.zaloga.baza_set.all().filter(status = "veljavno", datum__lte = instance.datum)
-        for baza in baze:
-            baza.status = "zaklenjeno"
-        Baza.objects.bulk_update(baze,["status"])
-
 
 class Zaposleni(models.Model):
+    oseba = models.OneToOneField(Oseba,default=None,blank=True,null=True,on_delete=models.CASCADE)
     user = models.OneToOneField(User,default=None,blank=True,null=True,on_delete=models.CASCADE)
-    zaloga = models.ForeignKey(Zaloga,default=1,on_delete=models.CASCADE)
-    ime = models.CharField(default="/",max_length=20)
-    priimek = models.CharField(default="/",max_length=20)
-    davcna = models.CharField(default="/", max_length=30)
-    naslov = models.OneToOneField(Naslov, default=None, on_delete=models.CASCADE, null=True, blank=True)
-    telefon = models.CharField(default="/", max_length=20)
-    mail = models.CharField(default="/", max_length=40)
 
 ##################################################################################################
 

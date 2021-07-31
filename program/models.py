@@ -149,6 +149,12 @@ class Drzava(models.Model):
 class Oseba(models.Model):
     ime = models.CharField(max_length=3,default="/")
     priimek = models.CharField(max_length=30,default="/")
+    davcna = models.CharField(default="/", max_length=30)
+    telefon = models.CharField(default="/", max_length=20)
+    mail = models.CharField(default="/", max_length=40)
+    ulica = models.CharField(default="/", max_length=40)
+    mesto = models.CharField(default="/", max_length=40)
+    drzava = models.ForeignKey(Drzava, default=None,null=True, on_delete=models.CASCADE)
 
 class Podjetje(models.Model):
     naziv = models.CharField(max_length=30,default="/")

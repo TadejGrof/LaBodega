@@ -14,7 +14,6 @@ from . import funkcije
 from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
 from program.models import Program
 from django.urls import reverse
-from .test import testiraj_stanja_zaklepov
 from django.http import HttpResponse
 from . import database_functions
 
@@ -99,7 +98,6 @@ def dodaj_dimenzijo(request):
             height = height,
             width = width,
             special = special)
-        testiraj_stanja_zaklepov()
         return redirect('nova_dimenzija')
     else:
         return pokazi_stran(request, 'zaloga/dodaj_dimenzijo.html')

@@ -4,8 +4,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.timezone import make_aware
 
-from datetime import datetime
+from datetime import datetime, time
 import os
 from django.contrib.auth.models import User
 from program.models import Drzava, Oseba, Podjetje
@@ -37,26 +38,6 @@ TIPI_CEN = (
         ('prodaja', 'Prodaja'),
         ('nakup', 'Nakup')
     )
-
-
-POSILJATELJI = (
-    ('bozo', 'Bozo'),
-    ('japan', 'Japan'),
-    ('poland',"Poland"),
-    ('sweden',"Sweden"),
-    ('zoki',"Zoki"),
-)
-
-DRZAVE = (
-    ('slo', 'Slovenia'),
-    ('jap', 'Japan'),
-    ('pol', 'Poland'),
-    ('ang', 'England'),
-    ('kor', 'Korea'),
-    ('pan', 'Panama'),
-    ('swe',"Sweden"),
-    ('sui',"Switzerland")
-)
 
 TIPI_BAZE = (
     ('inventura', 'Inventura'),
@@ -177,10 +158,6 @@ class Sestavina(models.Model):
 class Cena(models.Model):
     sestavina = models.ForeignKey(Sestavina, default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=0)
-    nacin = models.CharField(max_length=10, choices=TIPI_CEN, default="prodaja")
-    tip = models.CharField(max_length=4, choices=TIPI_SESTAVINE, default="Y")
-    prodaja = models.CharField(max_length=15, choices=TIPI_PRODAJE, null=True, blank=True, default=None)
-    drzava = models.CharField(max_length=15, choices=DRZAVE, null=True,blank=True,default=None)
     
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
@@ -210,7 +187,7 @@ class Zaloga(models.Model):
 
     def zaloga_na_datum(self,sestavina,datum):
         stanje = 0
-        vnosi = sestavina.vnos_set.all().filter(baza__datum__lte=datum,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
+        vnosi = sestavina.vnos_set.all().filter(baza__odprema_blaga__lte=datum,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("odprema_blaga")
         for vnos in vnosi:
             if vnos["sprememba_zaloge"] == 0:
                 stanje = vnos["stevilo"]
@@ -223,7 +200,7 @@ class Zaloga(models.Model):
 
     def vrni_stanja(self,sestavina,zacetek,konec):
         zaporedna_stanja = []
-        vnosi = sestavina.vnos_set.all().filter(baza__datum__gte=zacetek,baza__datum__lte=konec,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
+        vnosi = sestavina.vnos_set.all().filter(baza__odprema_blaga__gte=zacetek,baza__odprema_blaga__lte=konec,baza__zaloga=self,baza__status__in=["zaklenjeno","veljavno"]).exclude(baza__tip="narocilo").all_values().order_by("datum")
         stanje = self.zaloga_na_datum(sestavina,zacetek)
         for vnos in vnosi:
             if vnos["sprememba_zaloge"] == 0:
@@ -501,7 +478,8 @@ class Baza(models.Model):
     author = models.ForeignKey(User,default=1, on_delete=models.CASCADE)
     title = models.CharField(default="",max_length=15)
     datum = models.DateField(default=timezone.now)
-    cas_uveljavitve = models.DateTimeField(default=timezone.now)
+    odprema_blaga = models.DateTimeField(default=timezone.now)
+    uveljavitev = models.DateTimeField(default=timezone.now)
     zaloga = models.ForeignKey(Zaloga, default=1 ,on_delete=models.CASCADE)
     status = models.CharField(default="aktivno",max_length=10)
     sprememba_zaloge = models.IntegerField(default = -1)
@@ -526,6 +504,22 @@ class Baza(models.Model):
 
     def __str__(self):
         return self.title
+
+    def nastavi_cas_odpreme(self,datum = None):
+        if datum == None:
+            if self.tip == "racun":
+                datum = self.dnevna_prodaja.datum
+            else:
+                datum = self.datum
+        if self.tip in ["prevzem","prenos"]:
+            cas = time(8,0,0)
+        elif self.tip == "inventura":
+            cas = time(20,0,0)
+        elif self.tip == "racun":
+            cas = self.uveljavitev.time()
+        else:
+            cas = time(12,0,0)
+        self.odprema_blaga = make_aware(datetime.combine(datum,cas))
 
     #def save(self, *args, **kwargs):
     #    baza = Baza.objects.get(pk = self.pk)

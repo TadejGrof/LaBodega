@@ -22,7 +22,7 @@ class TipListFilter(admin.SimpleListFilter):
 
 @admin.register(Baza)
 class BazaAdmin(admin.ModelAdmin):
-    list_display = ('title','status','zaloga', 'tip', 'datum','stranka','kontejner','dnevna_prodaja','zalogaPrenosa')
+    list_display = ('title','status','zaloga', 'tip', 'uveljavitev','odprema_blaga','stranka','kontejner','dnevna_prodaja','zalogaPrenosa')
     list_filter = (TipListFilter,"zaloga","stranka",)
 
 admin.site.register(Zaklep)

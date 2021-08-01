@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Sum
-from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, VnosZaloge, Dobavitelj
+from .models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Dobavitelj
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
@@ -20,57 +20,6 @@ from . import database_functions
 #zaloga = Zaloga.objects.first()
 
 ##################################################################################################
-
-@login_required
-def pregled_zaloge(request,zaloga):
-    if request.method == "GET":
-        zaloga = Zaloga.objects.get(pk = zaloga)
-        vnosi_zaloge = VnosZaloge.objects.filter(zaloga=zaloga)
-        sestavine = vnosi_zaloge.all_values()
-        if nicelne == "false":
-            sestavine = sestavine.exclude(stanje=0)
-        slovar = {
-            'zaloga':zaloga,
-            'sestavine':sestavine
-        }
-        return pokazi_stran(request, 'zaloga/zaloga.html', slovar)
-
-@login_required
-def pregled_prometa(request,tip,pk):
-    if request.method == "GET":
-        sestavina = Sestavina.objects.get(pk=pk)
-        zaklep = sestavina.zaklep_zaloge
-        cene_prodaje = Cena.objects.filter(sestavina=sestavina, prodaja__in = ['dnevna_prodaja','vele_prodaja'], tip=tip)
-        danes = datetime.date.today().strftime('%Y-%m-%d')
-        pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
-        zacetek_sprememb = request.GET.get('zacetek_sprememb', pred_mescem)
-        konec_sprememb = request.GET.get('konec_sprememb', danes)
-        spremembe = sestavina.sprememba_set.filter(baza__datum__gt = zacetek_sprememb, baza__datum__lte=konec_sprememb, tip = tip).order_by('-baza__datum','-baza__cas').select_related('baza')
-        zaporedna_stanja = sestavina.vrni_stanja(tip,zacetek_sprememb,konec_sprememb)[::-1]
-        zacetek_dp = request.GET.get('zacetek_dp', pred_mescem)
-        konec_dp = request.GET.get('konec_dp', danes)
-        zacetek_vp = request.GET.get('zacetek_vp', pred_mescem)
-        konec_vp = request.GET.get('konec_vp', danes)
-        dp_stevilo, dp_cena = sestavina.prodaja('racun',tip, zacetek_dp, konec_dp)
-        vp_stevilo, vp_cena = sestavina.prodaja('vele_prodaja',tip, zacetek_vp, konec_vp)
-        slovar = {
-            'zaporedna_stanja': zaporedna_stanja,
-            'tip': tip,
-            'sestavina': sestavina,
-            'cene_prodaje':cene_prodaje,
-            'spremembe': spremembe,
-            'zacetek_sprememb': zacetek_sprememb,
-            'zacetek_dp': zacetek_dp,
-            'zacetek_vp': zacetek_vp,
-            'konec_sprememb': konec_sprememb,
-            'konec_dp': konec_dp,
-            'konec_vp': konec_vp,
-            'dp_stevilo': dp_stevilo,
-            'dp_cena': dp_cena,
-            'vp_stevilo': vp_stevilo,
-            'vp_cena': vp_cena
-        }
-    return pokazi_stran(request, 'zaloga/pregled_prometa.html', slovar)
 
 @login_required
 def sprememba_cene(request,tip,pk,cena):
@@ -215,9 +164,8 @@ def poravnava_dolga(request, zaloga, baza):
 def baza(request,zaloga, tip_baze, pk):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk=zaloga)
-        baza_query = Baza.objects.filter(pk = pk)
-        baza = baza_query[0]
-        baza_values = database_functions.baze_values(baza_query)[0]
+        baza = Baza.objcts.get(pk=pk)
+        baza_values = baza.all_values()
         vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
         sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)
         dimenzije = Dimenzija.objects.all().values("dimenzija","id")
@@ -234,11 +182,6 @@ def baza(request,zaloga, tip_baze, pk):
             "values": baza_values}
         return pokazi_stran(request, 'baza/baza.html',slovar)
     
-
-def poskus(request):
-    print("tadej")
-    return HttpResponse("TADEJ")
-
 @login_required
 def vnosi_iz_datoteke(request,zaloga,tip_baze, pk):
     zaloga = Zaloga.objects.get(pk=zaloga)

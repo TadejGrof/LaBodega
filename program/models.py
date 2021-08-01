@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from prodaja.models import Stranka
 from datetime import datetime
+from .model_queries import ModelQuerySet
 
 JEZIKI = (
     ('slo','Slovenscina'),
@@ -11,7 +12,19 @@ JEZIKI = (
     ('spa', 'Spanscina'),
 )
 
-class Program(models.Model):
+class BasicModel(models.Model):
+    class Meta:
+        abstract = True
+
+    objects = ModelQuerySet.as_manager()
+    
+    def query(self):
+        return self.__class__.objects.filter(id=self.id)
+
+    def all_values(self):
+        return self.query().all_values()[0]
+
+class Program(BasicModel):
     stevilo_prevzemov = models.IntegerField(default = 0)
     stevilo_odpisov = models.IntegerField(default = 0)
     stevilo_faktur = models.IntegerField(default = 0)
@@ -113,11 +126,7 @@ class Program(models.Model):
             width = width[:-1]
         return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
 
-    @property
-    def vrni_dimenzije(self):
-        return Dimenzija.objects.all().values_list('dimenzija','radius','height','width','special')
-
-class Profil(models.Model):
+class Profil(BasicModel):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     jezik =  models.CharField(default="spa",max_length=3, choices=JEZIKI)
     aktivna_zaloga = models.IntegerField(default=0)
@@ -139,14 +148,14 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profil.save()
 
-class Drzava(models.Model):
+class Drzava(BasicModel):
     naziv = models.CharField(max_length=30, default="")
     kratica = models.CharField(max_length=5,default="")
 
     def __str__(self):
         return self.naziv
 
-class Oseba(models.Model):
+class Oseba(BasicModel):
     ime = models.CharField(max_length=3,default="/")
     priimek = models.CharField(max_length=30,default="/")
     davcna = models.CharField(default="/", max_length=30)
@@ -156,7 +165,7 @@ class Oseba(models.Model):
     mesto = models.CharField(default="/", max_length=40)
     drzava = models.ForeignKey(Drzava, default=None,null=True, on_delete=models.CASCADE)
 
-class Podjetje(models.Model):
+class Podjetje(BasicModel):
     naziv = models.CharField(max_length=30,default="/")
     direktor = models.ForeignKey(Oseba, default=None,null=True,blank=True, on_delete=models.SET_NULL)
     drzava = models.ForeignKey(Drzava,default=0,on_delete=models.CASCADE)

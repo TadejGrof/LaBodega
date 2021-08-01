@@ -2,8 +2,9 @@ from django.db import models
 from django.db.models import IntegerField,FloatField,CharField
 from django.db.models import F,Value,Subquery, Count, OuterRef, Sum, When, Case, Q, Exists
 from django.db.models.functions import Concat,Cast, Coalesce, Round
+from program.model_queries import ModelQuerySet
 
-class BazaQuerySet(models.QuerySet):
+class BazaQuerySet(ModelQuerySet):
     def aktivne_baze(self, tip, zaloga):
         return self.filter(zaloga=zaloga,tip=tip, status="aktivno")
 
@@ -55,13 +56,13 @@ class BazaQuerySet(models.QuerySet):
             .skupno_values() \
             .values() 
 
-class DobaviteljQuerySet(models.QuerySet):
+class DobaviteljQuerySet(ModelQuerySet):
     def all_values(self):
         return self \
             .annotate(naziv=F("podjetje__naziv")) \
             .values()
 
-class CenaQuerySet(models.QuerySet):
+class CenaQuerySet(ModelQuerySet):
     def all_values(self):
         return self \
             .annotate(naziv = F("sestavina__naziv")) \
@@ -69,7 +70,7 @@ class CenaQuerySet(models.QuerySet):
             .annotate(tip = Coalesce(F("sestavina__tip__dolgo"),Value(""))) \
             .values()
             
-class SestavinaQuerySet(models.QuerySet):
+class SestavinaQuerySet(ModelQuerySet):
     def zaloga_values(self, zaloga):
         return self \
         .annotate(stanje=Sum(Case(
@@ -105,7 +106,7 @@ class SestavinaQuerySet(models.QuerySet):
                     self.filter(dimenzija__visina_special = sestavina_filter.visina_special)
         return self.filter(tip__in=sestavina_filter.tipi)
 
-class VnosZalogeQuerySet(models.QuerySet):
+class VnosZalogeQuerySet(ModelQuerySet):
     def all_values(self):
         return self.annotate(dimenzija = F("sestavina__dimenzija__dimenzija")) \
             .annotate(tip = F("sestavina__tip__kratko")) \
@@ -113,7 +114,7 @@ class VnosZalogeQuerySet(models.QuerySet):
             .annotate(tip_id = F("sestavina__tip__id")) \
             .values()
 
-class VnosQuerySet(models.QuerySet):
+class VnosQuerySet(ModelQuerySet):
     use_for_related_fields = True
 
     def all_values(self):

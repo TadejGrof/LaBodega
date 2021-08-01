@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja, VnosZaloge
+from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge
 from ..models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 from prodaja.models import Stranka
@@ -38,7 +38,9 @@ def pregled_zaloge(request,zaloga):
         sestavine = sestavine.filter(tip__kratko__in=tipi).all_values().zaloga_values(zaloga)
         if nicelne == "false":
             sestavine = sestavine.exclude(stanje=0)
+        dimenzije = Dimenzija.objects.all().values_list('dimenzija','radius','height','width','special')
         slovar = {
+            'dimenzije':dimenzije,
             'zaloga':zaloga,
             'sestavine': sestavine,
             'tipi':tipi,

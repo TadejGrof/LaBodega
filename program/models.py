@@ -107,25 +107,6 @@ class Program(BasicModel):
     def danes(self):
         return datetime.today().strftime('%Y-%m-%d')
 
-    
-    def vrni_slovar_dimenzij(self, obratno = False):
-        slovar = {}
-        dimenzije = Sestavina.objects.all().values('dimenzija_id','dimenzija__dimenzija')
-        if obratno:
-            for dimenzija in dimenzije:
-                slovar.update({dimenzija['dimenzija_id']:dimenzija['dimenzija__dimenzija']})
-        else: 
-            for dimenzija in dimenzije:
-                slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
-        return slovar
-
-    def vrni_dimenzijo(self,radius,height,width):
-        special = False
-        if "C" in width:
-            special = True
-            width = width[:-1]
-        return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
-
 class Profil(BasicModel):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     jezik =  models.CharField(default="spa",max_length=3, choices=JEZIKI)
@@ -155,6 +136,13 @@ class Drzava(BasicModel):
     def __str__(self):
         return self.naziv
 
+class Valuta(BasicModel):
+    naziv = models.CharField(max_length=30,default="/")
+    simbol = models.CharField(max_length=3,default="/")
+
+    def __str__(self):
+        return self.simbol
+        
 class Oseba(BasicModel):
     ime = models.CharField(max_length=3,default="/")
     priimek = models.CharField(max_length=30,default="/")

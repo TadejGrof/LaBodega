@@ -9,7 +9,7 @@ from django.utils.timezone import make_aware
 from datetime import datetime, time
 import os
 from django.contrib.auth.models import User
-from program.models import BasicModel, Drzava, Oseba, Podjetje
+from program.models import BasicModel, Drzava, Oseba, Podjetje, Valuta
 from prodaja.models import Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
@@ -42,6 +42,7 @@ TIPI_CEN = (
 TIPI_BAZE = (
     ('inventura', 'Inventura'),
     ('prevzem','Prevzem'),
+    ('prevzem_prenosa','Prevzem prenosa'),
     ('odpis', 'Odpis'),
     ('vele_prodaja', 'Vele prodaja'),
     ('racun','Racun'),
@@ -56,6 +57,13 @@ TIPI_STROSKOV = (
     ('placa','Placa'),
     ('drugo','Drugo')
 )
+
+PREDPONE_BAZ = {
+    "inventura":"I",
+    "prevzem":"P",
+    "prevzem_prenosa":"PX",
+    "Odpis":"O"
+}
 
 class Tip(BasicModel):
     kratko = models.CharField(max_length=10,default="")
@@ -99,12 +107,23 @@ class Sestavina(BasicModel):
 class Cena(BasicModel):
     sestavina = models.ForeignKey(Sestavina, default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=0)
+    valuta = models.ForeignKey(Valuta,default=None,null=True,on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return str(self.sestavina) + "_" + str(self.cena) + self.valuta.simbol 
+
+class Cenik(BasicModel):
+    naziv = models.CharField(default="vele_prodaja",max_length=20)
+    cene = models.ManyToManyField(Cena)
+
+    def __str__(self):
+        return self.naziv
 
 class Zaloga(BasicModel):
     title = models.CharField(default="skladisce", max_length=20)
     tipi_sestavin = models.ManyToManyField(Tip)
     sestavine = models.ManyToManyField(Sestavina)
-    cenik = models.ManyToManyField(Cena)
+    ceniki = models.ManyToManyField(Cenik)
 
     def __str__(self):
         return self.title
@@ -319,6 +338,22 @@ def create_dnevna_prodaja(sender, instance, created, **kwargs):
             dnevna_prodaja = instance,
             popust = 0 )
 
+class Stranka2(BasicModel):
+    podjetje = models.OneToOneField(Podjetje,null=True,blank=True,on_delete=models.CASCADE)
+    status = models.CharField(default='aktivno',max_length=10)
+
+    def __str__(self):
+        return self.podjetje.naziv if self.podjetje != None else "/"
+        
+    @property
+    def ima_aktivno_prodajo(self):
+        return self.baza_set.all().filter(status="aktivno").exists()
+
+    @property
+    def aktivna_prodaja(self):
+        return self.baza_set.all().filter(status="aktivno").first()
+
+    
 class Dobavitelj(BasicModel):
     podjetje = models.OneToOneField(Podjetje,default=0,on_delete=models.CASCADE)
 
@@ -351,14 +386,95 @@ class Baza(BasicModel):
     
     objects = BazaQuerySet.as_manager()
 
+    def __str__(self):
+        return self.title
+
     @property 
     def getZalogaPrenosa(self):
         return Zaloga.objects.get(id=self.zalogaPrenosa)
 
-    def __str__(self):
-        return self.title
+    @property
+    def vrni_vnose(self):
+        return self.vnos_set.all()
 
-    def nastavi_cas_odpreme(self,datum = None):
+    @property
+    def vnosi_values(self):
+        return self.vnos_set.all().all_values()
+
+    @property
+    def cena_nakupa(self):
+        return sum([vnos["skupna_cena_nakupa"] for vnos in self.vnosi_values])
+
+    @property
+    def skupna_cena_prodaje(self):
+        return sum([vnos["skupna_cena"] for vnos in self.vnosi_values])
+
+    @property
+    def stevilo_vnosov(self):
+        return self.vnos_set.all().count()
+
+    @property
+    def zasluzek(self):
+        return float(self.skupna_cena_prodaje) - float(self.cena_nakupa)
+
+    @property
+    def povprecna_cena(self):
+        cena = self.cena if self.cena != None else 0
+        return round(cena / self.skupno_stevilo, 2) if self.skupno_stevilo != 0 else 0
+
+    @property
+    def skupno_stevilo(self, tip=None):
+        if tip == None:
+            return sum([vnos["stevilo"] for vnos in self.vnos_set.all().values("stevilo")])
+        else:
+            return sum([vnos["stevilo"] for vnos in self.vnos_set.filter(sestavina__tip = tip).values("stevilo")])
+
+    @property
+    def skupna_cena(self, tip=None):
+        if tip == None:
+            return sum([vnos.skupna_cena for vnos in self.vnos_set.all()])
+        else:
+            return sum([vnos.skupna_cena for vnos in self.vnos_set.filter(sestavina__tip = tip)])
+
+    @property
+    def cena_popusta(self):
+        return round(float(self.skupna_cena) * (self.popust / 100)) if self.popust != None else 0
+
+    @property
+    def cena_prevoza(self):
+        return round(float(self.skupno_stevilo * self.prevoz)) if self.prevoz != None else 0
+    
+    @property
+    def koncna_cena(self):
+        return self.skupna_cena - self.cena_popusta + self.cena_prevoza
+
+    def doloci_title(self,stevilo=None):
+        leto = self.datum.year
+        if stevilo == None:
+            stevilo = Baza.objects.filter(datum__year=leto).order_by("stevilka").last().stevilka + 1
+        if self.tip == "racun":
+            title = str(stevilo)
+            while len(title) != 5:
+                title = "0" + title
+            return str(leto)[:2] + title
+        elif self.tip == "vele_prodaja":
+            return str(stevilo) + "/" + str(leto)
+        else:
+            title = PREDPONE_BAZ[self.title] + "-" + str(leto) + "-" + str(stevilo)
+        
+    def doloci_datum(self,datum):
+        if datum == None:
+            if self.tip == "racun":
+                self.datum = self.dnevna_prodaja.datum
+            else:
+                self.datum = self.uveljavitev.date()
+        else:
+            self.datum = datum
+
+    def doloci_uveljavitev(self):
+        self.uveljavitev = timezone.localtime(timezone.now())
+
+    def doloci_odpremo_blaga(self,datum = None):
         if datum == None:
             if self.tip == "racun":
                 datum = self.dnevna_prodaja.datum
@@ -374,94 +490,23 @@ class Baza(BasicModel):
             cas = time(12,0,0)
         self.odprema_blaga = make_aware(datetime.combine(datum,cas))
 
-    #def save(self, *args, **kwargs):
-    #    baza = Baza.objects.get(pk = self.pk)
-    #    print(baza.prevoz)
-    #    print(self.prevoz)
-    #    super(Baza, self).save(*args, **kwargs)
 
-    def skupnoStevilo(self,tip):
-        skupno = 0
-        for vnos in self.vnos_set.all().all_values():
-            if vnos["tip_id"] == tip.id:
-                skupno += vnos["stevilo"]
-        return skupno
-
-    def skupnaCena(self,tip):
-        skupno = 0
-        for vnos in self.vnosi_values:
-            if vnos["tip"] == tip:
-                skupno += vnos["cena"] * vnos["stevilo"]
-        return skupno
-
-    def uveljavi_inventuro(self,delno = False):
-        print("uveljavljam inventuro")
-        vnosi_zaloge = []
-        for sestavina in self.zaloga.sestavine.all():
-            vnos = self.vnos_set.all().filter(sestavina = sestavina).first()
-            if vnos == None and not delno:
-                vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
-                vnos_zaloge.stanje = 0
-                vnosi_zaloge.append(vnos_zaloge)
-            elif vnos != None:
-                vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
-                vnos_zaloge.stanje = vnos.stevilo
-                vnosi_zaloge.append(vnos_zaloge)
-        VnosZaloge.objects.bulk_update(vnosi_zaloge,["stanje"])
-
-           
-    def uveljavi_prenos(self,cas = None):
-        self.uveljavi_bazo()
-        self.status = "zaklenjeno"
-        self.save()
-        bazaPrenosa = Baza.objects.create(
-                zaloga_id = self.getZalogaPrenosa.pk,
-                tip = "prevzem",
-                sprememba_zaloge = 1,
-                title = self.title.replace("PS","PX"),
-                author = self.author,
-                zalogaPrenosa = self.zaloga.pk
+    def kopiraj_vnose(self,baza):
+        self.vnos_set.all().delete()
+        for vnos in baza.vnos_set.all():
+            Vnos.objects.create(
+                baza=self,
+                sestavina=vnos.sestavina,
+                stevilo=vnos.stevilo,
+                cena=vnos.cena
             )
-        for vnos in self.vnos_set.all().iterator():
-            bazaPrenosa.dodaj_vnos(vnos.sestavina,vnos.stevilo)
-        bazaPrenosa.save()
-        bazaPrenosa.uveljavi_bazo()
-        bazaPrenosa.status = "zaklenjeno"
-        bazaPrenosa.save()
 
-    def uveljavi_racun(self):
-        for vnos in self.vnos_set.all():
-            sestavina = Sestavina.objects.get(zaloga = self.zaloga, dimenzija = vnos.dimenzija)
-            sprememba = Sprememba.objects.filter(baza__dnevna_prodaja = self.dnevna_prodaja, sestavina = sestavina, tip = vnos.tip ).first()
-            if sprememba == None:
-                sprememba = Sprememba.objects.create(
-                    sestavina = sestavina,
-                    tip = vnos.tip,
-                    stevilo = vnos.stevilo,
-                    baza = self)
-            vnos.sprememba = sprememba
-            vnos.save()
-
-    @property
-    def posiljatelj(self):
-        if self.kontejner != None:
-            return self.kontejner.get_drzava_display()
-        elif self.zalogaPrenosa != None:
-            return Zaloga.objects.get(pk = self.zalogaPrenosa).title
-        return None
-        
-    @property
-    def tipPrevzema(self):
-        if self.kontejner != None:
-            return "Kontejner"
-        elif self.zalogaPrenosa != None:
-            return "Prenos"
-        return "Drugo"
-
-    def uveljavi(self,delno=False,datum=None,cas=None):
+    def uveljavi(self,delno=False,datum=None,odprema_blaga=None):
         self.status = "veljavno"
-        self.doloci_cas(cas)
+        self.doloci_uveljavitev()
         self.doloci_datum(datum)
+        self.doloci_odpremo_blaga(odprema_blaga)
+        self.doloci_title()
         self.save()
         if self.tip == "inventura":
             self.uveljavi_inventuro(delno)
@@ -480,104 +525,31 @@ class Baza(BasicModel):
                 vnosi_zaloge.append(vnos_zaloge)
         VnosZaloge.objects.bulk_update(vnosi_zaloge,["stanje"])  
 
-    def dodaj_vnos(self,sestavina,stevilo,cena_prodaje = None,cena_nakupa = None,):
-        vnos = Vnos.objects.create(sestavina=sestavina,stevilo=stevilo,baza=self,cena=cena_prodaje,cena_nakupa=cena_nakupa)
-        if self.status == 'veljavno':
-            self.zaloga.nastavi_iz_vnosov(sestavina)
-        return vnos
-
-    def doloci_cas(self,cas):
-        if cas == None:
-            self.cas = timezone.localtime(timezone.now())
-        else:
-            self.cas = cas
-
-    def doloci_datum(self,datum):
-        if datum == None:
-            self.datum = timezone.localtime(timezone.now())
-        else:
-            self.datum = datum
-
-    @property
-    def slovar_dosedanjih_kupljenih(self):
-        kupljene = self.dosedanje_kupljene_stranke
-        slovar = {}
-        for kupljena in kupljene:
-            slovar[kupljena["dimenzija_tip"]] = True
-        return slovar
-
-    @property
-    def dosedanje_kupljene_stranke(self):
-        if self.tip == "vele_prodaja":
-            return Vnos.objects.filter(baza__stranka = self.stranka)\
-            .order_by("dimenzija").values("dimenzija__dimenzija","tip")\
-            .annotate(dimenzija_tip = Concat(F("dimenzija__dimenzija"),Value("_"),F("tip")))\
-            .values("dimenzija_tip").distinct()
-        return []
-
-
-    @property
-    def vrni_vnose(self):
-        return self.vnos_set.all()
-
-    @property
-    def vnosi_values(self):
-        return self.vnos_set.all().all_values()
-
-    @property
-    def cena_nakupa(self):
-        vnosi = self.vnosi_values
-        cena = 0
-        for vnos in vnosi:
-            cena += vnos["skupna_cena_nakupa"]
-        return cena
-
-    @property
-    def skupna_cena_prodaje(self):
-        vnosi = self.vnosi_values
-        cena = 0
-        for vnos in vnosi:
-            cena += vnos["skupna_cena"]
-        return cena
-
-    @property
-    def stevilo_vnosov(self):
-        return self.vnos_set.all().count()
-
-    @property
-    def zasluzek(self):
-        return float(self.skupna_cena_prodaje) - float(self.cena_nakupa)
-
-    @property
-    def povprecna_cena(self):
-        cena = self.cena
-        if cena == None:
-            cena = 0
-        try:
-            return round(cena / self.skupno_stevilo, 2)
-        except:
-            return 0
-
-    @property
-    def skupno_stevilo(self):
-        return sum([vnos["stevilo"] for vnos in self.vnos_set.all().values("stevilo")])
-
-    @property
-    def skupna_cena(self):
-        return sum([vnos.skupna_cena for vnos in self.vnos_set.all()])
-
-    @property
-    def cena_popusta(self):
-        return round(float(self.skupna_cena) * (self.popust / 100)) if self.popust != None else 0
-
-    @property
-    def cena_prevoza(self):
-        return round(float(self.skupno_stevilo * self.prevoz)) if self.prevoz != None else 0
-    
-    @property
-    def koncna_cena(self):
-        return self.skupna_cena - self.cena_popusta + self.cena_prevoza
-
+    def uveljavi_inventuro(self,delno = False):
+        vnosi_zaloge = []
+        for sestavina in self.zaloga.sestavine.all():
+            vnos = self.vnos_set.all().filter(sestavina = sestavina).first()
+            if vnos == None and not delno:
+                vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
+                vnos_zaloge.stanje = 0
+                vnosi_zaloge.append(vnos_zaloge)
+            elif vnos != None:
+                vnos_zaloge = sestavina.vnoszaloge_set.all().get(zaloga=self.zaloga)
+                vnos_zaloge.stanje = vnos.stevilo
+                vnosi_zaloge.append(vnos_zaloge)
+        VnosZaloge.objects.bulk_update(vnosi_zaloge,["stanje"])
+        
+    def uveljavi_prenos(self,cas = None):
+        self.uveljavi_bazo()
+        baza_prenosa = Baza.objects.create(
+                zaloga_id = self.getZalogaPrenosa.pk,
+                tip = "prevzem",
+                sprememba_zaloge = 1,
+                author = self.author,
+                zalogaPrenosa = self.zaloga.pk
+            )
+        baza_prenosa.kopiraj_vnose(self)
+        baza_prenosa.uveljavi_bazo()
 
     # Ustvari nove vnose z trenutnim stanjem zaloge
     # Uporaba izključno v bazi tipa 'inventura'
@@ -613,40 +585,40 @@ class Vnos(BasicModel):
 
     @property
     def skupna_cena(self):
-        try:
-            return self.stevilo * self.cena
-        except:
-            return 0
+        return self.stevilo * self.cena if self.ceno != None else 0
             
     @property
     def skupna_cena_nakupa(self):
-        try:
-            return self.stevilo * self.cena_nakupa
-        except:
-            return 0
+        return self.stevilo * self.cena_nakupa if self.cena_nakupa != None else 0
 
     def doloci_ceno(self,cena = None):
         if cena == None:
             cena = float(self.vrni_sestavino().cena(self.baza.tip,self.tip))
-        self.cena = cena
-        self.save()
-
-    def spremeni_stevilo(self,stevilo):
-        razlika = self.stevilo - stevilo
-        if razlika != 0:
-            self.stevilo = stevilo
+            self.cena = cena
             self.save()
-        if self.baza.status == "veljavno":
-            self.baza.zaloga.nastavi_iz_vnosov(self.sestavina)
 
-    def spremeni_tip(self,tip):
-        if tip != self.tip:
-            nova_sestavina = Sestavina.objects.get(dimenzija=self.sestavina.dimenzija,tip=tip)
-            stara_sestavina = self.sestavina
-            self.sestavina = nova_sestavina
-            self.save()
-        if self.baza.status == "veljavno":
-            self.baza.zaloga.nastavi_iz_vnosov([nova_sestavina,stara_sestavina])
+
+@receiver(pre_save, sender=Vnos)
+def save_vnos(sender,instance,**kwargs):
+    print("VNOS SHRANJEN DELAM NASTAVI IZ VNOSOV")
+    if instance.pk != None:
+        baza = instance.baza
+        if baza.status == "veljavno":
+            old_vnos = Vnos.objects.get(id=instance.id)
+            if old_vnos.stevilo != instance.stevilo:
+                print("SPREMEMBA STEVILA")
+                baza.zaloga.nastavi_iz_vnosov(instance.sestavina)
+            elif old_vnos.sestavina != instance.sestavina:
+                print("SPREMEMBA SESTAVINE")
+                baza.zaloga.nastavi_iz_vnosov(old_vnos.sestavina)
+                baza.zaloga.nastavi_iz_vnosov(instance.sestavina)
+
+@receiver(post_save, sender=Vnos)
+def create_vnos(sender, instance, created, **kwargs):
+    if created:
+        baza = instance.baza
+        if baza.status == "veljavno":
+            baza.zaloga.nastavi_iz_vnosov(instance.sestavina)
 
 @receiver(post_delete, sender=Vnos)
 def delete_vnos(sender,instance,**kwargs):

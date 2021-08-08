@@ -1,21 +1,28 @@
 {% load zaloga_exstras %}
 
-<tr id="{{sestavina.id}}" class="vrstica {{sestavina.radij_dimenzije}} {{sestavina.kratek_tip}}">
-    <input type="text" class="skrit" id="pk_{{sestavina.id}}">
+<tr data-stevilo="{{sestavina.stevilo_vnosa}}" data-vnos="{{sestavina.pk_vnosa}}" data-sestavina="{{sestavina.id}}" data-vnesena="{{sestavina.vnesena}}" data-radij={{sestavina.radij_dimenzije}} data-tip={{sestavina.kratek_tip}}>
     <td class="dimenzija"> {{sestavina.naziv_dimenzije}} </td>
     <td class="tip"> {{sestavina.kratek_tip}} </td>
     <td class="stevilo">
-        <div class="{{sestavina.id}} skrit" id="stevilo_{{sestavina.id}}"></div>
-        <input class="{{sestavina.id}} stevilo" id="stevilo_value_{{sestavina.id}}" type="text">
+        <div class="sprememba stevilo_vnosa"> {{sestavina.stevilo_vnosa}} </div>
+        <div class="sprememba stevilo_vnosa skrit"> <input class="stevilo" type="number"> </div>
     </td>
     <td class="skrit inventura zaloga"> {{sestavina.stanje}} </td>
     <td class="razlika skrit razlika"> </td>
     <td class="skrit na_voljo"> {{sestavina.stanje}} </td>
-    <td>
-        <button class="{{sestavina.id}} novo" onclick="Nov_Vnos('{{sestavina.id}}')"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
-        <button class="{{sestavina.id}} skrit" onclick="ToggleClass('.{{sestavina.id}}','skrit');ToggleClass('.{{sestavina.id}}.novo','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-        <button class="{{sestavina.id}} skrit" onclick="Izbrisi_vnos(get_value('pk_{{sestavina.id}}'))"> X </button>
-        <button class="{{sestavina.id}} sprememba skrit" onclick="Spremeni_Vnos('{{sestavina.id}}')"> Ok </button>
-        <button class="{{sestavina.id}} sprememba skrit" onclick="ToggleClass('.{{sestavina.id}}','skrit');ToggleClass('.{{sestavina.id}}.novo','skrit')"> <- </button>     
+    <td class="edit">
+        <div class="nov_vnos">
+            <button class="nov_vnos_button"> {{slovar|keyvalue:'Potrdi'|keyvalue:jezik}} </button> 
+        </div>
+        <div class="spremeni_vnos">
+            <div class="sprememba">
+                <button class="show_spremeni_vnos_button"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                <button class="izbrisi_vnos_button" id="{{sestavina.id}}2"> X </button>
+            </div>
+            <div class="sprememba skrit">
+                <button class="spremeni_vnos_button"> Ok </button>
+                <button class="show_spremeni_vnos_button"> <- </button>     
+            </div>
+        </div>
     </td> 
 </tr>

@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 import json
 from . import funkcije
 from request_funkcije import pokazi_stran, vrni_dimenzijo, vrni_slovar
-from program.models import Program
+from program.models import Program, Valuta
 from django.urls import reverse
 from django.http import HttpResponse
 from . import database_functions
@@ -41,15 +41,30 @@ def dodaj_dimenzijo(request):
             special = True
         elif special == "false":
             special = False
-        Dimenzija.objects.create(
+        dimenzija = Dimenzija.objects.create(
             dimenzija = dimenzija,
             radius = radius,
             height = height,
             width = width,
             special = special)
+        sestavine = Sestavina.objects.filter(dimenzija=dimenzija)
+        for zaloga in Zaloga.objects.all():
+            if request.POST.get("zaloga_" + str(zaloga.id), False):
+                for sestavina in sestavine:
+                    if request.POST.get(str(zaloga.id) + "_" + str(sestavina.tip.id),False):
+                        zaloga.sestavine.add(sestavina)
+                        zaloga.sestavine.save()
+                        for cenik in zaloga.ceniki.all():
+                            cena = request.POST.get(str(zaloga.id + "_" + str(sestavina.tip.id) + "_" + str(cenik.id)),0)
+                            cena = Cena.objects.create(sestavina = sestavina, cena=cena)
+                            cenik.cene.add(cena)
+                            cenik.cene.save()
         return redirect('nova_dimenzija')
     else:
-        return pokazi_stran(request, 'zaloga/dodaj_dimenzijo.html')
+        slovar = {
+            'zaloge': Zaloga.objects.all()
+        }
+        return pokazi_stran(request, 'pregled/pregled_dimenzij/nova_dimenzija.html', slovar)
 
 ###############################################################################################################
 ###############################################################################################################
@@ -164,7 +179,7 @@ def poravnava_dolga(request, zaloga, baza):
 def baza(request,zaloga, tip_baze, pk):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk=zaloga)
-        baza = Baza.objcts.get(pk=pk)
+        baza = Baza.objects.get(pk=pk)
         baza_values = baza.all_values()
         vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
         sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)

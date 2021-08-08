@@ -34,6 +34,7 @@ function toggle(className, displayState){
 function ToggleClass(selector, className){
     $(selector).toggleClass(className)
 }
+
 function barva(className, color){
     var elements = document.getElementsByClassName(className)
     for (var i = 0; i < elements.length; i++){

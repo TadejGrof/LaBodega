@@ -44,7 +44,8 @@ class BazaQuerySet(ModelQuerySet):
         .annotate(razlika = F("skupna_cena") - F("skupna_cena_nakupa")) \
         .annotate(cena_popusta = Round(F("skupna_cena") * Coalesce(F("popust"),0) / Value(100), output_field=FloatField())) \
         .annotate(cena_prevoza = Round(F("skupno_stevilo") * Coalesce(F("prevoz"),0), output_field=FloatField())) \
-        .annotate(koncna_cena = F("skupna_cena") - F("cena_popusta") + F("cena_prevoza"))
+        .annotate(koncna_cena = F("skupna_cena") - F("cena_popusta") + F("cena_prevoza")) \
+        .annotate(dolg = Coalesce(Cast(F("koncna_cena") - F("placilo"),FloatField()),0)) \
 
     def all_values(self):
         return self \
@@ -118,7 +119,7 @@ class VnosQuerySet(ModelQuerySet):
     use_for_related_fields = True
 
     def all_values(self):
-        return self.annotate(datum = F("baza__datum")) \
+        values =  self.annotate(datum = F("baza__datum")) \
             .annotate(status = F("baza__status")) \
             .annotate(tip_baze = F("baza__tip")) \
             .annotate(title_baze = F("baza__title")) \
@@ -130,5 +131,11 @@ class VnosQuerySet(ModelQuerySet):
             .annotate(tip = F("sestavina__tip__kratko")) \
             .annotate(dolgi_tip = F("sestavina__tip__dolgo")) \
             .annotate(tip_id = F("sestavina__tip__id")) \
-            .order_by("datum") \
+            .annotate(skupna_cena=Coalesce(Cast(F("stevilo") * F("cena"), FloatField()),0)) \
+            .order_by("sestavina") \
             .values()
+        i = 0
+        for value in values:
+            value["index"] = i
+            i += 1
+        return values

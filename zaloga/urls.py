@@ -71,13 +71,8 @@ ajax_patterns = [
     path('spremeni_vnos/', baza_views.spremeni_vnos, name='spremeni_vnos'),
     path('nov_vnos/', baza_views.nov_vnos, name="nov_vnos"),
     path('izbrisi_vnos', baza_views.izbrisi_vnos, name="izbrisi_vnos"),
-    path('spremeni_popust/', baza_views.spremeni_popust, name='spremeni_popust'),
-    path('spremeni_ladijski_prevoz/', baza_views.spremeni_ladijski_prevoz, name='spremeni_ladijski_prevoz'),
-    path('spremeni_prevoz/', baza_views.spremeni_prevoz, name='spremeni_prevoz'),
-    path('vrni_zalogo/', baza_views.vrni_zalogo, name='vrni_zalogo'),
+    path('spremeni_baza_value/', baza_views.spremeni_baza_value, name='spremeni_baza_value'),
     path('spremeni_ceno/', baza_views.spremeni_ceno, name='spremeni_ceno'),
-    path('vrni_bazo/', baza_views.vrni_bazo,name="vrni_bazo"),
-    path('vrni_dimenzijo/', baza_views.vrni_dimenzijo, name="vrni_dimenzijo"),
     path('izbrisi_racun/', baza_views.izbrisi_racun, name="izbrisi_racun")
 ]
 

@@ -16,14 +16,17 @@
     <table class="tabela_vnosov"  id="inventurna_tabela" >
         {% include "./inventurna_tabela_header.html" %}
         {% for sestavina in sestavine %}
-            {% include "./inventurna_tabela_row.html" with sestavina=sestavina %}
+            {% include "./inventurna_tabela_row.html" %}
         {% endfor %}
     </table>
 </div>
 
-
 <script>
     $(document).ready(function() {
+        $("tr[data-vnesena='True'] .nov_vnos").toggleClass("skrit");
+        $("tr[data-vnesena='False'] .stevilo_vnosa").toggleClass("skrit");
+        $("tr[data-vnesena='False'] .spremeni_vnos").toggleClass("skrit");
+
         {% if tip == "vele_prodaja" or tip == "prenos" %}
             ToggleClass('.na_voljo', 'skrit')
         {% endif %}
@@ -32,68 +35,55 @@
         {% else %}
             ToggleClass('.inventura', 'skrit')
         {% endif %}
-        {% for sestavina in sestavine %}
-            {% if sestavina.vnesena %}
-                var stevilo = "{{sestavina.stevilo_vnosa}}"
-                var pk = "{{sestavina.pk_vnosa}}"
-                set_innerHtml('stevilo_{{sestavina.id}}',stevilo)
-                set_value('pk_{{sestavina.id}}', pk)
-                ToggleClass('.{{sestavina.id}}','skrit')
-                ToggleClass('.{{sestavina.id}}.sprememba','skrit')
-            {% endif %}
-        {% endfor %}
+    });
+</script>
+
+<script>
+    $("#inventurna_tabela .show_spremeni_vnos_button").click(function(){
+        $(".sprememba",this.parentElement.parentElement.parentElement.parentElement).toggleClass("skrit");
     });
 
-    function Spremeni_Vnos(sestavina_id){
-        var pk = get_value('pk_' + sestavina_id)
-        var stevilo = get_value('stevilo_value_' + sestavina_id)
-        var cena = ""
-        if (stevilo != "" ){
-            Spremeni_vnos(pk,stevilo,cena)
-            ToggleClass('.' + sestavina_id, 'skrit')
-            ToggleClass('.' + sestavina_id + '.novo', 'skrit')
-        }
-    }
-    function Nov_Vnos(sestavina_id){
-        var stevilo = get_value('stevilo_value_' + sestavina_id)
-        if (stevilo != ""){
-            Nov_vnos(sestavina_id,stevilo)
-        }
-    }
-    function Shrani_vse(gumb){
-        gumb.disabled = true;
-        {% for sestavina in sestavine %}
-            var stevilo = get_value('stevilo_value_{{sestavina.id}}')
-            var pk = get_value('pk_{{sestavina.id}}')
-            if (stevilo != "" && pk != ""){
-                Spremeni_Vnos('{{sestavina.id}}')
-            } else if ( stevilo != "" && pk == ""){
-                Nov_Vnos('{{sestavina.id}}')
-            }
-        {% endfor %}
-        setTimeout(() => { gumb.disabled = false }, 2000);
-    }
-    function Izracunaj_razliko(){
-        var vrstice = $('#inventurna_tabela tr.vrstica')
-        for (var i = 0; i < vrstice.length; i++){
-            var vrstica = vrstice[i];
-            vrstica.classList.add('skrit')
-            var stevilo = get_innerHtml('stevilo_' + vrstica.id);
-            var zaloga = get_innerHtml('zaloga_' + vrstica.id);
-            if (stevilo != ""){
-                var razlika = parseInt(stevilo) - parseInt(zaloga)
-                if ( razlika != 0){
-                    vrstica.classList.add("razlika");
-                    set_innerHtml('razlika_' + vrstica.id, razlika);
+    $("#inventurna_tabela .spremeni_vnos_button").click(function(){
+        var vrstica = this.parentElement.parentElement.parentElement.parentElement
+        var vnos = vrstica.getAttribute("data-vnos");
+        var stevilo = $("input.stevilo",vrstica).val();
+        Spremeni_vnos(vnos,stevilo,"");
+        $(".sprememba",vrstica).toggleClass("skrit");
+    });
+
+    $("#inventurna_tabela .izbrisi_vnos_button").click(function(){
+        var vrstica = this.parentElement.parentElement.parentElement.parentElement;
+        var vnos = vrstica.getAttribute("data-vnos");
+        Izbrisi_vnos(vnos);
+        $("td.edit div",vrstica).toggleClass("skrit");
+    });
+
+    $("#inventurna_tabela .nov_vnos_button").click(function(){
+        var vrstica = this.parentElement.parentElement.parentElement;
+        var sestavina = vrstica.getAttribute("data-sestavina");
+        var stevilo = $("input.stevilo",vrstica).val();
+        Nov_vnos(sestavina,stevilo); 
+        $("td.edit div",vrstica).toggleClass("skrit");
+    });
+    
+    $(".shrani_vse_button").click(function(){
+        this.disabled = true;
+        $("#inventurna_tabela tr").each(function(){
+            if(this.getAttribute("data-vnesena") == "True"){
+                var stevilo = $("input.stevilo",this).val();
+                if(stevilo != "" && stevilo != this.getAttribute("data-stevilo")){
+                    var vnos = this.getAttribute("data-vnos");
+                    Spremeni_vnos(vnos,stevilo);
+                }
+            } else{
+                var stevilo = $("input.stevilo",this).val();
+                if(stevilo != ""){
+                    var sestavina = this.getAttribute("data-sestavina");
+                    Nov_vnos(sestavina,stevilo);
                 }
             }
-        }
-        ToggleClass('.razlika', 'skrit')
-    }
-    function Preklici_razliko(){
-        $('.vrstica').removeClass('skrit')
-        $('td.razlika').addClass('skrit')
-        $('th.razlika').addClass('skrit')
-        Filtriraj()
-    }
+        })
+        setTimeout(() => { this.disabled = false }, 2000);
+    });
+
 </script>

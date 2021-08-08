@@ -37,6 +37,10 @@
     }
 </style>
 
+<script>
+    var baza = JSON.parse('{{values|json|safe}}');
+</script>
+
 {% include 'js/ajax_requests.html' %}
 {% include 'baza/bazno_okno.html' %}
 
@@ -48,11 +52,11 @@
     {% if status != "zaklenjeno" %}
         {% if tip == "inventura" %}
             <button onclick="Izracunaj_razliko()"> Razlika </button>
-            <button oncli   ck="Preklici_razliko()"> Preklici razliko </button>
-            <button id="shrani_vse" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+            <button onclick="Preklici_razliko()"> Preklici razliko </button>
+            <button id="shrani_vse"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% else %}
             {% if perms.zaloga.add_vnos %}
-                <button class="nov_vnos vnosi" style="width:15%" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+                <button id="pokazi_nov_vnos_button" class="nov_vnos vnosi" style="width:15%" > {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
                 <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
                     {% for dimenzija in dimenzije %}
                         <option value="{{dimenzija.id}}"> {{dimenzija.dimenzija}} </option>
@@ -64,16 +68,16 @@
                         <option value="{{tip.id}}"> {{tip.kratko}}  </option>
                     {% endfor %}
                 </select>
-                <button class="nov_vnos skrit" onclick="Nov_vnos_dimenzija_tip(get_value('dimenzija'), get_value('tip'), get_value('stevilo'))"> {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-                <button class="nov_vnos skrit" onclick="ToggleClass('.nov_vnos','skrit')"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+                <button id="nov_vnos_button" class="nov_vnos skrit" > {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
+                <button id="preklici_nov_vnos_button" class="nov_vnos skrit"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
             {% endif %}
             {% if status == "aktivno" %}
-                <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+                <button id="vnosi_button" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
             {% endif %}
-            <button class="vnosi skrit" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
+            <button id="shrani_vse_button" class="vnosi skrit"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% endif %} 
         {% if status == "aktivno" %}
-            <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
+            <button id="izbrisi_vse_button" class="nov_vnos inline vnosi" > Izbrisi_vse </button>
             {% if tip == "inventura" %}
                 <form class="nov_vnos inline vnosi" action="{% url 'nastavi_vnose_inventure' zaloga_pk tip values.id %}" method="POST">
                     {% csrf_token %}
@@ -87,9 +91,9 @@
             </form>
             <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip values.id %}" method="POST">
                 {% csrf_token %}
-                <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
+                <input id="uveljavi_button" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
             </form>
-            <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
+            <button id="preklici_vnosi_button" class="vnosi skrit" > {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
             {% if tip == "inventura" %}
                 <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip values.id %}" method="GET">
                     <input style="width:150px" type="submit" value="PDF Razlike">
@@ -119,59 +123,24 @@
 
 {% block javascript %}
     <script>
-        function Uveljavi_bazo(gumb){
-            {% if values.stevilo_vnosov == 0 %}
-                alert('baza mora vsebovati vsaj en vnos');
-                return false;
-            {% else %}
-                if( Confirm() ){
-                    gumb.disabled = true;
-                    gumb.form.submit();
-                } else{
-                    return false
-                }
-            {% endif %}
-        };
-        function Izbrisi_vse(){
-            if(Confirm()){
-                var table = document.getElementById("tabela_vnosov");
-                for(var i = 1; i < table.rows.length; i++) {
-                var row = table.rows[i]
-                var cell = row.cells[row.cells.length - 1]
-                if ( row.cells[0].classList.contains('index')){
-                        cell.getElementsByTagName('button')[1].click()
-                }
-                }
-            }
-        }
-        function Refresh_tabela_vnosov(data){
-            set_innerHtml('stevilo_' + data.pk, data.stevilo)
-            set_innerHtml('tip_' + data.pk, data.dolgi_tip)
-            set_innerHtml('skupno_stevilo',data.skupno_stevilo)
-            set_innerHtml('cena_' + data.pk, data.cena + ' $')
-            set_innerHtml('cena_vnosa_' + data.pk, data.cena_vnosa + ' $')
-            set_innerHtml('skupna_cena', data.skupna_cena + ' $')
-            set_innerHtml('koncna_cena', data.koncna_cena + ' $')
-            set_innerHtml('cena_popusta', data.cena_popusta + ' $')
-            set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')
-        }
-        function Refresh_inventurna_tabela(data){
-            set_value('stevilo_value_'+ data.id , '')
-            if ( data.action == "izbris" ){
-                set_value('pk_' + data.id, "")
-                ToggleClass('.' + data.id, 'skrit')
-                ToggleClass('.' + data.id + '.sprememba', 'skrit')
-            } else if ( data.action == "novo" ) {
-                set_value('pk_' + data.id, data.pk)
-                set_innerHtml('stevilo_' + data.id, data.stevilo)
-                ToggleClass('.' + data.id, 'skrit')
-                ToggleClass('.' + data.id + '.sprememba', 'skrit')
-            } else{
-                set_value('pk_' + data.id, data.pk)
-                set_innerHtml('stevilo_' + data.id, data.stevilo)
-            }       
-        }
-        function Izbrisi_vnos(pk){
+        $("#pokazi_nov_vnos_button, #preklici_nov_vnos_button").click(function(){
+            $(".nov_vnos").toggle();
+        });
+        $("#vnosi_button, #preklici_vnosi_button").click(function(){
+            $(".vnosi").toggleClass("skrit");
+        });
+        $("#uveljavi_button").click(function(){
+            if(confirm()){this.disabled=true;}
+        })
+        $("#izbrisi_vse_button").click(function(){
+            alert("BRISEM VSE");
+        });
+
+        $('.spremeni_button').click(function(){
+            spremeniBazaValue(this.getAttribute("data-sprememba"),function(){});
+        });
+        
+        function izbrisiVnos(pk){
             $.ajax({
                 url: '{% url "izbrisi_vnos" %}',
                 method: 'POST',
@@ -189,7 +158,8 @@
                 }
             }); 
         }
-        function Spremeni_vnos(pk, stevilo, cena){
+
+        function spremeniVnos(pk, stevilo, cena){
             $.ajax({
                 url: '{% url "spremeni_vnos" %}',
                 method: 'POST',
@@ -201,32 +171,14 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                    Refresh_inventurna_tabela(data)
-                    Refresh_tabela_vnosov(data)
+                    baza = data["baza"];
+                    Refresh_vrstica(data["vnos"]);
+                    Refresh_tabela_vnosov();
                 }
             }); 
         }
-        function Nov_vnos_dimenzija_tip(dimenzija,tip,stevilo){
-            $.ajax({
-                url: '{% url "nov_vnos" %}',
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'dimenzija':dimenzija,
-                'tip':tip,
-                'stevilo':stevilo,
-                'pk': '{{values.id}}'
-                },
-                dataType: 'json',
-                success: function (data) {
-                    Refresh_inventurna_tabela(data);
-                    Vstavi_vrstico(data);
-                    Refresh_tabela_vnosov(data);
-                    Nastavi_vrstice('tabela_vnosov','index')
-                }
-            }); 
-        }
-        function Nov_vnos(sestavina,stevilo){
+
+        function novVnos(sestavina,stevilo){
             $.ajax({
                 url: '{% url "nov_vnos" %}',
                 method: 'POST',
@@ -238,41 +190,50 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                    Refresh_inventurna_tabela(data);
-                    Vstavi_vrstico(data);
-                    Refresh_tabela_vnosov(data);
-                    Nastavi_vrstice('tabela_vnosov','index')
+                    if(data["success"]){
+                        baza = data["baza"];
+                        Vstavi_vrstico(data["vnos"]);
+                        Refresh_tabela_vnosov();
+                    } else {
+                        alert("NAPAKA");
+                    } 
                 }
             }); 
         }
-        function Spremeni_ladijski_prevoz(){
-            var prevoz = get_value('ladijski_prevoz_value')
-            var pk = '{{values.id}}'
-            SpremeniLadijskiPrevoz(pk, prevoz, function(data){
-                    set_innerHtml('ladijski_prevoz', data.ladijski_prevoz + ' $')
-                    ToggleClass('.ladijski_prevoz','skrit')
-                })
-        }
-        
-        function Spremeni_popust(){
-            var popust = get_value('popust_value')
-            var pk = '{{values.id}}'
-            SpremeniPopust(pk, popust, function(data){
-                    set_innerHtml('popust', data.popust + ' %')
-                    set_innerHtml('cena_popusta', data.cena_popusta + ' $')
-                    set_innerHtml('koncna_cena', data.koncna_cena + ' $')
-                    ToggleClass('.popust','skrit')
-                })
-        }
-        function Spremeni_prevoz(){
-            var prevoz = get_value('prevoz_value')
-            var pk = '{{values.id}}'
-            SpremeniPrevoz(pk,prevoz,function (data) {
-                    set_innerHtml('prevoz', data.prevoz + ' $')
-                    set_innerHtml('cena_prevoza', data.cena_prevoza + ' $')
-                    set_innerHtml('koncna_cena', data.koncna_cena + ' $')
-                    ToggleClass('.prevoz','skrit')
-                })
+
+        function spremeniBazaValue(sprememba,funkcija){
+            $.ajax({
+                url: "{% url 'spremeni_baza_value' %}",
+                method: 'POST',
+                data: {
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+                'value': $('#' + sprememba + '_value').val(),
+                'baza': baza["id"],
+                'sprememba':sprememba
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if(data["success"]){
+                        baza = data["baza"];
+                        refreshPage();
+                        ToggleClass('.' + sprememba,'skrit');
+                    } else {
+                        alert("NAPAKA");
+                    }
+                }
+            });  
+        };
+
+        function refreshPage(){
+            $("#skupno_stevilo").html(baza["skupno_stevilo"]);
+            $("#koncna_cena").html(baza["koncna_cena"] + " $");
+            $("#placilo_koncna_cena").html("/ " + baza["koncna_cena"] + " $");
+            $("#cena_popusta").html(baza["cena_popusta"] + " $");
+            $("#popust").html(baza["popust"] + " %");
+            $("#prevoz").html(baza["prevoz"] + " $");
+            $("#cena_prevoza").html(baza["cena_prevoza"] + " $");
+            $("#placilo").html(baza["placilo"] + " $");
+            $("#dolg").html(baza["dolg"] + " $");
         }
     </script>
 {% endblock %}

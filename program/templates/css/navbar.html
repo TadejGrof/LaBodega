@@ -240,7 +240,7 @@
             <a href="{% url 'arhiv_baz' zaloga_pk 'prenos' %}">{{slovar|keyvalue:'Arhiv prenosov'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
-    {% if perms.prodaja.view_prodaja and zaloga|ima_prodajo:"vele_prodaja"  %}
+    {% if perms.prodaja.view_prodaja %}
         <button class="dropdown-btn">{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>

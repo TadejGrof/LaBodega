@@ -107,7 +107,7 @@ class Sestavina(BasicModel):
 class Cena(BasicModel):
     sestavina = models.ForeignKey(Sestavina, default=0, on_delete=models.CASCADE)
     cena = models.DecimalField(decimal_places=2,max_digits=5,default=0)
-    valuta = models.ForeignKey(Valuta,default=None,null=True,on_delete=models.SET_NULL)
+    valuta = models.ForeignKey(Valuta,default=1,null=True,on_delete=models.SET_NULL)
 
     def __str__(self):
         return str(self.sestavina) + "_" + str(self.cena) + self.valuta.simbol 
@@ -383,7 +383,8 @@ class Baza(BasicModel):
     cena = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     ladijski_prevoz = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     placilo = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
-    
+    narocilo = models.OneToOneField("self",default=None,null=True,blank=True,on_delete=models.SET_NULL)
+
     objects = BazaQuerySet.as_manager()
 
     def __str__(self):

@@ -8,190 +8,59 @@
 </style>
 
 <div class="vnosi inline" style="width:80%;margin:2%">
-    <table id="tabela_vnosov" style="vertical-align:top;" class="tabela_vnosov">
+    <table id="tabela_vnosov" class="tabela_vnosov">
         {% include 'baza/tabela_vnosov_header.html' %}
         {% for vnos in vnosi %}
             {% include 'baza/tabela_vnosov_row.html' with index=forloop.counter %}
         {% endfor %}
+        {% include './tabela_vnosov_row.html' %}
+        {% include "./tabela_vnosov_skupno_row.html" %}; 
         {% if tip == "vele_prodaja" %}
-            <tr class="endrow">
-                <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}:</td>
-                <td id="skupno_stevilo"> {{values.skupno_stevilo}} </td>
-                <td> {{slovar|keyvalue:'Znesek'|keyvalue:jezik}}: </td>
-                <td id="skupna_cena"> {{values.skupna_cena}} $ </td>
-                <td colspan="2"> </td>
-            </tr>
-            <tr class="endrow">
-                <td> {{slovar|keyvalue:'Popust'|keyvalue:jezik}}: </td>
-                <td>  
-                    <div id="popust" class="popust"> {{values.popust}} % </div>
-                    <input style="width:60%" type="text" class="popust skrit" id="popust_value" value="">
-                    <div class="popust skrit inline">%</div>  
-                </td>
-                <td>   
-                    <button class="popust" onclick="ToggleClass('.popust','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                    <button class="popust skrit" onclick="Spremeni_popust()"> Ok </button>
-                    <button class="popust skrit" onclick="ToggleClass('.popust','skrit')"> X </button>
-                </td>
-                <td colspan="2"> {{slovar|keyvalue:'Znesek popusta'|keyvalue:jezik}}: </td>
-                <td id="cena_popusta"> {{values.cena_popusta}} $</td>
-                <td colspan="2" > </td>
-            </tr>
-            <tr class="endrow">
-                <td> {{slovar|keyvalue:'Prevoz'|keyvalue:jezik}}: </td>
-                <td>  
-                    <div class="prevoz" id="prevoz"> {{values.prevoz}} $ </div>
-                    <input class="prevoz skrit inline" style="width:60%" type="text" id="prevoz_value" value="">
-                    <div class="prevoz skrit inline">$</div>  
-                </td>
-                <td>   
-                    <button class="prevoz" onclick="ToggleClass('.prevoz','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                    <button class="prevoz skrit" onclick="Spremeni_prevoz()"> Ok </button>
-                    <button class="prevoz skrit" onclick="ToggleClass('.prevoz','skrit')"> X </button>
-                </td>
-                <td colspan="2"> {{slovar|keyvalue:'Cena prevoza'|keyvalue:jezik}}: </td>
-                <td id="cena_prevoza"> {{values.cena_prevoza}} $</td>
-                <td colspan="2" > </td>
-            </tr>
-            <tr class="endrow">
-                <td colspan="5"> {{slovar|keyvalue:'Koncna cena'|keyvalue:jezik}}: </td>
-                <td id="koncna_cena"> {{values.koncna_cena}} $ </td>
-                <td colspan="2" > </td>
-            </tr>
-        
-        {% else %}
-            {% if tip == "prevzem" %}
-                <tr class="endrow">
-                    <td colspan="2"> Skupni stroški: </td>
-                    <td colspan="1">  
-                        <div id="ladijski_prevoz" class="ladijski_prevoz"> {{values.ladijski_prevoz_value}} $</div>
-                        <input style="width:60%" type="text" class="ladijski_prevoz skrit" id="ladijski_prevoz_value" value="">
-                        <div class="ladijski_prevoz skrit inline">$</div>  
-                    </td>
-                    <td colspan="2">   
-                        <button class="ladijski_prevoz" onclick="ToggleClass('.ladijski_prevoz','skrit')"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                        <button class="ladijski_prevoz skrit" onclick="Spremeni_ladijski_prevoz()"> Ok </button>
-                        <button class="ladijski_prevoz skrit" onclick="ToggleClass('.ladijski_prevoz','skrit')"> X </button>
-                    </td>
-                </tr>
-            {% endif %}
-            <tr class="skrit">
-                <td colspan="3"> Delno število: </td>
-                <td id="delno_stevilo"> </td>
-                <td> </td>
-            </tr>
-            <tr>
-                
-                <td colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </td>
-                <td id="skupno_stevilo"> {{baza|skupno:"all"}} </td>
-            
-                {% if status != "zaklenjeno"  %}
-                    <td> </td>
-                {% endif %}
-            </tr>
-            {% if tip == "prevzem" %}
-            <tr>
-                <td colspan="2"> {{slovar|keyvalue:'Razlika'|keyvalue:jezik}}: </td>
-                <td colspan="2"> {{values.razlika}} $ </td>
-                {% if status != "zaklenjeno" %}
-                    <td> </td>
-                {% endif %}
-            </tr>
-            {% endif %}
+            {% include "./tabela_vnosov_vele_prodaja.html" %}
+        {% elif tip == "prevzem" %}
+            {% include "./tabela_vnosov_prevzem.html" %}
         {% endif %}
     </table>
 </div>
 
 <script>
-        function spremeni_vnos(pk){
-            var stevilo = get_value('stevilo_value_' + pk)
-            var cena = ""
-            {% if tip == "vele_prodaja" %}
-                cena = get_value('cena_value_' + pk)
-            {% endif %}
-            Spremeni_vnos(pk,stevilo,cena)
-            ToggleClass('.' + pk, 'skrit')
-        }
-        function nov_vnos(){
-            var stevilo = get_value('stevilo')
-            Nov_vnos(sestavina,stevilo)
-        }
-        function Vstavi_vrstico(data){
-            var table = document.getElementById('tabela_vnosov')
-            var row = table.insertRow(data.index + 1)
-            row.id = "vrstica_" + data.pk 
-            var cell = row.insertCell(0)
-            cell.classList.add("index");
-            var cell = row.insertCell(1)
-            cell.innerHTML = data.dimenzija
-            var cell = row.insertCell(2)
-            cell.innerHTML = data.dolgi_tip
-            var cell = row.insertCell(3)
-            var input = document.createElement('input')
-            input.classList.add(data.pk)
-            input.classList.add('skrit')
-            input.classList.add('input')
-            input.id = "stevilo_value_" + data.pk
-            input.type = "text"
-            cell.appendChild(input);
-            var div = document.createElement('div')
-            div.innerHTML = data.stevilo
-            div.id = "stevilo_" + data.pk
-            div.classList.add(data.pk)      
-            cell.appendChild(div)
-            if(data.tip_baze == "vele_prodaja"){
-                var cell = row.insertCell(4)
-                var input = document.createElement('input')
-                input.classList.add(data.pk)
-                input.classList.add('skrit')
-                input.classList.add('input')
-                input.id = "cena_value_" + data.pk
-                input.type = "text"
-                cell.appendChild(input);
-                var div = document.createElement('div')
-                div.innerHTML = ' $'
-                div.classList.add(data.pk)
-                div.classList.add('skrit')  
-                div.classList.add('inline')        
-                cell.appendChild(div)
-                var div = document.createElement('div')
-                div.innerHTML = data.cena + ' $'
-                div.id = "cena_" + data.pk
-                div.classList.add(data.pk)      
-                cell.appendChild(div)
-                var cell = row.insertCell(5)
-                cell.innerHTML = data.cena_vnosa + ' $'
-                cell.id = "cena_vnosa_" + data.pk
-                var cell = row.insertCell(6)
-            } else{
-                var cell = row.insertCell(4)
-            }
-            var button = document.createElement('button')
-            button.onclick = function(){ToggleClass('.' + data.pk,'skrit')}
-            button.classList.add(data.pk)
-            button.innerHTML = "E"
-            cell.appendChild(button);
-            cell.appendChild (document.createTextNode(" "));
-            var button = document.createElement('button');
-            button.onclick = function(){Izbrisi_vnos(data.pk)}
-            button.innerHTML = "X"
-            button.classList.add(data.pk);
-            cell.appendChild(button);
-            var button = document.createElement('button')
-            button.onclick = function(){spremeni_vnos(data.pk)}
-            button.classList.add(data.pk)
-            button.classList.add('skrit')
-            button.innerHTML = "Ok"
-            cell.appendChild(button);
-            cell.appendChild (document.createTextNode(" "));
-            var button = document.createElement('button')
-            button.onclick = function(){ToggleClass('.' + data.pk,'skrit')}
-            button.classList.add(data.pk)
-            button.classList.add('skrit')
-            button.innerHTML = "X"
-            cell.appendChild(button);
-        }
-    $(document).ready(function() {
-        Nastavi_vrstice('tabela_vnosov','index')
+    $("#tabela_vnosov .show_spremeni_vnos_button").click(function(){
+        $(".sprememba",this.parentElement.parentElement.parentElement).toggleClass("skrit");
     });
+
+    $("#tabela_vnosov .spremeni_vnos_button").click(function(){
+        var vrstica = this.parentElement.parentElement.parentElement
+        var vnos = vrstica.getAttribute("data-vnos");
+        var stevilo = $("input.stevilo",vrstica).val();
+        if(stevilo == "" || stevilo <= 0){return;}
+        alert(stevilo);
+        var cena = $("input.cena",vrstica).val();
+        spremeniVnos(vnos,stevilo,cena);
+        $(".sprememba",vrstica).toggleClass("skrit");
+    });
+
+    $("#tabela_vnosov .izbrisi_vnos_button").click(function(){
+        var vrstica = this.parentElement.parentElement.parentElement;
+        var vnos = vrstica.getAttribute("data-vnos");
+        izbrisiVnos(vnos);
+    });
+
+    function Vstavi_vrstico(vnos){
+        var prazna_vrstica = document.getElementById("empty_row");
+        var nova_vrstica = prazna_vrstica.cloneNode(true);
+        nova_vrstica.setAttribute("data-vnos","2");
+        nova_vrstica.classList.remove("skrit");
+        $("#tabela_vnosov tr:nth-child(" + vnos["index"] + ")").after(nova_vrstica);
+        refreshVrstica(vnos);
+    }
+
+    function refreshVrstica(vnos){
+        var vrstica = $("#tabela_vnosov tr['data-vnos'=" + vnos["id"] + "]");
+        $("div.dimenzija",vrstica).html(vnos["dimenzija"]);
+        $("div.tip",vrstica).html(vnos["dimenzija"]);
+        $("div.stevilo",vrstica).html(vnos["stevilo"]);
+        $("div.cena",vrstica).html(vnos["cena"]);
+        $("div.skupna_cena",vrstica).html(vnos["skupna_cena"]);
+    }
+
 </script>

@@ -1,6 +1,7 @@
 from django import template
-import json
-import datetime
+import json as JSON
+import datetime 
+from decimal import Decimal
 
 register = template.Library()
 
@@ -17,6 +18,16 @@ def razlika(value, index):
     return value[index] 
 
 @register.filter
+def json(data):
+    for key, value in data.items():
+        if isinstance(value,(datetime.date,datetime.datetime)):
+            data[key] = str(value)
+        elif isinstance(value,Decimal):
+            data[key] = float(value)
+    print(JSON.dumps(data))
+    return JSON.dumps(data)
+
+@register.filter
 def zadnji(list):
     return list[-1] 
 
@@ -29,12 +40,6 @@ def getDayOfWeek(datum):
     dnevi = ["Ponedeljek","Torek","Sreda","Četrtek","Petek","Sobota","Nedelja"]
     return dnevi[datum.weekday()]
 
-
-#vele_prodaja.html
-@register.filter
-def skupna_cena(vnos):
-    return vnos['stevilo'] * vnos['cena']
-
 @register.filter
 def split(string,locilo):
     return string.split(locilo)
@@ -42,22 +47,22 @@ def split(string,locilo):
 @register.filter
 def odstrani(seznam, element):
     if isinstance(seznam,str):
-        seznam = json.loads(seznam)
+        seznam = JSON.loads(seznam)
     else:
         seznam = seznam
     for x in seznam:
         if x == element:
             seznam.remove(element)
-    return json.dumps(seznam)
+    return JSON.dumps(seznam)
 
 @register.filter
 def dodaj(seznam, element):
     if isinstance(seznam,str):
-        seznam = json.loads(seznam)
+        seznam = JSON.loads(seznam)
     else:
         seznam = seznam
     seznam.append(element)
-    return json.dumps(seznam)
+    return JSON.dumps(seznam)
 
 @register.filter
 def divide(value, arg):

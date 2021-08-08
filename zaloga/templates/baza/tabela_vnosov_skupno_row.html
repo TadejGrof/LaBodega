@@ -1,0 +1,11 @@
+{% load zaloga_exstras %}
+
+<tr class="endrow">
+    <td class="skupno_title" colspan="3"> {{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}:</td>
+    <td id="skupno_stevilo"> {{values.skupno_stevilo}} </td>
+    {% if tip == "vele_prodaja" %}
+        <td> {{slovar|keyvalue:'Znesek'|keyvalue:jezik}}: </td>
+        <td id="skupna_cena"> {{values.skupna_cena}} $ </td>
+    {% endif %}
+    <td class="skupno_space"> </td>
+</tr>

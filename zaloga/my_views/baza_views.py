@@ -9,12 +9,14 @@ from request_funkcije import pokazi_stran, vrni_slovar
 from request_funkcije import vrni_dimenzijo as dimenzija_iz_requesta
 from django.urls import reverse
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST,require_GET
 
+@require_POST
 def spremeni_vnos(request):
-    if request.method=="POST":
-        stevilo = request.POST.get('stevilo')
-        cena = request.POST.get('cena')
-        tip = request.POST.get('tip')
+    try:
+        stevilo = request.POST.get('stevilo', None)
+        cena = request.POST.get('cena', None)
+        tip = request.POST.get('tip', None)
         vnos = Vnos.objects.get(pk = int(request.POST.get('pk')))
         if stevilo and stevilo != "":
             vnos.spremeni_stevilo(int(stevilo))
@@ -23,107 +25,69 @@ def spremeni_vnos(request):
         if cena and cena != "" :
             vnos.cena = float(cena)
             vnos.save()
-        baza = vnos.baza
-        data = podatki_vnosa(vnos)
-        data.update(podatki_baze(baza))
-        data.update({'action':'sprememba'})
+        data = {
+            "vnos": vnos.all_values(),
+            "baza": vnos.baza.all_values(),
+            "action":"sprememba",
+            "success":True,
+        }
+    except:
+        data = {"success":False}
     return JsonResponse(data)
 
+@require_POST
 def nov_vnos(request):
-    if request.method == "POST":
+    try:
         stevilo = int(request.POST.get('stevilo'))
-        dimenzija = request.POST.get('dimenzija',None)
-        if dimenzija == None:
-            sestavina = Sestavina.objects.get(pk=int(request.POST.get("sestavina")))
-        else:
-            try:
-                sestavina = Sestavina.objects.get(
-                    dimenzija__id = int(dimenzija),
-                    tip__id = int(request.POST.get("tip"))
-                )
-            except:
-                sestavina = Sestavina.objects.get(
-                    dimenzija__dimenzija = dimenzija,
-                    tip__id = int(request.POST.get("tip"))
-                )
-        print(sestavina)
-        pk = int(request.POST.get('pk'))
-        baza = Baza.objects.get(pk = pk)
+        sestavina = Sestavina.objects.get(pk=request.POST.get('sestavina'))
+        baza = Baza.objects.get(pk = int(request.POST.get('baza')))
         zaloga = baza.zaloga
         cena = None
         if baza.tip == "vele_prodaja" or baza.tip == "racun":
-            cena = zaloga.cenik.all().filter(sestavina=sestavina).first()
+            cena = zaloga.cenik.get(sestavina)
         vnos = Vnos.objects.create(
             sestavina = sestavina,
             stevilo = stevilo,
-            cena = cena.cena,
+            cena = cena,
             baza = baza)
-        vnosi = baza.vnos_set.all().order_by('sestavina').all_values()
-        pk = vnos.pk
-        index = 0
-        for slovar in vnosi:
-            if slovar['id'] == pk:
-                break
-            index += 1
-        data = podatki_vnosa(vnos)
-        data.update(podatki_baze(baza))
-        data.update({'action':'novo','index':index})
-        return JsonResponse(data)
+        data = {
+            "vnos": vnos.all_values(),
+            "baza": vnos.baza.all_values(),
+            "action":"novo",
+            "success":True,
+        }
+    except:
+        data = {"success":False}
+    return JsonResponse(data)
 
+@require_POST
 def izbrisi_vnos(request):
-    if request.method=="POST":
+    try:       
         pk = int(request.POST.get('pk'))
         vnos = Vnos.objects.get(pk = pk)
         baza = vnos.baza
-        pk = vnos.baza.pk
         vnos.delete()
-        data = podatki_vnosa(vnos)
-        data.update(podatki_baze(baza))
-        data.update({'action':'izbris'})
+        data = {
+            "baza": baza.all_values(),
+            "action":"izbris",
+            "success":True
+        }
+    except:
+        data = {"success": False}
     return JsonResponse(data)
-    
-def spremeni_ladijski_prevoz(request):
-    if request.method=="POST":
-        pk = int(request.POST.get('pk'))
-        baza = Baza.objects.get(pk=pk)
-        prevoz = request.POST.get('ladijski_prevoz',0)
-        try:
-            prevoz = float(prevoz)
-        except:
-            prevoz = 0
-        baza.ladijski_prevoz = prevoz
+
+@require_POST
+def spremeni_baza_value(request):
+    try:
+        baza = Baza.objects.get(pk=int(request.POST.get('baza')))
+        setattr(baza,request.POST.get("sprememba"),request.POST.get("value"))
         baza.save()
-        data = podatki_baze(baza)
-    return JsonResponse(data) 
-
-def spremeni_popust(request):
-    if request.method=="POST":
-        pk = int(request.POST.get('pk'))
-        baza = Baza.objects.get(pk=pk)
-        popust = request.POST.get('popust')
-        if popust and popust != "":
-            try:
-                popust = float(popust)
-            except:
-                popust = 0
-            baza.popust = popust
-            baza.save()
-        data = podatki_baze(baza)
-    return JsonResponse(data) 
-
-def spremeni_prevoz(request):
-    if request.method=="POST":
-        pk = int(request.POST.get('pk'))
-        baza = Baza.objects.get(pk=pk)
-        prevoz = request.POST.get('prevoz')
-        if prevoz and prevoz != "":
-            try:
-                prevoz = float(prevoz)
-            except:
-                prevoz = 0
-            baza.prevoz = prevoz
-            baza.save()
-        data = podatki_baze(baza)
+        data = {
+            "baza":baza.all_values(),
+            "success":True
+        }
+    except:
+        data = {"success":False}
     return JsonResponse(data) 
 
 def spremeni_ceno(request):
@@ -140,7 +104,6 @@ def spremeni_ceno(request):
             data['cena'] = 0
     return JsonResponse(data)
 
-
 def izbrisi_racun(request):
     data = {}
     if request.method == "POST":
@@ -155,66 +118,5 @@ def izbrisi_racun(request):
         data['skupna_cena'] = prodaja.skupna_cena
         print('po')
     return JsonResponse(data) 
-#############################################################################
-#############################################################################
-def vrni_bazo(request):
-    data = {}
-    try:
-        baza = Baza.objects.get(pk = int(request.GET.get('pk')))
-        data.update(podatki_baze(baza))
-        data['vnosi'] = [podatki_vnosa(vnos) for vnos in baza.vnos_set.all()]
-    except:
-        pass
-    return JsonResponse(data)
 
 
-def vrni_dimenzijo(request):
-    data = {}
-    try:
-        dimenzija = dimenzija_iz_requesta(request).dimenzija  
-    except:
-        dimenzija = Dimenzija.objects.first().dimenzija
-    data['dimenzija'] = dimenzija
-    return JsonResponse(data)
-    
-def vrni_zalogo(request):
-    data = {}
-    try:
-        dimenzija = request.GET.get('dimenzija')
-        tip = request.GET.get('tip')
-        zaloga = int(request.GET.get('zaloga'))
-        stevilo = VnosZaloge.objects.get(zaloga_id=zaloga,sestavina__dimenzija__dimenzija=dimenzija,sestavina__tip__id=tip).stanje
-        data['zaloga'] = stevilo
-    except:
-        data['zaloga'] = 0
-    return JsonResponse(data)
-
-##############################################################################
-##############################################################################
-def podatki_vnosa(vnos):
-    data = {}
-    data['id'] = str(vnos.sestavina.id)
-    data['pk'] = str(vnos.pk)
-    data['cena'] = str(vnos.cena)
-    data['cena_vnosa'] = str(vnos.skupna_cena)
-    data['stevilo'] = str(vnos.stevilo)
-    data['dimenzija'] = str(vnos.sestavina.dimenzija.dimenzija)
-    data['tip'] = vnos.sestavina.tip.kratko
-    data['dolgi_tip'] =  vnos.sestavina.tip.dolgo
-    return data
-
-def podatki_baze(baza):
-    data = {}
-    data['pk_baze'] = baza.pk
-    data['title'] = baza.title
-    data['cas'] = baza.cas
-    data['prodajalec'] = str(baza.author.username)
-    data['popust'] = str(baza.popust)
-    data['cena_popusta'] = str(baza.cena_popusta)
-    data['cena_prevoza'] = str(baza.cena_prevoza)
-    data['prevoz'] = str(baza.prevoz)
-    data['koncna_cena'] = str(baza.koncna_cena)
-    data['skupna_cena'] = str(baza.skupna_cena)
-    data['skupno_stevilo'] = str(baza.skupno_stevilo)
-    data['ladijski_prevoz'] = str(baza.ladijski_prevoz)
-    return data

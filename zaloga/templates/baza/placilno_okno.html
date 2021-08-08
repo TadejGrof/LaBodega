@@ -1,28 +1,33 @@
 {% load zaloga_exstras %}
 
 <style>
-    div.placilo{
-        width:10%;
-    }
     input.placilo{
         width:10%;
+        text-align:center;
     }
     div.koncna_cena{
         width:10%;
         margin-left:0%;
     }
     div.dolg{
-        width:20%;
+        width:10%;
+        text-align:right;
     }
+    
 
 </style>
 <div>
-    <div class="inline placilo"> Placilo: </div>
-    <input class="inline placilo" type="text" form="sprememba_placila" value="{{values.placilo}}" name="placilo"> 
-    $ / {{values.koncna_cena}} $
-    <div class="inline dolg"> Dolg: {{values.dolg}} $ </div>
-    <form class="inline" id="sprememba_placila" action="{% url 'spremeni_placilo' zaloga_pk tip values.id %}" method="POST">
-        {% csrf_token %}
-        <input class="button" type="submit" class="vnosi" value="Spremeni placilo">
-    </form> 
+    <div class="inline"> Placilo: </div>
+    
+    <input class="inline skrit placilo" type="text" id="placilo_value" value="{{values.placilo}}"> 
+    <div class="inline placilo" id="placilo"> {{values.placilo}} $ </div>
+    <div class="inline" id="placilo_koncna_cena">/ {{values.koncna_cena}} $ </div>
+    <div class="inline placilo skrit">
+        <button class="spremeni_button" data-sprememba="placilo"> OK </button>
+        <button onclick="ToggleClass('.placilo','skrit')"> <- </button>
+    </div>
+    <button class="placilo inline" onclick="ToggleClass('.placilo','skrit')"> Spremeni </button>
+    <div class="dolg inline"> Dolg: </div>
+    <div id="dolg" class="inline"> {{values.dolg}} $ </div>
+    
 </div>

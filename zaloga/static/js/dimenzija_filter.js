@@ -11,8 +11,8 @@ template.innerHTML = `
         }
     </style>
 
-    <div class="filter">
-        <div class="selectors">
+    <div id="filter">
+        <div id="selectors">
             Radij:
             <select id="radij">
                 <option value="all"> All </option>
@@ -22,12 +22,12 @@ template.innerHTML = `
                 <option value="all"> All </option>
             </select>
             Visina:
-            <select id="visinaSpecial">
+            <select id="visina_special">
                 <option value="all"> All </option>
             </select>
         </div>
 
-        <div class="buttons">
+        <div id="buttons">
 
         </div>
     </div>
@@ -42,37 +42,63 @@ class DimenzijaFilter extends HTMLElement{
         this.setRazlicni(dimenzije,"radij");
     }
 
+    get dimenzija(){
+        try{
+            return this.filtrirajDimenzije[0];
+        } catch(error){
+            return null;
+        }
+    }
+
     get radij(){
         return $("#radij",this.shadowRoot).val();
+    }
+
+    set radij(value){
+        $("#radij",this.shadowRoot).val(value);
+        this.setAttribute("radij",value);
     }
 
     get sirina(){
         return $("#sirina",this.shadowRoot).val();
     }
 
-    get visinaSpecial(){
-        return $("#visinaSpecial",this.shadowRoot).val();
+    set sirina(value){
+        $("#sirina",this.shadowRoot).val(value);
+        this.setAttribute("sirina",value);
     }
 
-    static get observedAttributes(){
-        return ["radij","sirina","visinaSpecial"];
+    get visina_special(){
+        return $("#visina_special",this.shadowRoot).val();
+    }
+
+    set visina_special(value){
+        alert("sprememba");
+        $("#visina_special",this.shadowRoot).val(value);
+        this.setAttribute("visina_special",value);
+    }
+
+    static get observedAttributes(){    
+        return ["radij","sirina","visina_special"];
     }
 
     attributeChangedCallback(name,oldValue,newValue){
+        alert(name);
         if(name == "radij"){
             this.clearSelector("sirina");
-            this.clearSelector("visinaSpecial");
+            this.clearSelector("visina_special");
             if(newValue!="all"){
-                alert(this.filtrirajDimenzije);
                 this.setRazlicni(this.filtrirajDimenzije,"sirina");
             }
         } else if(name == "sirina"){
-            this.clearSelector("visinaSpecial");
+            this.clearSelector("visina_special");
             if(newValue != "all"){
-                this.setRazlicni(this.filtrirajDimenzije,"visinaSpecial");
+                this.setRazlicni(this.filtrirajDimenzije,"visina_special");
             }
-        }
+        } else if(name = "visina_special"){
 
+        }
+        this.nastaviGumbe();
     }
 
     connectedCallback(){
@@ -80,21 +106,45 @@ class DimenzijaFilter extends HTMLElement{
         $("select",this.shadowRoot).change(function(){
             filter.setAttribute(this.id, $(this).val());
         });
+        this.nastaviGumbe();
+        this.visina_special = "all";
     }
 
     disconnectedCallback(){
+        $("select",this.shadowRoot).unbind();
+    }
 
+    get filter(){
+        for(var f of DimenzijaFilter.observedAttributes){
+            if(this.getAttribute(f) == "all" || this.getAttribute(f) == null) return f;
+        }
+        return null;
     }
 
     nastaviGumbe(){
-
+        var buttons = this.shadowRoot.querySelector("#buttons");
+        var dimenzijaFilter = this;
+        var filter = this.filter;
+        buttons.innerHTML = "";
+        if(filter == null) return;
+        var selector = this.shadowRoot.querySelector("#" + filter);
+        $(".data",selector).each(function() {
+            var button = document.createElement("button");
+            var value = this.text;
+            button.innerHTML = this.text;
+            $(button).click(function(){
+                $("#" + filter ,dimenzijaFilter.shadowRoot).val(value);
+                dimenzijaFilter.setAttribute(filter,value);
+            });
+            $(buttons).append(button);
+        });
     };
 
     get filtrirajDimenzije(){
         var filtri = []
         if (this.radij != "all"){ filtri.push("radij")};
         if (this.sirina != "all"){ filtri.push("sirina")};
-        if (this.visinaSpecial != "all"){ filtri.push("visinaSpecial")};
+        if (this.visina_special != "all"){ filtri.push("visina_special")};
         var filtrirane = []
         for(var dimenzija of dimenzije){
             var veljavno = true;
@@ -133,9 +183,6 @@ class DimenzijaFilter extends HTMLElement{
         }
     }
 
-    spremeni_radij(){
-
-    }
 }
 
 window.customElements.define("dimenzija-filter",DimenzijaFilter);

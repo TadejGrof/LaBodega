@@ -75,24 +75,25 @@ class Tip(BasicModel):
 class Dimenzija(BasicModel):
     dimenzija = models.CharField(default="", max_length=20)
     radij = models.CharField(max_length=10)
-    visina = models.CharField(max_length=10)
     sirina = models.CharField(max_length=10)
-    visinaSpecial = models.CharField(max_length=10, default="")
+    visina = models.CharField(max_length=10)
+    visina_special = models.CharField(max_length=10, default="")
     special = models.BooleanField(default=False)
     
     class Meta:
-        ordering = ['radij', 'visina', 'sirina' , 'special']
+        ordering = ['radij', 'sirina', 'visina' , 'special']
 
     def save(self, *args, **kwargs):
-        self.visinaSpecial = self.visina if not self.special else self.visina + "C"
+        self.visina_special = self.visina if not self.special else self.visina + "C"
         super().save(args,kwargs)
 
     def __str__(self):
         return self.dimenzija
 
     @classmethod
-    def get(radij,height,width,special=False):
-        return Dimenzija.objects.filter(radij=radij,height=height,width=width,special=special).first()
+    def get(radij,sirina,visina,special=False):
+        return Dimenzija.objects.filter(radij=radij,sirina=sirina,visina=visina,special=special).first()
+
 
 class Sestavina(BasicModel):
     dimenzija = models.ForeignKey(Dimenzija, on_delete=models.CASCADE)

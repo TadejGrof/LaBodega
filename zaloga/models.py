@@ -74,20 +74,25 @@ class Tip(BasicModel):
 
 class Dimenzija(BasicModel):
     dimenzija = models.CharField(default="", max_length=20)
-    radius = models.CharField(max_length=10)
-    height = models.CharField(max_length=10)
-    width = models.CharField(max_length=10)
+    radij = models.CharField(max_length=10)
+    visina = models.CharField(max_length=10)
+    sirina = models.CharField(max_length=10)
+    visinaSpecial = models.CharField(max_length=10, default="")
     special = models.BooleanField(default=False)
     
     class Meta:
-        ordering = ['radius', 'height', 'width' , 'special']
+        ordering = ['radij', 'visina', 'sirina' , 'special']
+
+    def save(self, *args, **kwargs):
+        self.visinaSpecial = self.visina if not self.special else self.visina + "C"
+        super().save(args,kwargs)
 
     def __str__(self):
         return self.dimenzija
 
     @classmethod
-    def get(radius,height,width,special=False):
-        return Dimenzija.objects.filter(radius=radius,height=height,width=width,special=special).first()
+    def get(radij,height,width,special=False):
+        return Dimenzija.objects.filter(radij=radij,height=height,width=width,special=special).first()
 
 class Sestavina(BasicModel):
     dimenzija = models.ForeignKey(Dimenzija, on_delete=models.CASCADE)
@@ -138,7 +143,7 @@ class Zaloga(BasicModel):
 
     @property
     def vrni_razlicne_radiuse(self):
-        return [value["dimenzija__radius"] for value in self.sestavine.values('dimenzija__radius').distinct().order_by('dimenzija__radius')]
+        return [value["dimenzija__radij"] for value in self.sestavine.values('dimenzija__radij').distinct().order_by('dimenzija__radij')]
 
     def zaloga_na_datum(self,sestavina,datum):
         stanje = 0

@@ -95,7 +95,7 @@ class SestavinaQuerySet(ModelQuerySet):
         return self \
         .annotate(naziv_dimenzije = F("dimenzija__dimenzija")) \
         .annotate(kratek_tip = F("tip__kratko")) \
-        .annotate(radij_dimenzije = F("dimenzija__radius")) \
+        .annotate(radij_dimenzije = F("dimenzija__radij")) \
         .values()
 
     def filtriraj(self,sestavina_filter):
@@ -125,7 +125,7 @@ class VnosQuerySet(ModelQuerySet):
             .annotate(title_baze = F("baza__title")) \
             .annotate(sprememba_zaloge = F("baza__sprememba_zaloge")) \
             .annotate(title = F("baza__title")) \
-            .annotate(radij = F("sestavina__dimenzija__radius")) \
+            .annotate(radij = F("sestavina__dimenzija__radij")) \
             .annotate(dimenzija = F("sestavina__dimenzija__dimenzija")) \
             .annotate(dimenzija_id = F("sestavina__dimenzija__id")) \
             .annotate(tip = F("sestavina__tip__kratko")) \

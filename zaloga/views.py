@@ -183,7 +183,7 @@ def baza(request,zaloga, tip_baze, pk):
         baza_values = baza.all_values()
         vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
         sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)
-        dimenzije = Dimenzija.objects.all().values("dimenzija","id")
+        dimenzije = Dimenzija.objects.all().all_values()
         slovar = {
             'zaloga': zaloga,
             'baza':baza,

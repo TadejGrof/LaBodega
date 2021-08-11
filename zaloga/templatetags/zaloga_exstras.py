@@ -18,6 +18,11 @@ def razlika(value, index):
     return value[index] 
 
 @register.filter
+def jsonList(data):
+    seznam = [x for x in data]
+    return JSON.dumps(seznam)
+
+@register.filter
 def json(data):
     for key, value in data.items():
         if isinstance(value,(datetime.date,datetime.datetime)):

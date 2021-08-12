@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from .models import Stranka, Prodaja, Naslov
 from zaloga.models import Vnos, Zaloga, Dimenzija, Sestavina, Baza, Cena, Dnevna_prodaja
 from django.shortcuts import redirect
 import datetime

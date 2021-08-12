@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge
+from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Stranka2
 from ..models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
-from prodaja.models import Stranka
 import io
 import datetime
 from django.contrib.auth.decorators import login_required

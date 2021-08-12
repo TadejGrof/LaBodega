@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-from zaloga.models import Dnevna_prodaja,Stranka
+from zaloga.models import Dnevna_prodaja
 
 admin.site.register(Dnevna_prodaja)
-admin.site.register(Stranka)

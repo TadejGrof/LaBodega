@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from zaloga.models import Zaloga, Dnevna_prodaja, Baza
 from django.contrib.auth.decorators import login_required
-from prodaja.models import Prodaja
 from django.shortcuts import redirect
 from .models import Program
 import json 
@@ -17,35 +16,11 @@ def ponastavi_zalogo(request):
 @login_required
 def home_page(request):
     zaloga = Zaloga.objects.get(id=request.user.profil.aktivna_zaloga)
-    prodaja = Prodaja.objects.first()
-    stranke = prodaja.stranka_set.all().filter(status="aktivno").prefetch_related('baza_set').values(
-        "pk",
-        "naziv",
-        "telefon",
-        "mail"
-    )
-    prodaje = Baza.objects.all().filter(zaloga = zaloga, status="aktivno", tip="vele_prodaja").values(
-        "stranka",
-        "pk"
-    )
-    for stranka in stranke:
-        for prodaja in prodaje:
-            if prodaja["stranka"] == stranka["pk"]:
-                stranka["aktivna_prodaja"] = True
-                stranka["aktivna_prodaja__pk"] = prodaja["pk"]
-                break
-            stranka["aktivna_prodaja"] = False
-    #for stranka in stranke.iterator():
-    #    print(stranka.aktivna_prodaja)
-
-    tip = request.GET.get('tip','all')
-    radius = request.GET.get('radius','all')
     
+
     danasnja_prodaja = Dnevna_prodaja.objects.filter(zaloga = zaloga, datum = datetime.date.today()).first()
     slovar = {
         'dnevna_prodaja':danasnja_prodaja,
-        'stranke':stranke,
-        'tip':tip,
         'zaloga':zaloga,
         'zaloga_pk': zaloga.pk,
         }

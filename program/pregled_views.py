@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from zaloga.models import Zaloga, Dnevna_prodaja, Zaposleni
-from prodaja.models import Stranka,Naslov
 from django.contrib.auth.decorators import login_required
-from prodaja.models import Prodaja
 from django.shortcuts import redirect
 from .models import Program
 import json 

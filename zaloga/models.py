@@ -10,7 +10,6 @@ from datetime import datetime, time
 import os
 from django.contrib.auth.models import User
 from program.models import BasicModel, Drzava, Oseba, Podjetje, Valuta
-from prodaja.models import Stranka, Naslov
 import json
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.db.models.functions import Concat, Cast
@@ -382,8 +381,7 @@ class Baza(BasicModel):
     dobavitelj = models.ForeignKey(Dobavitelj,null=True,default=None,blank=True, on_delete=models.CASCADE)
     kontejner = models.OneToOneField(Kontejner,null=True,default=None,blank=True, on_delete=models.CASCADE)
     popust = models.IntegerField(default = None, null=True, blank=True)
-    stranka = models.ForeignKey(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
-    stranka2 = models.ForeignKey(Stranka2,on_delete=models.SET_NULL,null=True,blank=True,default=None)
+    stranka = models.ForeignKey(Stranka2,on_delete=models.SET_NULL,null=True,blank=True,default=None)
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
     prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
     zalogaPrenosa = models.IntegerField(default=None,null=True,blank=True)

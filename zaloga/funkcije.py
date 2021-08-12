@@ -4,7 +4,7 @@ import json
 import os
 import shutil
 from program.models import Program
-from zaloga.models import Baza,Kontejner,Stranka,Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
+from zaloga.models import Baza,Kontejner,Stranka2,Zaloga, TIPI_SESTAVINE, Sestavina, Tip, Dimenzija, VnosZaloge, Vnos, Cena
 import json
 from django.contrib.auth.models import User
 

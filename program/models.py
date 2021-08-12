@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from prodaja.models import Stranka
 from datetime import datetime
 from .model_queries import ModelQuerySet
 
@@ -111,7 +110,6 @@ class Profil(BasicModel):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     jezik =  models.CharField(default="spa",max_length=3, choices=JEZIKI)
     aktivna_zaloga = models.IntegerField(default=0)
-    stranka = models.OneToOneField(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
     celo_ime = models.CharField(default="",max_length=40)
     tip_banke = models.CharField(default="",max_length=40)
     stevilka_racuna = models.CharField(default="",max_length=40)

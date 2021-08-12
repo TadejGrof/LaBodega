@@ -7,10 +7,12 @@
     <script>
         var baza = JSON.parse('{{values|json|safe}}');
         var dimenzije = JSON.parse('{{dimenzije|jsonList|safe}}');
-
     </script>
     <script src="{% static 'js/dimenzija_filter.js' %}"></script>
     <script>
+        window.alert = function() {
+            debugger;
+        }
         $("#pokazi_nov_vnos_button, #preklici_nov_vnos_button").click(function(){
             $(".nov_vnos").toggle();
         });
@@ -161,10 +163,6 @@
     }
 </style>
 
-<dimenzija-filter dimenzija="haha">
-
-</dimenzija-filter>
-
 {% include 'js/ajax_requests.html' %}
 {% include 'baza/bazno_okno.html' %}
 
@@ -172,7 +170,7 @@
     {% include "baza/placilno_okno.html" %}
 {% endif %}
 
-<div class="delovno_okno">
+<div id="delovno_okno" class="delovno_okno">
     {% if status != "zaklenjeno" %}
         {% if tip == "inventura" %}
             <button onclick="Izracunaj_razliko()"> Razlika </button>
@@ -180,35 +178,22 @@
             <button id="shrani_vse"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% else %}
             {% if perms.zaloga.add_vnos %}
-                <button id="pokazi_nov_vnos_button" class="nov_vnos vnosi" style="width:15%" > {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-                <select class="nov_vnos skrit" style="width:15%" id="dimenzija">
-                    {% for dimenzija in dimenzije %}
-                        <option value="{{dimenzija.id}}"> {{dimenzija.dimenzija}} </option>
-                    {% endfor %}
-                </select>
-                <input type="number" id="stevilo" class="nov_vnos skrit" min="1" max="999" style="text-align:center">
-                <select id="tip" class="nov_vnos skrit">
-                    {% for tip in tipi %}
-                        <option value="{{tip.id}}"> {{tip.kratko}}  </option>
-                    {% endfor %}
-                </select>
-                <button id="nov_vnos_button" class="nov_vnos skrit" > {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
-                <button id="preklici_nov_vnos_button" class="nov_vnos skrit"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+                <button class="toggle_nov_vnos_button" style="width:15%" > {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button>
             {% endif %}
             {% if status == "aktivno" %}
-                <button id="vnosi_button" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
+                <button id="vnosi_button"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
             {% endif %}
             <button id="shrani_vse_button" class="vnosi skrit"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% endif %} 
         {% if status == "aktivno" %}
-            <button id="izbrisi_vse_button" class="nov_vnos inline vnosi" > Izbrisi_vse </button>
+            <button id="izbrisi_vse_button" class="inline vnosi" > Izbrisi_vse </button>
             {% if tip == "inventura" %}
-                <form class="nov_vnos inline vnosi" action="{% url 'nastavi_vnose_inventure' zaloga_pk tip values.id %}" method="POST">
+                <form class="inline vnosi" action="{% url 'nastavi_vnose_inventure' zaloga_pk tip values.id %}" method="POST">
                     {% csrf_token %}
                     <input type="submit" class="vnosi" value="Nastavi zalogo">
                 </form>    
             {% endif %}
-            <form enctype='multipart/form-data' class="nov_vnos inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip values.id %}" method="POST">
+            <form enctype='multipart/form-data' class="inline vnosi" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip values.id %}" method="POST">
                 {% csrf_token %}
                 <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
                 <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
@@ -228,11 +213,11 @@
     {% include 'forms/pdf_baze_form.html' with tip=tip baza=values.id zaloga=zaloga_pk select=True razlicni_tipi=baza.razlicni_tipi %}
 </div>
 
-    
-{% if status == "aktivno" %}
-    {% include 'baza/filter.html' with tip=tip tipi=tipi radiusi=razlicni_radiusi slovar=slovar dosedanje_kupljene=dosedanje_kupljene %}
-{% endif %}
+{% include './nov_vnos.html' %}
 
+{% if status == "aktivno" %}
+    {% include 'baza/filter.html' with radiusi=razlicni_radiusi %}
+{% endif %}
 
 {% if tip != "inventura" or status == "veljavno" or status == "zaklenjeno" %}
     {% include 'baza/tabela_vnosov.html' %}

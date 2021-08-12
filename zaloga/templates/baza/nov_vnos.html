@@ -1,0 +1,81 @@
+{% load zaloga_exstras %}
+<style>
+    #nov_vnos{
+        height:45%;
+    }
+</style>
+
+<div id="nov_vnos" class="nov_vnos skrit">
+    <dimenzija-filter id="dimenzija_filter">
+    </dimenzija-filter>
+    <div id="koncno">
+        <table>
+            <tr>
+                <td> <button> Nazaj </button>
+                <td> <button class="toggle_nov_vnos_button"> Izhod </button>
+            </tr>
+            <tr>
+                <td> Dimenzija: </td>
+                <td>
+                    <div class="inline" id="dimenzija_value" data-dimenzija=""></div> 
+                </td>
+            </tr>
+            <tr>
+                <td> Tip: </td>
+                <td> 
+                    <select id="tip_value"> 
+                        {% for tip in tipi %}
+                            <option value="{{tip.id}}"> {{tip.dolgo}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> Število: </td>
+                <td> 
+                    <input type="number" min="0" id="stevilo_value">
+                </td>
+            </tr>
+            <tr>
+                <td> Cena: </td>
+                <td> 
+                    <input type="number" step="0.01" min="0" id="cena_value">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"> 
+                    <button> Potrdi </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.querySelector("#dimenzija_filter").finalAction = finalAction;
+
+    $('.toggle_nov_vnos_button').click(function(){
+        var dimenzija_filter = document.querySelector('#dimenzija_filter');
+        dimenzija_filter.radij = "all";
+        dimenzija_filter.classList.remove("skrit");
+        document.querySelector('#koncno').classList.add('skrit');
+        $('#delovno_okno').toggleClass("skrit");
+        $('#nov_vnos').toggleClass("skrit");
+    });
+
+    $('#nov_vnos_button').click(function(){
+        var dimenzija = document.querySelector("#dimenzija_value").getAttribute("data-dimeznija");
+        var tip = $("#tip_value").val();
+        var stevilo = $("#stevilo_value").val();
+        var cena = $("cena_value").val();
+        novVnos(dimeznija,tip,stevilo,cena);
+    });
+
+    function finalAction(){
+        $("#nov_vnos > *").toggleClass("skrit");
+        var filter = document.querySelector("#dimenzija_filter");
+        var dimenzija = filter.dimenzija;
+        $('#dimenzija_value').html(dimenzija["dimenzija"]);
+    }
+
+</script>

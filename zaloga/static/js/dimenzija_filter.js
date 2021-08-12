@@ -2,26 +2,39 @@ const template = document.createElement('template');
 
 template.innerHTML = `
     <style>
-        .selectors{
-            height:20%;
+
+        #selectors{
+            height:15%;
         }
 
-        .button{
-            height:80%;
+        #selectors *{
+            width:16%;
+            height:100%;
+            display:inline-block;
+            text-align:center;
+        }
+
+        #buttons{
+            height:85%;
+        }
+
+        button{
+            width:32%;
+            height:20%;
         }
     </style>
 
     <div id="filter">
         <div id="selectors">
-            Radij:
+            <div> Radij: </div>
             <select id="radij">
                 <option value="all"> All </option>
             </select>
-            Sirina:
+            <div> Sirina: </div>
             <select id="sirina">
                 <option value="all"> All </option>
             </select>
-            Visina:
+            <div> Visina: </div>
             <select id="visina_special">
                 <option value="all"> All </option>
             </select>
@@ -42,12 +55,20 @@ class DimenzijaFilter extends HTMLElement{
         this.setRazlicni(dimenzije,"radij");
     }
 
+    get event(){
+        return new Event('final');
+    }
+
     get dimenzija(){
         try{
             return this.filtrirajDimenzije[0];
         } catch(error){
             return null;
         }
+    }
+
+    set finalAction(action){
+        this.addEventListener('final',action,false)
     }
 
     get radij(){
@@ -73,7 +94,6 @@ class DimenzijaFilter extends HTMLElement{
     }
 
     set visina_special(value){
-        alert("sprememba");
         $("#visina_special",this.shadowRoot).val(value);
         this.setAttribute("visina_special",value);
     }
@@ -83,7 +103,6 @@ class DimenzijaFilter extends HTMLElement{
     }
 
     attributeChangedCallback(name,oldValue,newValue){
-        alert(name);
         if(name == "radij"){
             this.clearSelector("sirina");
             this.clearSelector("visina_special");
@@ -96,7 +115,9 @@ class DimenzijaFilter extends HTMLElement{
                 this.setRazlicni(this.filtrirajDimenzije,"visina_special");
             }
         } else if(name = "visina_special"){
-
+            if(newValue != "all"){
+                this.dispatchEvent(this.event); 
+            }
         }
         this.nastaviGumbe();
     }
@@ -112,6 +133,10 @@ class DimenzijaFilter extends HTMLElement{
 
     disconnectedCallback(){
         $("select",this.shadowRoot).unbind();
+    }
+
+    clear(){
+        this.radij = "all";
     }
 
     get filter(){

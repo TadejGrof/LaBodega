@@ -116,7 +116,7 @@ class DimenzijaFilter extends HTMLElement{
             }
         } else if(name = "visina_special"){
             if(newValue != "all"){
-                this.dispatchEvent(this.event); 
+                this.dispatchEvent(this.event);
             }
         }
         this.nastaviGumbe();
@@ -135,14 +135,10 @@ class DimenzijaFilter extends HTMLElement{
         $("select",this.shadowRoot).unbind();
     }
 
-    clear(){
-        this.radij = "all";
-    }
-
     get filter(){
-        for(var f of DimenzijaFilter.observedAttributes){
-            if(this.getAttribute(f) == "all" || this.getAttribute(f) == null) return f;
-        }
+        if(this.radij == "all") return "radij";
+        if(this.sirina == "all") return "sirina";
+        if(this.visina_special == "all") return "visina_special";
         return null;
     }
 
@@ -186,8 +182,13 @@ class DimenzijaFilter extends HTMLElement{
 
     clearSelector(id){
         $("#" + id, this.shadowRoot).find(".data").remove();
+        
     }
 
+    clear(){
+        this.radij = "all";
+    }
+    
     setRazlicni(dimenzije, id){
         this.clearSelector(id);
         var razlicni = [];

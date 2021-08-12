@@ -2,16 +2,33 @@
 <style>
     #nov_vnos{
         height:45%;
+        width:60%;
+        margin:5%;
+    }
+    table.nov_vnos{
+        width:100%;
+        height:100%;
+    }
+    table.nov_vnos button{
+        width:100%;
+        height:100%;
+    }
+    table.nov_vnos td{
+        width: 50%;
+        text-align:center;
+    }
+    #nov_vnos_button{
+        width:33%;
     }
 </style>
 
-<div id="nov_vnos" class="nov_vnos skrit">
+<div id="nov_vnos" class="nov_vnos skrit inline">
     <dimenzija-filter id="dimenzija_filter">
     </dimenzija-filter>
     <div id="koncno">
-        <table>
+        <table class="nov_vnos">
             <tr>
-                <td> <button> Nazaj </button>
+                <td> <button id="back_button"> Nazaj </button>
                 <td> <button class="toggle_nov_vnos_button"> Izhod </button>
             </tr>
             <tr>
@@ -44,7 +61,7 @@
             </tr>
             <tr>
                 <td colspan="2"> 
-                    <button> Potrdi </button>
+                    <button id="nov_vnos_button"> Potrdi </button>
                 </td>
             </tr>
         </table>
@@ -53,6 +70,11 @@
 
 <script>
     document.querySelector("#dimenzija_filter").finalAction = finalAction;
+
+    $('#back_button').click(function(){
+        $("#nov_vnos > *").toggleClass("skrit");
+        document.querySelector('#dimenzija_filter').clear();
+    });
 
     $('.toggle_nov_vnos_button').click(function(){
         var dimenzija_filter = document.querySelector('#dimenzija_filter');

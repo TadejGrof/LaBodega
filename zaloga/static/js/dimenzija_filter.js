@@ -102,6 +102,10 @@ class DimenzijaFilter extends HTMLElement{
         return ["radij","sirina","visina_special"];
     }
 
+    focus(){
+        this.shadowRoot.querySelector("#radij").focus();
+    }
+
     attributeChangedCallback(name,oldValue,newValue){
         if(name == "radij"){
             this.clearSelector("sirina");
@@ -188,7 +192,7 @@ class DimenzijaFilter extends HTMLElement{
     clear(){
         this.radij = "all";
     }
-    
+
     setRazlicni(dimenzije, id){
         this.clearSelector(id);
         var razlicni = [];

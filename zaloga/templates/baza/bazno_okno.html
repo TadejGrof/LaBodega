@@ -1,91 +1,145 @@
 {% load zaloga_exstras %}
 
 <style>
-    table.okno{
-        padding:1%;
-        display:inline-block;
-        width:70%;
-        border:1px solid black;
-        margin-top:2%; 
+    #bazno_okno{
+        position:relative;
+        width:80%;
+        height:auto;
+        margin:2%;
+        margin-left:10%;
+        border:1px solid black
+    }
+    #tabela_podatkov td{
+        width:25%;
+        height:3.4vh;
+        font-size:3vh;
+        text-align:left;
+    }
+    #tabela_podatkov td.info{
+        width:18%;
+    }
+
+    #bazno_okno div.table{
+        margin-left:5%;
+        width:85%;
+    }
+    #bazno_okno div.edit{
+        text-align:center;
+        margin:1.5%;
+    }
+    #edit_bazno_okno_button{
+        position:absolute;
+        width:5%;
+        left:95%;
+        height:5vh;
     }
 </style>
-{% if baza.tip == "prevzem" %}
-    <table id="tabela_podatkov" class="tabela_podatkov okno">
-        <tr class="header">
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki baze'|keyvalue:jezik}}:</th>
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki kontejnerja'|keyvalue:jezik}}: </th>
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Ostali podatki'|keyvalue:jezik}}: </th>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{slovar|keyvalue:values.tip|keyvalue:jezik}} </td>
-            <td class="info"> {{slovar|keyvalue:'Stevilka'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.stevilka_kontejnerja}} </td>
-            <td class="info"> User: </td>
-            <td class="podatek"> {{baza.author.username}} </td>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.title}} </td>
-            <td class="info"> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.kontejner.get_posiljatelj_display}} </td>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.datum}} </td>
-            <td class="info"> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.kontejner.get_drzava_display}} </td>
-        </tr>
-    </table>
-{% elif baza.tip == "vele_prodaja" %}
-    <table  id="tabela_podatkov" class="tabela_podatkov okno">
-        <tr class="header">
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki prodaje'|keyvalue:jezik}}:</th>
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki stranke'|keyvalue:jezik}}: </th>
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki prodajalca'|keyvalue:jezik}}: </th>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.tip}} </td>
-            <td class="info"> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.stranka.ime}} </td>
-            <td class="info"> {{slovar|keyvalue:'Prodajalec'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.author.username}} </td>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Faktura'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.title}} </td>
-            <td class="info"> {{slovar|keyvalue:'Telefon'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.stranka.telefon}} </td>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.datum}} </td>
-            <td class="info"> {{slovar|keyvalue:'E-mail'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{baza.stranka.mail}} </td>
-        </tr>
-    </table>
-{% else %}
-    <table  id="tabela_podatkov" class="tabela_podatkov okno">
-        <tr class="header">
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Podatki baze'|keyvalue:jezik}}:</th>
-            <th width=33% colspan="2"> {{slovar|keyvalue:'Ostali podatki'|keyvalue:jezik}}: </th>
-            <th width=33% colspan="2"></th>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{slovar|keyvalue:values.tip|keyvalue:jezik}} </td>
-            <td class="info"> User: </td>
-            <td class="podatek"> {{baza.author.username}} </td>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.title}} </td>
-        </tr>
-        <tr>
-            <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
-            <td class="podatek"> {{values.datum}} </td>
-        </tr>
-    </table>
-{% endif %}
+
+<div id="bazno_okno">
+    <button id="edit_bazno_okno_button"> E </button>
+    <div class="table">
+        <table id="tabela_podatkov">
+            {% if baza.tip == "prevzem" %}
+                <tr>
+                    <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> {{slovar|keyvalue:values.tip|keyvalue:jezik}} </td>
+                    <td class="info"> 
+                        Dobavitelj: 
+                    </td>
+                    <td class="dobavitelj podatek"> 
+                        <div class="sprememba"> {{values.naziv_dobavitelja}} </div>
+                        <div class="sprememba skrit">
+                            <select id="dobavitelj_value">
+                                {% for dobavitelj in dobavitelji %}
+                                    {% if dobavitelj.id == values.dobavitelj_id %}
+                                        <option value="{{dobavitelj.id}}" selected> {{dobavitelj.naziv}} </option>
+                                    {% else %}
+                                        <option value="{{dobavitelj.id}}"> {{dobavitelj.naziv}} </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="info"> Naziv: </td>
+                    <td class="podatek"> {{values.title}} </td>
+                    <td class="info"> Kontejner: </td>
+                    <td class="kontejner podatek"> 
+                        <div class="sprememba">
+                            {{values.stevilka_kontejnerja}} 
+                        </div>
+                        <div class="sprememba skrit">
+                            <input type="text" value="{{values.stevilka_kontejnerja}}" id="kontejner_value">
+                        </div>
+                        </td>
+                </tr>
+                <tr>
+                    <td class="info"> Odprema blaga: </td>
+                    <td class="odprema_blaga podatek"> 
+                        <div class="sprememba">
+                            {{baza.odprema_blaga|datum|datum_str}} 
+                        </div>
+                        <div class="sprememba skrit">
+                            <input type="date" value="{{baza.odprema_blaga|datum|datum_str}}" id="odprema_blaga_value">
+                        </div>
+                    </td>
+                    <td class="info"> Prevzem blaga: </td>
+                    <td class="podatek"> {{value.prevzem_blaga}} </td>
+                </tr>
+            {% elif baza.tip == "vele_prodaja" %}
+                <tr>
+                    <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> {{values.tip}} </td>
+                    <td class="info"> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> 
+                        <div class="sprememba"> {{baza.stranka.ime}} </div>
+                        <div class="sprememba skrit">
+                            <select id="stranka_value">
+                                {% for stranka in stranke %}
+                                    {% if stranka.id == baza.straka.id %}
+                                        <option selected value="{{stranka.id}}"> {{stranka.ime}} </option>
+                                    {% else  %}
+                                        <option selected value="{{stranka.id}}"> {{stranka.ime}} </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="info"> Faktura: </td>
+                    <td class="podatek"> {{values.title}} </td>
+                    <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> {{values.datum}} </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> {{slovar|keyvalue:values.tip|keyvalue:jezik}} </td>
+                    <td class="info"> User: </td>
+                    <td class="podatek"> {{baza.author.username}} </td>
+                </tr>
+                <tr>
+                    <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> {{values.title}} </td>
+                </tr>
+                <tr>
+                    <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
+                    <td class="podatek"> {{values.datum}} </td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+    <div class="edit skrit">
+        <button class="inline" id="shrani_bazno_okno"> Potrdi </button>
+    </div>
+</div>
+
+<script>
+    $('#edit_bazno_okno_button').click(function(){
+        $('#bazno_okno div.edit').toggleClass("skrit");
+        $('#bazno_okno .sprememba').toggleClass("skrit");
+    });
+</script>
     

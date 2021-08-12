@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.db.models import Sum
-from .models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Dobavitelj
+from .models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Dobavitelj, Stranka2
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
-from prodaja.models import Stranka
 from django.db.models import Sum, OuterRef
 from django.db.models.functions import Coalesce
 import io
@@ -184,12 +183,15 @@ def baza(request,zaloga, tip_baze, pk):
         vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
         sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)
         dimenzije = Dimenzija.objects.all().all_values()
+        
         slovar = {
             'zaloga': zaloga,
             'baza':baza,
             'tip':tip_baze,
             'status':baza.status,
             'dimenzije':dimenzije,
+            'dobavitelji': Dobavitelj.objects.all().all_values() if baza.tip == "prevzem" else None,
+            'stranke': Stranka2.objects.all().all_values() if baza.tip == "vele_prodaja" else None,
             'vnosi': baza.vnos_set.all().all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
             'sestavine': sestavine,

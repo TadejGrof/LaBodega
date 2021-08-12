@@ -383,6 +383,7 @@ class Baza(BasicModel):
     kontejner = models.OneToOneField(Kontejner,null=True,default=None,blank=True, on_delete=models.CASCADE)
     popust = models.IntegerField(default = None, null=True, blank=True)
     stranka = models.ForeignKey(Stranka, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    stranka2 = models.ForeignKey(Stranka2,on_delete=models.SET_NULL,null=True,blank=True,default=None)
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
     prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
     zalogaPrenosa = models.IntegerField(default=None,null=True,blank=True)

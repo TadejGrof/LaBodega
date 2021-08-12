@@ -9,7 +9,15 @@
 
 <div class="vnosi inline" style="width:80%;margin:2%">
     <table id="tabela_vnosov" class="tabela_vnosov">
-        {% include 'baza/tabela_vnosov_header.html' %}
+        <tr class="header">
+            <th class="index"> N. </th>
+            <th class="dimenzija"> {{slovar|keyvalue:'Dimenzija'|keyvalue:jezik}}: </th>
+            <th class="tip"> {{slovar|keyvalue:'Tip'|keyvalue:jezik}}: </th>
+            <th class="stevilo"> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
+            <th class="skrit cena"> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
+            <th class="skrit skupnaCena"> {{slovar|keyvalue:'Skupaj'|keyvalue:jezik}}: </th>
+            <th class="uredi"> {{slovar|keyvalue:'Uredi'|keyvalue:jezik}}: </th>  
+        </tr>
         {% for vnos in vnosi %}
             {% include 'baza/tabela_vnosov_row.html' with index=forloop.counter %}
         {% endfor %}
@@ -24,6 +32,13 @@
 </div>
 
 <script>
+    if(baza["status"] == "zaklenjeno"){
+        $("#tabela_vnosov .edit").toggleClass("skrit");
+    }
+    if(baza["status"] == "vele_prodaja"){
+        $("#tabela_vnosov .cena, .skupnaCena").toggleClass("skrit");
+    }
+
     $("#tabela_vnosov .show_spremeni_vnos_button").click(function(){
         $(".sprememba",this.parentElement.parentElement.parentElement).toggleClass("skrit");
     });
@@ -33,7 +48,6 @@
         var vnos = vrstica.getAttribute("data-vnos");
         var stevilo = $("input.stevilo",vrstica).val();
         if(stevilo == "" || stevilo <= 0){return;}
-        alert(stevilo);
         var cena = $("input.cena",vrstica).val();
         spremeniVnos(vnos,stevilo,cena);
         $(".sprememba",vrstica).toggleClass("skrit");
@@ -45,22 +59,35 @@
         izbrisiVnos(vnos);
     });
 
-    function Vstavi_vrstico(vnos){
+    function odstraniVrstico(vnos){
+        $('#tabela_vnosov tr[data-vnos=' + vnos["id"] + ']').remove();
+    }
+    
+    function vstaviVrstico(vnos){
         var prazna_vrstica = document.getElementById("empty_row");
         var nova_vrstica = prazna_vrstica.cloneNode(true);
-        nova_vrstica.setAttribute("data-vnos","2");
+        nova_vrstica.setAttribute("data-vnos",vnos["id"]);
         nova_vrstica.classList.remove("skrit");
+        nova_vrstica.classList.add("vnos_row");
         $("#tabela_vnosov tr:nth-child(" + vnos["index"] + ")").after(nova_vrstica);
         refreshVrstica(vnos);
     }
 
+    function refreshTabelaVnosov(){
+        var i = 0
+        $('#tabela_vnosov tr.vnos_row').each(function(){
+            i++;
+            $("td.index",this).html(i + ".");
+        })
+    }
+
     function refreshVrstica(vnos){
-        var vrstica = $("#tabela_vnosov tr['data-vnos'=" + vnos["id"] + "]");
-        $("div.dimenzija",vrstica).html(vnos["dimenzija"]);
-        $("div.tip",vrstica).html(vnos["dimenzija"]);
+        var vrstica = $("#tabela_vnosov tr[data-vnos=" + vnos["id"] + "]");
+        $("td.dimenzija",vrstica).html(vnos["dimenzija"]);
+        $("td.tip",vrstica).html(vnos["tip"]);
         $("div.stevilo",vrstica).html(vnos["stevilo"]);
         $("div.cena",vrstica).html(vnos["cena"]);
-        $("div.skupna_cena",vrstica).html(vnos["skupna_cena"]);
+        $("td.skupna_cena",vrstica).html(vnos["skupna_cena"]);
     }
 
 </script>

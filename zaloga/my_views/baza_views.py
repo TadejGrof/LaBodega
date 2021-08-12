@@ -17,14 +17,15 @@ def spremeni_vnos(request):
         stevilo = request.POST.get('stevilo', None)
         cena = request.POST.get('cena', None)
         tip = request.POST.get('tip', None)
-        vnos = Vnos.objects.get(pk = int(request.POST.get('pk')))
+        vnos = Vnos.objects.get(pk = int(request.POST.get('vnos')))
         if stevilo and stevilo != "":
-            vnos.spremeni_stevilo(int(stevilo))
+            vnos.stevilo = int(stevilo)
         if tip and tip != "" :
-            vnos.spremeni_tip(Tip.objects.get(id=int(tip)))
+            tip = Tip.objects.get(id=tip)
+            vnos.tip = tip
         if cena and cena != "" :
             vnos.cena = float(cena)
-            vnos.save()
+        vnos.save()
         data = {
             "vnos": vnos.all_values(),
             "baza": vnos.baza.all_values(),
@@ -50,8 +51,15 @@ def nov_vnos(request):
             stevilo = stevilo,
             cena = cena,
             baza = baza)
+        index = 1
+        for v in baza.vnos_set.all().order_by("sestavina").values("id"):
+            if vnos.id == v["id"]:
+                break
+            index += 1
+        vnos_values = vnos.all_values()
+        vnos_values["index"] = index
         data = {
-            "vnos": vnos.all_values(),
+            "vnos": vnos_values,
             "baza": vnos.baza.all_values(),
             "action":"novo",
             "success":True,
@@ -61,13 +69,27 @@ def nov_vnos(request):
     return JsonResponse(data)
 
 @require_POST
+def izbrisi_vse(request):
+    try:
+        baza = Baza.objects.get(pk=request.POST.get("baza"))
+        baza.vnos_set.all().delete()
+        data = {
+            "baza":baza.all_values(),
+            "success":True
+        }
+    except:
+        data = {"success":False}
+    return JsonResponse(data)
+
+@require_POST
 def izbrisi_vnos(request):
     try:       
-        pk = int(request.POST.get('pk'))
-        vnos = Vnos.objects.get(pk = pk)
+        vnos = Vnos.objects.get(pk = int(request.POST.get('vnos')))
+        vnos_values = {"id":vnos.id}
         baza = vnos.baza
         vnos.delete()
         data = {
+            "vnos":vnos_values,
             "baza": baza.all_values(),
             "action":"izbris",
             "success":True

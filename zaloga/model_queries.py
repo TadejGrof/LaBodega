@@ -134,8 +134,4 @@ class VnosQuerySet(ModelQuerySet):
             .annotate(skupna_cena=Coalesce(Cast(F("stevilo") * F("cena"), FloatField()),0)) \
             .order_by("sestavina") \
             .values()
-        i = 0
-        for value in values:
-            value["index"] = i
-            i += 1
         return values

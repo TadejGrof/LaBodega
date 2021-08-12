@@ -39,6 +39,10 @@ def zadnji(list):
 @register.filter
 def datum(datetime):
     return datetime.date()
+
+@register.filter
+def datum_str(date):
+    return date.strftime('%Y-%m-%d')
     
 @register.filter
 def getDayOfWeek(datum):

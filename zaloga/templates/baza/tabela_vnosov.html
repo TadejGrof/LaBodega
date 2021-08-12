@@ -35,7 +35,7 @@
     if(baza["status"] == "zaklenjeno"){
         $("#tabela_vnosov .edit").toggleClass("skrit");
     }
-    if(baza["status"] == "vele_prodaja"){
+    if(baza["tip"] == "vele_prodaja"){
         $("#tabela_vnosov .cena, .skupnaCena").toggleClass("skrit");
     }
 
@@ -47,8 +47,7 @@
         var vrstica = this.parentElement.parentElement.parentElement
         var vnos = vrstica.getAttribute("data-vnos");
         var stevilo = $("input.stevilo",vrstica).val();
-        if(stevilo == "" || stevilo <= 0){return;}
-        var cena = $("input.cena",vrstica).val();
+        var cena = $("input.cena_vnosa",vrstica).val();
         spremeniVnos(vnos,stevilo,cena);
         $(".sprememba",vrstica).toggleClass("skrit");
     });
@@ -86,8 +85,8 @@
         $("td.dimenzija",vrstica).html(vnos["dimenzija"]);
         $("td.tip",vrstica).html(vnos["tip"]);
         $("div.stevilo",vrstica).html(vnos["stevilo"]);
-        $("div.cena",vrstica).html(vnos["cena"]);
-        $("td.skupna_cena",vrstica).html(vnos["skupna_cena"]);
+        $("div.cena_vnosa",vrstica).html(vnos["cena"]);
+        $("td.skupnaCena",vrstica).html(vnos["skupna_cena"] + " $");
     }
 
 </script>

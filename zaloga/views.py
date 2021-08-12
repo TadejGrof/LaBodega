@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Sum
-from .models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Dobavitelj, Stranka2
-from .models import Baza, Zaloga, Cena
+from .models import *
 from django.shortcuts import redirect
 from django.db.models import Sum, OuterRef
 from django.db.models.functions import Coalesce
@@ -191,7 +190,7 @@ def baza(request,zaloga, tip_baze, pk):
             'status':baza.status,
             'dimenzije':dimenzije,
             'dobavitelji': Dobavitelj.objects.all().all_values() if baza.tip == "prevzem" else None,
-            'stranke': Stranka2.objects.all().all_values() if baza.tip == "vele_prodaja" else None,
+            'stranke': Stranka.objects.all().all_values() if baza.tip == "vele_prodaja" else None,
             'vnosi': baza.vnos_set.all().all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
             'sestavine': sestavine,

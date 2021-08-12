@@ -93,14 +93,14 @@
                     <td class="podatek"> {{values.tip}} </td>
                     <td class="info"> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
                     <td class="podatek"> 
-                        <div class="sprememba"> {{baza.stranka.ime}} </div>
+                        <div class="sprememba"> {{values.naziv_stranke}} </div>
                         <div class="sprememba skrit">
                             <select id="stranka_value">
                                 {% for stranka in stranke %}
-                                    {% if stranka.id == baza.straka.id %}
-                                        <option selected value="{{stranka.id}}"> {{stranka.ime}} </option>
+                                    {% if stranka.id == baza.stranka_id %}
+                                        <option selected value="{{stranka.id}}"> {{stranka.naziv}} </option>
                                     {% else  %}
-                                        <option selected value="{{stranka.id}}"> {{stranka.ime}} </option>
+                                        <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
                                     {% endif %}
                                 {% endfor %}
                             </select>

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Stranka2
+from ..models import Dimenzija, Sestavina, Vnos, Kontejner, Dnevna_prodaja, VnosZaloge, Stranka
 from ..models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
 import io

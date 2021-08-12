@@ -28,13 +28,7 @@ class BazaQuerySet(ModelQuerySet):
 
     def stranka_values(self):
         return self \
-        .annotate(naziv_stranke = Coalesce(F("stranka__naziv"),Value(""))) \
-        .annotate(telefon_stranke = Coalesce(F("stranka__telefon"),Value(""))) \
-        .annotate(email_stranke = Coalesce(F("stranka__mail"),Value(""))) \
-        .annotate(ime_stranke = Coalesce(F("stranka__ime"),Value(""))) \
-        .annotate(status_stranke = Coalesce(F("stranka__status"),Value(""))) \
-        .annotate(davcna_stranke = Coalesce(F("stranka__davcna"),Value("")))
-        #.annotate(ulica_stranke = Coalesce(F("stranka__ulica"),Value(""))) \
+        .annotate(naziv_stranke = Coalesce(F("stranka__podjetje__naziv"),Value(""))) \
 
     def skupno_values(self):
         return self \
@@ -135,3 +129,10 @@ class VnosQuerySet(ModelQuerySet):
             .order_by("sestavina") \
             .values()
         return values
+
+class StrankaQuerySet(ModelQuerySet):
+
+    def all_values(self):
+        return self.annotate(naziv = F("podjetje__naziv")) \
+            .values()
+        

@@ -17,7 +17,7 @@ from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
-from .model_queries import VnosZalogeQuerySet, VnosQuerySet, SestavinaQuerySet, BazaQuerySet, DobaviteljQuerySet
+from .model_queries import *
 
 
 TIPI_SESTAVINE = (
@@ -343,9 +343,11 @@ def create_dnevna_prodaja(sender, instance, created, **kwargs):
             dnevna_prodaja = instance,
             popust = 0 )
 
-class Stranka2(BasicModel):
+class Stranka(BasicModel):
     podjetje = models.OneToOneField(Podjetje,null=True,blank=True,on_delete=models.CASCADE)
     status = models.CharField(default='aktivno',max_length=10)
+
+    objects = StrankaQuerySet.as_manager()
 
     def __str__(self):
         return self.podjetje.naziv if self.podjetje != None else "/"
@@ -381,7 +383,7 @@ class Baza(BasicModel):
     dobavitelj = models.ForeignKey(Dobavitelj,null=True,default=None,blank=True, on_delete=models.CASCADE)
     kontejner = models.OneToOneField(Kontejner,null=True,default=None,blank=True, on_delete=models.CASCADE)
     popust = models.IntegerField(default = None, null=True, blank=True)
-    stranka = models.ForeignKey(Stranka2,on_delete=models.SET_NULL,null=True,blank=True,default=None)
+    stranka = models.ForeignKey(Stranka,on_delete=models.SET_NULL,null=True,blank=True,default=None)
     dnevna_prodaja = models.ForeignKey(Dnevna_prodaja, on_delete=models.CASCADE, default=None, null=True, blank=True)
     prevoz = models.DecimalField(default=None,null=True,blank=True,max_digits=5, decimal_places=2)
     zalogaPrenosa = models.IntegerField(default=None,null=True,blank=True)

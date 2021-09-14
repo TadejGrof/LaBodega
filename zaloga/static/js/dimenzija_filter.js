@@ -7,11 +7,12 @@ template.innerHTML = `
             height:15%;
         }
 
-        #selectors *{
-            width:16%;
+        div.selectors div, div.selectors select{
+            width:10%;
             height:100%;
             display:inline-block;
             text-align:center;
+            text-overflow:hidden;
         }
 
         #buttons{
@@ -25,7 +26,7 @@ template.innerHTML = `
     </style>
 
     <div id="filter">
-        <div id="selectors">
+        <div class="selectors">
             <div> Radij: </div>
             <select id="radij">
                 <option value="all"> All </option>

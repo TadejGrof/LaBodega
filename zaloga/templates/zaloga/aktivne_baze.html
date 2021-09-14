@@ -4,6 +4,12 @@
 {% block content %}
 
 <style>
+    .aktivne_baze{
+        width:80%;
+        margin-left:10%;
+        display:block;
+    }
+
     div.title{
         font-size:6vh;
         text-align:center;
@@ -176,89 +182,60 @@
     {{slovar|keyvalue:'Aktivno'|keyvalue:jezik}}:
 </h1>
 
-{% if baze.count == 0 %}
-    <h2>
-        {{slovar|keyvalue:'Ni aktivnih baz'|keyvalue:jezik}}
-    </h2>
-{% else %}
-    {% if tip == "vele_prodaja" %}
-        <form action="{% url 'skupen_pregled_narocil' zaloga.pk %}" method="GET">
-            <input type="submit" value="Skupen pregled naročil"> 
-        </form>
-    {% endif %}
-    <div style="width:70%;display:inline-block;margin-top:2%" >
-        <table class="tabela_vnosov">
-            <tr class="header">
-                <th> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
-                {% if tip == "vele_prodaja" %}
-                <th> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </th>
-                {% elif tip == "prevzem" %}
-                <th> {{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}: </th>
-                <th> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </th>
-                {% elif tip == "prenos" %}
-                <th> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
-                {% endif %}
-                <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
-                <th> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
-                {% if tip == "vele_prodaja" %}
-                <th> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
-                {% endif %}
-                <th> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
-                <th> {{slovar|keyvalue:'Izbris'|keyvalue:jezik}}: </th>
-            </tr>
-            {% for baza in baze %}
-            <tr>
-                <td> {{baza.title}} </td>
-                {% if tip == "vele_prodaja" %}
-                <td> {{baza.naziv_stranke}} </td>
-                {% elif tip == "prevzem" %}
-                <td> {{baza.stevilka_kontejnerja}} </td>
-                <td> {{baza.drzava_dobavitelja}} </td>
-                {% elif tip == "prenos" %}
-                <td> {{baza.zaloga_prenosa}} </td>
-                {% endif %}
-                <td> {{baza.datum}} </td>
-                <td> {{baza.skupno_stevilo}} </td>
-                {% if tip == "vele_prodaja" %}
-                <td> {{baza.skupna_cena}} $ </td>
-                {% endif %}
-                <td class="ogled"> 
-                    <form action="{% url 'baza' zaloga_pk tip baza.id %}" method="GET">
-                        <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
-                    </form>
-                </td>
-                <td class="izbris">
-                    <form action="{% url 'izbris_baze' zaloga_pk baza.tip baza.id %}" onsubmit="return Confirm()" method="POST">
-                        {% csrf_token %}
-                        <input type="submit" value="{{slovar|keyvalue:'Izbris'|keyvalue:jezik}}">
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-            <tr>
-                {% if tip == "prevzem" %}
-                <td colspan="4"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </td>
-                {% else %}
-                <td colspan="3"> {{slovar|keyvalue:'Skupno'|keyvalue:jezik}}: </td>
-                {% endif %}
-                <td> {{skupno_stevilo}} </td>
-                {% if tip == "vele_prodaja" %}
-                <td>{{skupna_cena}} $</td>
-                <td colspan="2"></td> 
-                {% else %}
-                <td colspan="3"></td>
-                {% endif %}
-            </tr>
-            
-        </table>
-        <div style="height:5%"></div>
-    </div>
-{% endif %}
+<template id="header">
+    <tr class="header">
+        <th> Title: </th>
+        <th> Datum: </th>
+        <th filter="prevzem">  Kontejner: </th>
+        <th filter="prevzem">  Dobavitelj: </th>
+        <th filter="prevzem"> Prihod: </th>
+        <th filter="vele_prodaja"> Stranka: </th>
+        <th> Število </th>
+        <th filter="vele_prodaja"> Cena: </th> 
+        <th> Ogled: </th>
+        <th> Izbris: </th>
+    </tr>
+</template>
+
+<template id="baza_row_model">
+    <row-model-element style="display:table-row" className="Baza">
+        <value-element attrName="title" class="table_cell"></value-element>
+        <value-element attrName="datum" class="table_cell"></value-element>
+        <value-element filter="prevzem" attrName="stevilka_kontejnerja" class="table_cell"></value-element>
+        <value-element filter="prevzem" attrName="naziv_dobavitelja" class="table_cell"></value-element>
+        <value-element filter="prevzem" attrName="prihod" class="table_cell"></value-element>
+        <value-element filter="vele_prodaja" attrName="naziv_stranke" class="table_cell"></value-element>
+        <value-element attrName="skupno_stevilo" class="table_cell"></value-element>
+        <value-element filter="vele_prodaja" attrName="skupna_cena" type="price" class="table_cell"></value-element>
+        <div class="table_cell">
+            <button validate="true" is="delete-button"> Izbrisi </button>
+        </div>
+        <div class="table_cell">
+            <button onclick="ogledAction(this)"> Ogled </button>
+        </div>
+    </row-model-element>
+</template>
+
+<models-table-element 
+    rowModel="baza_row_model" 
+    class="aktivne_baze"
+    header="header" 
+    filterAttr="tip" 
+    tip="{{tip}}">
+</models-table-element>
+
 <script>
-    function Confirm() {
-        if (!confirm('are you sure?')){
-            return false
-        }
+    var baze = JSON.parse('{{baze|jsonList|safe}}');
+    var table = $("models-table-element").get(0)
+    table.value = baze;
+
+    function ogledAction(button){
+        var id = $(button).closest(".modelElement").get(0).model["id"]; 
+        var url = "ogled/" + id + "/";
+        window.location.href = url;
     }
+
+
 </script>
+
 {% endblock %}

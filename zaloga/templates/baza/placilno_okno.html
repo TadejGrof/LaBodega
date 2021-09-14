@@ -1,33 +1,27 @@
 {% load zaloga_exstras %}
 
 <style>
-    input.placilo{
-        width:10%;
-        text-align:center;
+    .placiloInput{
+        width:20%;
     }
-    div.koncna_cena{
+    .koncnaCenaInput{
         width:10%;
-        margin-left:0%;
     }
-    div.dolg{
-        width:10%;
-        text-align:right;
+    .dolgValue{
+        margin-left:5%;
+        width:20%;
     }
-    
-
 </style>
-<div>
-    <div class="inline"> Placilo: </div>
-    
-    <input class="inline skrit placilo" type="text" id="placilo_value" value="{{values.placilo}}"> 
-    <div class="inline placilo" id="placilo"> {{values.placilo}} $ </div>
-    <div class="inline" id="placilo_koncna_cena">/ {{values.koncna_cena}} $ </div>
-    <div class="inline placilo skrit">
-        <button class="spremeni_button" data-sprememba="placilo"> OK </button>
-        <button onclick="ToggleClass('.placilo','skrit')"> <- </button>
+
+<div class="placilnoOkno">
+    <input-value-element class="placiloInput" type="price" attrName="placilo" text="Placilo:"> </input-value-element>
+    /
+    <value-element class="koncnaCenaInput" type="price" attrName="koncna_cena"> </value-element>
+    <div class="inline sprememba skrit">
+        <button is="save-button"> OK </button>
+        <button is="toggle-button" scope=".placilnoOkno"> <- </button>
     </div>
-    <button class="placilo inline" onclick="ToggleClass('.placilo','skrit')"> Spremeni </button>
-    <div class="dolg inline"> Dolg: </div>
-    <div id="dolg" class="inline"> {{values.dolg}} $ </div>
-    
+    <button is="toggle-button" class="sprememba" scope=".placilnoOkno"> Spremeni </button>
+    <value-element class="dolgValue" type="price" attrName="dolg" text="Dolg:"></value-element>
 </div>
+

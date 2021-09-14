@@ -15,9 +15,10 @@ class BazaQuerySet(ModelQuerySet):
         return self \
         .annotate(username_creatorja = F("author__username")) \
         .annotate(username_uveljavitelja = F("author__username"))
-
+        
     def dobavitelj_values(self):
         return self \
+        .annotate(dobavitelj__naziv = Coalesce(F("dobavitelj__podjetje__naziv"), Value(""))) \
         .annotate(naziv_dobavitelja = Coalesce(F("dobavitelj__podjetje__naziv"),Value(""))) \
         .annotate(drzava_dobavitelja = Coalesce(F("dobavitelj__podjetje__drzava__naziv"),Value(""))) 
         #.annotate(telefon_dobavitelja = Coalesce(F("dobavitelj__telefon"),Value(""))) \
@@ -43,6 +44,7 @@ class BazaQuerySet(ModelQuerySet):
 
     def all_values(self):
         return self \
+            .annotate(kontejner__stevilka = F("kontejner__stevilka")) \
             .annotate(stevilka_kontejnerja = Coalesce(F("kontejner__stevilka"),Value(""))) \
             .annotate(ladijski_prevoz_value = Coalesce(F("ladijski_prevoz"),0)) \
             .dobavitelj_values() \
@@ -113,7 +115,7 @@ class VnosQuerySet(ModelQuerySet):
     use_for_related_fields = True
 
     def all_values(self):
-        values =  self.annotate(datum = F("baza__datum")) \
+        return self.annotate(datum = F("baza__datum")) \
             .annotate(status = F("baza__status")) \
             .annotate(tip_baze = F("baza__tip")) \
             .annotate(title_baze = F("baza__title")) \
@@ -125,10 +127,9 @@ class VnosQuerySet(ModelQuerySet):
             .annotate(tip = F("sestavina__tip__kratko")) \
             .annotate(dolgi_tip = F("sestavina__tip__dolgo")) \
             .annotate(tip_id = F("sestavina__tip__id")) \
+            .annotate(sestavina__tip__kratko = F("sestavina__tip__kratko")) \
             .annotate(skupna_cena=Coalesce(Cast(F("stevilo") * F("cena"), FloatField()),0)) \
-            .order_by("sestavina") \
             .values()
-        return values
 
 class StrankaQuerySet(ModelQuerySet):
 

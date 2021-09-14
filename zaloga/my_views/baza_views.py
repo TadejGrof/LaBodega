@@ -40,7 +40,7 @@ def spremeni_vnos(request):
 def nov_vnos(request):
     try:
         stevilo = int(request.POST.get('stevilo'))
-        sestavina = Sestavina.objects.get(pk=request.POST.get('sestavina'))
+        sestavina = Sestavina.objects.get(pk=int(request.POST.get('sestavina')))
         baza = Baza.objects.get(pk = int(request.POST.get('baza')))
         zaloga = baza.zaloga
         cena = None
@@ -51,21 +51,17 @@ def nov_vnos(request):
             stevilo = stevilo,
             cena = cena,
             baza = baza)
-        index = 1
-        for v in baza.vnos_set.all().order_by("sestavina").values("id"):
-            if vnos.id == v["id"]:
-                break
-            index += 1
-        vnos_values = vnos.all_values()
-        vnos_values["index"] = index
+        print(baza.vnos_set.all().all_values())
         data = {
-            "vnos": vnos_values,
-            "baza": vnos.baza.all_values(),
-            "action":"novo",
+            "vnos": vnos.all_values(),
+            "baza": baza.all_values(),
+            "vnosi": [vnos for vnos in baza.vnos_set.all().order_by("sestavina").all_values()],
             "success":True,
         }
     except:
-        data = {"success":False}
+        data = {
+            "success":False,
+        }
     return JsonResponse(data)
 
 @require_POST

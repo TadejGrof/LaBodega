@@ -4,3 +4,35 @@
 .skrit{
     display:none
 }
+
+select{
+    text-align:center;
+    text-align-last:center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.valueElement{
+    text-align:center;
+}
+
+.valueElement > div {
+    text-align:center;
+}
+
+.valueElement div.textBox{
+    text-align: left;
+    width:30%;
+}
+
+div.valueBox .value{
+    margin:0%;
+    padding:0%;
+}
+
+div.inputBox input,
+div.inputBox select {
+    text-align:center;
+    width:90%;
+}

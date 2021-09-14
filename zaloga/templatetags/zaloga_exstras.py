@@ -19,18 +19,23 @@ def razlika(value, index):
 
 @register.filter
 def jsonList(data):
-    seznam = [x for x in data]
+    print(data)
+    seznam = [clear_data(x) for x in data]
     return JSON.dumps(seznam)
 
-@register.filter
-def json(data):
+def clear_data(data):
     for key, value in data.items():
+        if(isinstance(value,list)):
+            data[key] = JSON.loads(jsonList(value))
         if isinstance(value,(datetime.date,datetime.datetime)):
             data[key] = str(value)
         elif isinstance(value,Decimal):
             data[key] = float(value)
-    print(JSON.dumps(data))
-    return JSON.dumps(data)
+    return data
+
+@register.filter
+def json(data):
+    return JSON.dumps(clear_data(data))
 
 @register.filter
 def zadnji(list):
@@ -43,7 +48,7 @@ def datum(datetime):
 @register.filter
 def datum_str(date):
     return date.strftime('%Y-%m-%d')
-    
+
 @register.filter
 def getDayOfWeek(datum):
     dnevi = ["Ponedeljek","Torek","Sreda","Četrtek","Petek","Sobota","Nedelja"]

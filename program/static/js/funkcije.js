@@ -5,6 +5,7 @@ function Confirm() {
         return true
     }
 }
+
 function Nastavi_vrstice(id_tabele, cell_class){
     var table = document.getElementById(id_tabele);
     if (table){

@@ -9,6 +9,9 @@
         margin-left:10%;
         border:1px solid black
     }
+    div.edit{
+        height:5%;
+    }
     #tabela_podatkov td{
         width:25%;
         height:3.4vh;
@@ -27,119 +30,51 @@
         text-align:center;
         margin:1.5%;
     }
-    #edit_bazno_okno_button{
+    .edit_bazno_okno_button{
         position:absolute;
         width:5%;
         left:95%;
         height:5vh;
     }
+    .pdf_button{
+        position:absolute;
+        width:5%;
+        left:95%;
+        height:5vh;
+        bottom:0;
+        margin:0;
+    }
+    #edit_button{
+        width:15%;
+        height:5vh;
+    }
+    #uveljavi_button{
+        width:15%;
+        height:5vh;
+    }
+    #bazno_okno form{
+        width:100%;
+        height:100%;
+    }
 </style>
 
-<div id="bazno_okno">
-    <button id="edit_bazno_okno_button"> E </button>
-    <div class="table">
-        <table id="tabela_podatkov">
-            {% if baza.tip == "prevzem" %}
-                <tr>
-                    <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> {{slovar|keyvalue:values.tip|keyvalue:jezik}} </td>
-                    <td class="info"> 
-                        Dobavitelj: 
-                    </td>
-                    <td class="dobavitelj podatek"> 
-                        <div class="sprememba"> {{values.naziv_dobavitelja}} </div>
-                        <div class="sprememba skrit">
-                            <select id="dobavitelj_value">
-                                {% for dobavitelj in dobavitelji %}
-                                    {% if dobavitelj.id == values.dobavitelj_id %}
-                                        <option value="{{dobavitelj.id}}" selected> {{dobavitelj.naziv}} </option>
-                                    {% else %}
-                                        <option value="{{dobavitelj.id}}"> {{dobavitelj.naziv}} </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info"> Naziv: </td>
-                    <td class="podatek"> {{values.title}} </td>
-                    <td class="info"> Kontejner: </td>
-                    <td class="kontejner podatek"> 
-                        <div class="sprememba">
-                            {{values.stevilka_kontejnerja}} 
-                        </div>
-                        <div class="sprememba skrit">
-                            <input type="text" value="{{values.stevilka_kontejnerja}}" id="kontejner_value">
-                        </div>
-                        </td>
-                </tr>
-                <tr>
-                    <td class="info"> Odprema blaga: </td>
-                    <td class="odprema_blaga podatek"> 
-                        <div class="sprememba">
-                            {{baza.odprema_blaga|datum|datum_str}} 
-                        </div>
-                        <div class="sprememba skrit">
-                            <input type="date" value="{{baza.odprema_blaga|datum|datum_str}}" id="odprema_blaga_value">
-                        </div>
-                    </td>
-                    <td class="info"> Prevzem blaga: </td>
-                    <td class="podatek"> {{value.prevzem_blaga}} </td>
-                </tr>
-            {% elif baza.tip == "vele_prodaja" %}
-                <tr>
-                    <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> {{values.tip}} </td>
-                    <td class="info"> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> 
-                        <div class="sprememba"> {{values.naziv_stranke}} </div>
-                        <div class="sprememba skrit">
-                            <select id="stranka_value">
-                                {% for stranka in stranke %}
-                                    {% if stranka.id == baza.stranka_id %}
-                                        <option selected value="{{stranka.id}}"> {{stranka.naziv}} </option>
-                                    {% else  %}
-                                        <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info"> Faktura: </td>
-                    <td class="podatek"> {{values.title}} </td>
-                    <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> {{values.datum}} </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td class="info"> {{slovar|keyvalue:'Tip baze'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> {{slovar|keyvalue:values.tip|keyvalue:jezik}} </td>
-                    <td class="info"> User: </td>
-                    <td class="podatek"> {{baza.author.username}} </td>
-                </tr>
-                <tr>
-                    <td class="info"> {{slovar|keyvalue:'Ime baze'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> {{values.title}} </td>
-                </tr>
-                <tr>
-                    <td class="info"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </td>
-                    <td class="podatek"> {{values.datum}} </td>
-                </tr>
-            {% endif %}
-        </table>
-    </div>
-    <div class="edit skrit">
-        <button class="inline" id="shrani_bazno_okno"> Potrdi </button>
+<div class="baznoOkno">
+    <button class="edit_bazno_okno_button" is="toggle-button" toggle=".edit, .sprememba" scope="div"> E </button>
+    <value-element text="Tip baze:" attrName="tip"> </value-element>
+    <model-select-value-element options='{{dobavitelji|jsonList|safe}}' filter="prevzem" text="Dobavitelj:" attrName="dobavitelj" textAttr="naziv"> </model-select-value-element>
+    <model-select-value-element options='{{stranke|jsonList|safe}}' filter="vele_prodaja" text="Stranka:" attrName="stranka" textAttr="naziv"> </model-select-value-element>
+    <value-element text="Title:" attrName="title"> </value-element>
+    <input-value-element filter="prevzem" text="Kontejner:" attrName="kontejner__stevilka"> </input-value-element>
+    <input-value-element type="date" text="Datum:" attrName="datum"> </input-value-element>
+    
+    <div class="buttons">
+        <div class="edit skrit">
+            <button is="save-button" scope=".baznoOkno"> Shrani </button>
+        </div>
+        <div class="edit">
+            <button> Uveljavi </button>
+        </div>
     </div>
 </div>
 
-<script>
-    $('#edit_bazno_okno_button').click(function(){
-        $('#bazno_okno div.edit').toggleClass("skrit");
-        $('#bazno_okno .sprememba').toggleClass("skrit");
-    });
-</script>
     

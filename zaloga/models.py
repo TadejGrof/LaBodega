@@ -196,7 +196,6 @@ class Zaposleni(BasicModel):
 
 ##################################################################################################
 
-
 @receiver(post_save, sender=Tip)
 def create_tip(sender, instance, created, **kwargs):
     if created:
@@ -346,7 +345,7 @@ def create_dnevna_prodaja(sender, instance, created, **kwargs):
 class Stranka(BasicModel):
     podjetje = models.OneToOneField(Podjetje,null=True,blank=True,on_delete=models.CASCADE)
     status = models.CharField(default='aktivno',max_length=10)
-
+    
     objects = StrankaQuerySet.as_manager()
 
     def __str__(self):
@@ -393,6 +392,11 @@ class Baza(BasicModel):
     narocilo = models.OneToOneField("self",default=None,null=True,blank=True,on_delete=models.SET_NULL)
 
     objects = BazaQuerySet.as_manager()
+
+    def all_values(self):
+        values = super().all_values()
+        values["vnosi"] = [vnos for vnos in self.vnos_set.all().order_by("sestavina").all_values()]
+        return values
 
     def __str__(self):
         return self.title
@@ -455,6 +459,16 @@ class Baza(BasicModel):
     @property
     def koncna_cena(self):
         return self.skupna_cena - self.cena_popusta + self.cena_prevoza
+
+    @property
+    def narocilo_values(self):
+        if self.narocilo != None:
+            return {
+                "narocilo": self.narocilo.all_values(),
+                "vnosi": self.narocilo.vnos_set.all().all_values()
+            }
+        else:
+            return None
 
     def doloci_title(self,stevilo=None):
         leto = self.datum.year
@@ -620,6 +634,18 @@ def save_vnos(sender,instance,**kwargs):
                 print("SPREMEMBA SESTAVINE")
                 baza.zaloga.nastavi_iz_vnosov(old_vnos.sestavina)
                 baza.zaloga.nastavi_iz_vnosov(instance.sestavina)
+
+@receiver(post_save, sender=Baza)
+def create_baza(sender, instance, created, **kwargs):
+    if created:
+        if instance.tip == "vele_prodaja":
+            narocilo = Baza.objects.create(
+                tip = "narocilo",
+                stranka = instance.stranka,
+                zaloga = instance.zaloga
+            )
+            instance.narocilo = narocilo
+            instance.save()
 
 @receiver(post_save, sender=Vnos)
 def create_vnos(sender, instance, created, **kwargs):

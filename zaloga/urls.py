@@ -6,6 +6,7 @@ from .my_views import stroski_views
 from .my_views import skupen_pregled_views
 from .my_views import baza_views
 from .my_views import pviews
+from .my_views import ajax_views
 
 ogled_patterns = [
     path('',views.baza, name="baza"),
@@ -68,6 +69,9 @@ dnevna_prodaja_patterns = [
 ]
 
 ajax_patterns = [
+    path('create/',ajax_views.create,name="create"),
+    path('save/',ajax_views.save,name="save"),
+    path('delete/',ajax_views.delete,name="delete"),
     path('spremeni_vnos/', baza_views.spremeni_vnos, name='spremeni_vnos'),
     path('nov_vnos/', baza_views.nov_vnos, name="nov_vnos"),
     path('izbrisi_vnos/', baza_views.izbrisi_vnos, name="izbrisi_vnos"),

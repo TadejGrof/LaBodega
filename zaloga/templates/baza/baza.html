@@ -5,16 +5,24 @@
 
 {% block javascript %}
     <script>
+        var csrf = '{{csrf_token}}';
         var baza = JSON.parse('{{values|json|safe}}');
+        var vnosi = JSON.parse('{{vnosi|jsonList|safe}}');
         var dimenzije = JSON.parse('{{dimenzije|jsonList|safe}}');
         var sestavine = JSON.parse('{{sestavine|jsonList|safe}}');
+        var tipi = JSON.parse('{{tipi|jsonList|safe}}');
     </script>
     <script src="{% static 'js/dimenzija_filter.js' %}"></script>
-    
+    <script src="{% static 'js/dimenzija_dinamic_filter.js' %}"></script>
+    <script src="{% static 'js/tabela_vnosov.js' %}"></script>
+    <script src="{% static 'js/nov_vnos.js' %}"></script>
+    <script src="{% static 'js/models/baza_model_element.js' %}"></script>
+    <script src="{% static 'js/models/vnos_model_element.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <style>
+    
     div.okno{
         margin-top:2%;
         display:inline-block;
@@ -47,125 +55,69 @@
         text-align:center;
         margin-top:2%
     }
+
+    div.baznoOkno{
+        position:relative;
+        text-align: left;
+        width:80%;
+        margin:10%;
+        border: 1px solid black;
+    }
+
+    div.baznoOkno > .valueElement {
+        margin-left:5%;
+        margin-bottom:1%;
+        margin-top: 1%;
+        width: 40%;
+        font-size:120%;
+    }
+
+    div.baznoOkno .edit_bazno_okno_button{
+        margin:0%;
+        font-size: 100%;
+        position:absolute;
+        width:5%;
+        left:95%;
+        height:5vh;
+    }
+    div.baznoOkno div.edit{
+        width:100%;
+        text-align:center;
+    }
+    div.baznoOkno .pdf_button{
+        position:absolute;
+        width:5%;
+        left:95%;
+        height:5vh;
+        bottom:0;
+        margin:0;
+    }
+    div.baznoOkno .buttons{
+        margin-top:2%;
+    }
+
+    div.baznoOkno div.edit button{
+        width:15%;
+    }
 </style>
 
-{% include 'baza/bazno_okno.html' %}
+<baza-model-element id="poskus" className="Baza">
+    {% include 'baza/bazno_okno.html' %}
 
-{% if tip == "vele_prodaja" %}
-    {% include "baza/placilno_okno.html" %}
-{% endif %}
+    <tabela-vnosov>
+        
+    </tabela-vnosov>
 
-<div id="delovno_okno" class="delovno_okno">
-    <button class="toggle_nov_vnos_button" style="width:15%" > {{slovar|keyvalue:'Nov vnos'|keyvalue:jezik}} </button> 
-    <button id="izbrisi_vse_button"> Izbrisi vse </button>
-    <form enctype='multipart/form-data' class="inline" style="margin-left:3px;margin-right:3px"  action="{% url 'iz_datoteke' zaloga_pk tip values.id %}" method="POST">
-        {% csrf_token %}
-        <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
-        <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
-    </form>
-    <form class="inline" action="{% url 'uveljavi_bazo' zaloga_pk tip values.id %}" method="POST">
-        {% csrf_token %}
-        <input id="uveljavi_button" type="submit" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
-    </form>   
-    {% if tip == "inventura" %}
-        <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip values.id %}" method="GET">
-            <input style="width:150px" type="submit" value="PDF Razlike">
-        </form>
+    {% if tip == "vele_prodaja" %}
+        {% include "baza/placilno_okno.html" %}
     {% endif %}
-    {% include 'forms/pdf_baze_form.html' with tip=tip baza=values.id zaloga=zaloga_pk select=True razlicni_tipi=baza.razlicni_tipi %}
-</div>
+</baza-model-element>
 
-{% include './nov_vnos.html' %}
 
-{% if status == "aktivno" %}
-    {% include 'baza/filter.html' with radiusi=razlicni_radiusi %}
-{% endif %}
-
-{% if tip != "inventura" or status == "veljavno" or status == "zaklenjeno" %}
-    {% include 'baza/tabela_vnosov.html' %}
-{% endif %}
 
 <script>
-        $(".vnosi_button").click(function(){alert("DELAM8")});
-        $("#izbrisi_vse_button").click(function(){
-            $.ajax({
-                url: '{% url "izbrisi_vse" %}',
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'baza': baza["id"]
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if(data["success"]){
-                        baza = data["baza"];
-                        $("#tabela_vnosov tr.vnos_row").remove();
-                        refreshPage();
-                    } else {
-                        alert("NAPAKA");
-                    }
-                    
-                }
-            });
-        })
-        $("#pokazi_nov_vnos_button, #preklici_nov_vnos_button").click(function(){
-            $(".nov_vnos").toggle();
-        });
-        $("#vnosi_button").click(function(){
-            alert("DELAM");
-        });
-        $("#uveljavi_button").click(function(){
-            alert("DELAM");
-        })
-
-        $('.spremeni_button').click(function(){
-            spremeniBazaValue(this.getAttribute("data-sprememba"),function(){});
-        });
-        
-        function izbrisiVnos(vnos){
-            $.ajax({
-                url: '{% url "izbrisi_vnos" %}',
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'vnos': vnos
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if(data["success"]){
-                        baza = data["baza"];
-                        odstraniVrstico(data["vnos"]);
-                        refreshPage();
-                    } else {
-                        alert("NAPAKA");
-                    }
-                    
-                }
-            }); 
-        }
-
-        function spremeniVnos(vnos, stevilo, cena){
-            $.ajax({
-                url: '{% url "spremeni_vnos" %}',
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'vnos': vnos,
-                'stevilo': stevilo,
-                'cena':cena
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if(data["success"]){
-                        baza = data["baza"];
-                        refreshVrstica(data["vnos"]);
-                        refreshPage();
-                    } else {
-                        alert("NAPAKA");
-                    }    
-                }
-            }); 
-        }
+    var poskus = document.querySelector("#poskus");
+    poskus.model = baza;
 
         function novVnos(sestavina,stevilo){
             $.ajax({
@@ -188,42 +140,6 @@
                     } 
                 }
             }); 
-        }
-
-        function spremeniBazaValue(sprememba,funkcija){
-            $.ajax({
-                url: "{% url 'spremeni_baza_value' %}",
-                method: 'POST',
-                data: {
-                'csrfmiddlewaretoken': '{{csrf_token}}',
-                'value': $('#' + sprememba + '_value').val(),
-                'baza': baza["id"],
-                'sprememba':sprememba
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if(data["success"]){
-                        baza = data["baza"];
-                        refreshPage();
-                        ToggleClass('.' + sprememba,'skrit');
-                    } else {
-                        alert("NAPAKA");
-                    }
-                }
-            });  
-        };
-
-        function refreshPage(){
-            refreshTabelaVnosov();
-            $("#skupno_stevilo").html(baza["skupno_stevilo"]);
-            $("#koncna_cena").html(baza["koncna_cena"] + " $");
-            $("#placilo_koncna_cena").html("/ " + baza["koncna_cena"] + " $");
-            $("#cena_popusta").html(baza["cena_popusta"] + " $");
-            $("#popust").html(baza["popust"] + " %");
-            $("#prevoz").html(baza["prevoz"] + " $");
-            $("#cena_prevoza").html(baza["cena_prevoza"] + " $");
-            $("#placilo").html(baza["placilo"] + " $");
-            $("#dolg").html(baza["dolg"] + " $");
         }
 
         function getSestavina(dimenzija,tip){

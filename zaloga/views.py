@@ -73,7 +73,7 @@ def baze(request,zaloga,tip_baze):
     if request.method == "GET":
         zaloga = Zaloga.objects.get(pk = zaloga)
         baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno').all_values()
-        stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
+        stranke = Stranka.objects.all().all_values()
         zaloge = Zaloga.objects.all()
         skupno_stevilo = baze.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
         skupna_cena = baze.aggregate(cena = Sum("koncna_cena"))["cena"]
@@ -104,17 +104,14 @@ def nova_baza(request,zaloga,tip_baze):
             title = program.naslednja_baza(tip_baze,delaj = True)
         if tip_baze == "prevzem":
             stevilka = request.POST.get('stevilka')
-            posiljatelj = request.POST.get('posiljatelj')
-            drzava = request.POST.get('drzava')
+            dobavitelj = request.POST.get('dobavitelj')
             kontejner = Kontejner.objects.create(
-                stevilka=stevilka,
-                posiljatelj=posiljatelj,
-                drzava=drzava)
+                stevilka=stevilka)
             Baza.objects.create(
                 zaloga_id = zaloga,
                 title=title,
                 kontejner=kontejner,
-                author=request.user,
+                dobavitelj_id = dobavitelj,
                 tip=tip_baze,
                 sprememba_zaloge = 1)
         elif tip_baze == "prenos":
@@ -182,19 +179,21 @@ def baza(request,zaloga, tip_baze, pk):
         vnosi = Vnos.objects.filter(baza=baza,sestavina=OuterRef("id"))
         sestavine = zaloga.sestavine.all().all_values().vnosi_values(vnosi).zaloga_values(zaloga)
         dimenzije = Dimenzija.objects.all().all_values()
-        
+        print("BAZA:")
+        print(baza_values)
         slovar = {
             'zaloga': zaloga,
             'baza':baza,
             'tip':tip_baze,
             'status':baza.status,
             'dimenzije':dimenzije,
-            'dobavitelji': Dobavitelj.objects.all().all_values() if baza.tip == "prevzem" else None,
-            'stranke': Stranka.objects.all().all_values() if baza.tip == "vele_prodaja" else None,
+            'dobavitelji': Dobavitelj.objects.all().all_values() if baza.tip == "prevzem" else [],
+            'stranke': Stranka.objects.all().all_values() if baza.tip == "vele_prodaja" else [],
+            'narocilo': baza.narocilo_values if baza.tip == "vele_prodaja" and baza.status == "aktivno" else None,
             'vnosi': baza.vnos_set.all().all_values(),
             'razlicni_radiusi': zaloga.vrni_razlicne_radiuse,
             'sestavine': sestavine,
-            'tipi': zaloga.tipi_sestavin.all(),
+            'tipi': zaloga.tipi_sestavin.all().all_values(),
             "values": baza_values}
         return pokazi_stran(request, 'baza/baza.html',slovar)
     

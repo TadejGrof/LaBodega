@@ -136,3 +136,10 @@ function Skrij(id){
 function razkrij(id){
     document.getElementById(id).style.visibility = "visible"
 };
+
+function getFormData(form){
+    return form.serializeArray().reduce(function(obj, item) {
+        obj[item.name] = item.value;
+        return obj;
+    }, {});
+}

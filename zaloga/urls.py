@@ -7,6 +7,8 @@ from .my_views import skupen_pregled_views
 from .my_views import baza_views
 from .my_views import pviews
 from .my_views import ajax_views
+from zaloga.models import Baza
+from zaloga.api.views.viewsets import *
 
 ogled_patterns = [
     path('',views.baza, name="baza"),
@@ -87,6 +89,10 @@ dolgovi_patterns = [
 ]
 
 urlpatterns = [
+    path("poskus3/", include(StrankaViewSet().urls())),
+    path("poskus3/", include(DimenzijaViewSet().urls())),
+    path("poskus3/", include(SestavinaViewSet().urls())),
+    path("poskus3/", include(DobaviteljViewSet().urls())),
     path('<int:zaloga>/pregled_zaloge/', zaloga_views.pregled_zaloge, name='pregled_zaloge'),
     path('<int:zaloga>/pregled_prometa/<int:sestavina>/', include(pregled_patterns)),
     path('<int:zaloga>/pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
@@ -101,5 +107,4 @@ urlpatterns = [
     path('<int:zaloga>/dodaj_dnevne_prodaje/',pviews.dodaj_dnevne_prodaje, name="dodaj_dnevne_prodaje"),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
-    
 ]

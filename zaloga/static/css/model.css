@@ -1,0 +1,7 @@
+.rowModelElement > * {
+    display: "table-cell";
+}
+
+.rowModelElement {
+    display: "table-row";
+}

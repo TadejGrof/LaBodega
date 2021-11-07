@@ -1,0 +1,40 @@
+{% extends 'program/base.html' %}
+
+{% load staticfiles %}
+{% load zaloga_exstras %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/views/form_table.css' %}">
+    <link rel="stylesheet" href="{% static 'css/views/formset_table.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h2> {{title}} </h2>
+
+<div class="actions">
+    <button class="delete_button"> DELETE </button>
+    <button class="json_button"> JSON </button>
+    {% block actions %} {% endblock %}
+</div>
+
+{% for form in forms %}
+    <div class="form">
+        <form action="{{form.action}}" method="{{form.method}}" data-connected_forms="{{form.connected_forms}}">
+            {% include "views/table_form.html" %}
+        </form>
+    </div>
+{% endfor %}
+
+{% for formset in formsets %}
+    <div class="formset_table">
+        <form data-connected_forms="{{form.connected_forms}}">
+            {% include "views/table_formset.html" %}
+        </form>
+    </div>
+{% endfor %}
+
+{% block endjs %}
+    <script src="{% static 'js/views/form_table.js' %}"></script>
+    <script src="{% static 'js/views/formset_table.js' %}"></script>
+{% endblock %}

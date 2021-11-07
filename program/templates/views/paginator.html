@@ -1,0 +1,42 @@
+{% load zaloga_exstras %}
+
+{% if paginator.num_pages > 1 %}
+<div class="pagenav">
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% for page in paginator.pages %}
+                {% if page.number == paginator.current_page.number %}
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{page.number}}
+                            <span class="sr-only">(current)</span>
+                        </span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <button class="page-link" onclick="change_page({{page.display}})">{{page.display}}</button>
+                    </li>
+                {% endif %}
+            {% endfor %}      
+        </ul>
+    </nav>
+</div>
+
+<script>
+    function change_page(page){
+        var page = page
+        var current_url = window.location.href;
+        page_pattern = RegExp(`page=(\\d){1,}`, 'g');
+        current_url = current_url.replace(page_pattern,"")
+        last_char = current_url.charAt(current_url.length - 1) 
+        alert(last_char);
+        if(last_char == "?"){
+            window.location.href = current_url + "page=" + page  
+        }else if(last_char == "/"){
+            window.location.href = current_url + "?page=" + page  
+        } else {
+            window.location.href = current_url + "&page=" + page  
+        }
+    }
+</script>
+{% endif %}

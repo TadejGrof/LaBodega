@@ -5,6 +5,11 @@ from django.db.models.functions import Concat,Cast, Coalesce, Round
 
 class ModelQuerySet(models.QuerySet):
     def all_values(self):
-        return self.values()
+        return self.annotate(__str__=F("id")).values()
 
         
+class PodjetjeQuerySet(ModelQuerySet):
+    use_for_related_fields = True
+
+    def all_values(self):
+        return self.annotate(__str__ = F("naziv")).values()

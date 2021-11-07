@@ -103,6 +103,19 @@ class InputValueElement extends ValueElement{
         $(".valueBox",this).show();
     }
 
+    get connectedFields(){
+        var connectedFields = Json.parse(this.getAttrName("connectedFields"))
+        if(connectedFields == null){
+            return [this];
+        } else {
+            var fields = [this];
+            for(var fieldName of connectedFields){
+                fields.push($("[attrName=" + fieldName + "]", this.closest(".modelElement")).get(0));
+            }
+        }
+        return connectedFields;
+    }
+
     setInput(){
         var inputBox = this.querySelector(".inputBox");
         var type = this.type;
@@ -269,7 +282,7 @@ class ModelsElement extends ValueElement{
     }
 
     setContent(){
-
+    
     }
 
     setAttributes(){
@@ -287,3 +300,76 @@ class ModelsElement extends ValueElement{
 }
 
 window.customElements.define("models-element",ModelsElement);
+
+
+class ModelsTableElement extends ModelsElement{
+    constructor(){
+        super();
+    }
+
+    set rowModel(data){
+        this.setAttribute("rowModel",data);
+    }
+
+    get rowModel(){
+        return $("#" + this.getAttribute("rowModel")).get(0);
+    }
+
+    createHeader(){
+        var vrstica = document.createElement("tr");
+        vrstica.classList.add("header");
+        var rowModel = this.rowModel();
+        for(var tableCell of $(this).childs()){
+            var cell = document.createElement("th");
+            $(vrstica).append(cell);
+            var valueElement = $(".valueElement",tableCell).get(0);
+            if(valueElement != null){
+                if(valueElement.text != null){
+                    cell.innerHTML = valueElement.text;
+                } else {
+                    cell.innerHTML = valueElement.attrName.replace("_"," ");
+                }
+            } else {
+                cell.innerHTML = tableCell.getAttribute("text");
+            }
+        }
+        return vrstica;
+    }
+
+    setContent(){
+        var table = document.createElement("table");
+        table.classList.add("tabela_vnosov");
+        var rowModel = this.rowModel();
+        if(rowModel == null){
+            alert("MANJKA ROW MODEL");
+        }else{
+            var header = this.createHeader();
+            $(table).append(header);
+        }
+    }
+
+    refresh(){
+        this.removeRows();
+        this.addRows();
+    }
+
+    removeRows(){
+        $(".rowModelElement",this).remove();
+    }
+
+    addRows(){
+        var rowModel = this.rowModel;
+        for(var model of this.value){
+            var row = rowTemplate.content.cloneNode(true);
+            $("table.modelTableElement tbody",this).append(row);
+            rowModel.model = model;
+        }
+    }
+
+    connectedCallback(){
+        super.connectedCallback();
+        this.classList.add("modelsTableElement");
+    }
+}
+
+window.customElements.define("models-table-element",ModelsTableElement);

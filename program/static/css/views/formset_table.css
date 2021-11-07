@@ -1,0 +1,60 @@
+.formset_table table{
+    width:100%;
+    margin: 0%;
+}
+
+.filter{
+    margin-bottom:1.5%;
+}
+
+.formset_table .buttons{
+    margin:0%;
+}
+
+.formset_table td, .formset_table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.formset_table label{
+    margin-bottom: 0px
+}
+
+
+
+
+.formset_table input[type="submit"]{
+    width:15%;
+    display:inline-block;
+}
+
+.formset_table input{
+    text-align:center;
+    max-width: 100px;
+    
+}
+
+
+
+
+.formset_table .table-hover tbody tr:hover input:disabled {
+    background-color: rgba(0,0,0,0);
+}
+
+input:disabled{
+    background:white;
+    border:0;
+    color:black
+}
+
+.formset_table .edit_button {
+    display:none
+}
+
+.formset_table .edit_button.inline {
+    display:inline-block
+}
+
+.formset_table .toggle_edit_button {
+    display:inline-block
+}

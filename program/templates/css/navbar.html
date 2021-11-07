@@ -1,14 +1,13 @@
-
 {% load zaloga_exstras %}
 
-<style class="navbar">
-    .navbar {
+<style class="navigation">
+    .navigation {
         overflow: hidden;
         background-color: #333;
         font-family: Arial;
         height:12%}
 
-    .navbar a{
+    .navigation a{
         float: left;
         font-size: 5vmin;
         color: white;
@@ -17,19 +16,19 @@
         text-decoration:none;
         height:100%;}
 
-    .navbar .dropdown a{
+    .navigation .listdown a{
         width:100%;
         height:100%;
     }
 
-    .navbar .dropdown, .nav {
+    .navigation .listdown, .nav {
         float: left;
         height:100%;
         width:100%;
         margin:0;
         overflow:hidden;}
 
-    .navbar .dropdown .dropbtn, .nav {
+    .navigation .listdown .dropbtn, .nav {
     font-size: 5vmin; 
     border: none;
     outline: none;
@@ -42,11 +41,11 @@
     margin: 0; /* Important for vertical align on mobile phones */
     }
 
-    .navbar a:hover, .dropdown:hover .dropbtn {
+    .navigation a:hover, .listdown:hover .dropbtn {
     background-color: red;
     }
 
-    .navbar .dropdown-content {
+    .navigation .listdown-content {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
@@ -56,7 +55,7 @@
     width:300px
     }
 
-    .navbar .dropdown-content a {
+    .navigation .listdown-content a {
     float: none;
     color: black;
     padding: 12px 16px;
@@ -65,20 +64,20 @@
     text-align: left;
     }
 
-    .navbar .dropdown-content a:hover {
+    .navigation .listdown-content a:hover {
     background-color: #ddd;
     }
 
-    .navbar .dropdown:hover .dropdown-content {
+    .navigation .listdown:hover .listdown-content {
     display: block;
     } 
 
-    .navbar .racun {
+    .navigation .racun {
         float:right;
         width:300px;
         overflow:hidden
     }
-    .navbar .show {
+    .navigation .show {
     display: block;
     }
 
@@ -99,8 +98,8 @@
     display:none
   }
 
-  /* Style the sidenav links and the dropdown button */
-  .sidenav a, .dropdown-btn {
+  /* Style the sidenav links and the listdown button */
+  .sidenav a, .listdown-btn {
     padding: 8px 8px 8px 16px;
     text-decoration: none;
     font-size: 5vmin;
@@ -116,7 +115,7 @@
   }
 
   /* On mouse-over */
-  .sidenav a:hover, .dropdown-btn:hover {
+  .sidenav a:hover, .listdown-btn:hover {
     background-color: #f1f1f1;
   }
 
@@ -127,14 +126,14 @@
     padding: 0px 10px;
   }
 
-  /* Add an active class to the active dropdown button */
+  /* Add an active class to the active listdown button */
   .sidenav .active {
     background-color: green;
     color: white;
   }
 
-  /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-  .sidenav .dropdown-container {
+  /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the listdown content */
+  .sidenav .listdown-container {
     display: none;
     background-color: #262626;
     padding-left: 8px;
@@ -147,7 +146,7 @@
   } 
 </style>
 
-<div id="navbar" class="navbar">
+<div id="navigation" class="navigation">
     {% if je_stranka %}
         <div style="display:inline-block;width:28%"><a href="{% url 'stranka_pregled_narocil' %}" style="width:100%"> Pregled narocil </a></div>
         <div style="display:inline-block;width:22%"><a href="{% url 'stranka_zgodovina' %}" style="width:100%"> Zgodovina </a></div>
@@ -156,11 +155,11 @@
         <button onclick="odpri()" class="nav" style="width:15%"> ☰ </button>
         <a style="width:20%" href="/">Home</a>
     {% endif %}
-    <div class="racun dropdown" id="racun">
+    <div class="racun listdown" id="racun">
         <button class="dropbtn" >{{ user.get_username }}
         <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-content" id="profil">
+        <div class="listdown-content" id="profil">
             {% if perms.admin.view_logentry %}
                 <a href="{% url 'admin:index' %}"> Admin </a>
             {% endif %}
@@ -174,30 +173,30 @@
 <div id="sidenav" class="sidenav">
     <a style="margin-bottom:10%" onclick="zapri()"> X </a>
     {% if perms.admin.view_logentry %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Pregled'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Pregled'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             <a href="{% url 'pregled_zalog' %}" > Skladisca </a>
             <a href="{% url 'pregled_zaposlenih' %}" > Zaposleni </a>
             <a href="{% url 'pregled_strank' %}"> Stranke </a>
             <a href="{% url 'nova_dimenzija' %}" >{{slovar|keyvalue:'Dodaj dimenzijo'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
-        <button class="dropdown-btn"> {{zaloga.title}}
+        <button class="listdown-btn"> {{zaloga.title}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             {% for skladisce in zaloge %}
                 <form id="myform_{{skladisce.pk}}" method="POST" action="{% url 'spremeni_zalogo' skladisce.pk %}">{% csrf_token %}</form>
                 <a href="#" onclick="document.getElementById('myform_{{skladisce.pk}}').submit()">{{skladisce.title}}</a>
             {% endfor %}  
         </div>
     {% if perms.zaloga.view_zaloga %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             <a href="{% url 'pregled_zaloge' zaloga_pk %}" >{{slovar|keyvalue:'Pregled zaloge'|keyvalue:jezik}}</a>
             {% if perms.zaloga.add_inventura %}
             <a href="{% url 'baze' zaloga_pk 'inventura' %}">{{slovar|keyvalue:'Inventura'|keyvalue:jezik}}</a>
@@ -208,10 +207,10 @@
         </div>
     {% endif %}
     {% if false %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             {% if perms.zaloga.add_odpis %}
             <a href="{% url 'baze' zaloga_pk 'odpis' %}">{{slovar|keyvalue:'Odpis'|keyvalue:jezik}}</a>
             {% endif %}
@@ -219,10 +218,10 @@
         </div>
     {% endif %}
     {% if perms.zaloga.view_prevzem %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             {% if perms.zaloga.add_prevzem %}
             <a href="{% url 'baze' zaloga_pk 'prevzem' %}">{{slovar|keyvalue:'Prevzem'|keyvalue:jezik}}</a>
             {% endif %}
@@ -230,10 +229,10 @@
         </div>
     {% endif %}
     {% if perms.zaloga.view_prevzem %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             {% if perms.zaloga.add_prevzem %}
             <a href="{% url 'baze' zaloga_pk 'prenos' %}">{{slovar|keyvalue:'Prenos'|keyvalue:jezik}}</a>
             {% endif %}
@@ -241,10 +240,10 @@
         </div>
     {% endif %}
     {% if perms.prodaja.view_prodaja %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Prodaja'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             {% if perms.prodaja.add_vele_prodaja %}
                 <a href="{% url 'baze' zaloga_pk 'vele_prodaja' %}">{{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}</a>
             {% endif %}
@@ -259,10 +258,10 @@
         </div>
     {% endif %}
     {% if perms.prodaja.add_dnevna_prodaja and zaloga|ima_prodajo:"dnevna_prodaja"  %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             {% if danasnja_prodaja != None %}
                 <a href="{% url 'dnevna_prodaja' zaloga_pk danasnja_prodaja.id %}">{{slovar|keyvalue:'Dnevna prodaja'|keyvalue:jezik}}</a>
             {% endif %}
@@ -273,10 +272,10 @@
         </div>
     {% endif %}
     {% if perms.zaloga.add_strosek %}
-        <button class="dropdown-btn">{{slovar|keyvalue:'Stroski'|keyvalue:jezik}}
+        <button class="listdown-btn">{{slovar|keyvalue:'Stroski'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             <a href="{% url 'strosek'%}">{{slovar|keyvalue:'Nov strosek'|keyvalue:jezik}}</a>
             {% if perms.zaloga.view_stroski_group %}
                 <a href="{% url 'pregled_stroskov' %}">{{slovar|keyvalue:'Pregled'|keyvalue:jezik}}</a>
@@ -284,19 +283,19 @@
         </div>
     {% endif %}
     {% if perms.zaloga.view_stroski_group %}
-        <button class="dropdown-btn"> {{slovar|keyvalue:'Porocilo'|keyvalue:jezik}}
+        <button class="listdown-btn"> {{slovar|keyvalue:'Porocilo'|keyvalue:jezik}}
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             <a href="{% url 'porocilo_prometa' %}"> {{slovar|keyvalue:'Porocilo prometa'|keyvalue:jezik}}</a>
             <a href="{% url 'porocilo_prodaje' %}"> {{slovar|keyvalue:'Porocilo prodaje'|keyvalue:jezik}}</a>
         </div>
     {% endif %}
     {% if perms.admin.view_logentry %}
-        <button class="dropdown-btn"> Narocilo
+        <button class="listdown-btn"> Narocilo
             <i class="fa fa-caret-down"></i>
         </button>
-        <div class="dropdown-container">
+        <div class="listdown-container">
             <a href="{% url 'baze' zaloga_pk 'narocilo' %}">Narocilo</a>
         </div>
     {% endif %}
@@ -309,17 +308,17 @@
     function zapri() {
         document.getElementById('sidenav').style.display = "none"
     }
-    var dropdown = document.getElementsByClassName("dropdown-btn");
+    var listdown = document.getElementsByClassName("listdown-btn");
     var i;
 
-    for (i = 0; i < dropdown.length; i++) {
-    dropdown[i].addEventListener("click", function() {
+    for (i = 0; i < listdown.length; i++) {
+    listdown[i].addEventListener("click", function() {
         this.classList.toggle("active");
-        var dropdownContent = this.nextElementSibling;
-        if (dropdownContent.style.display === "block") {
-        dropdownContent.style.display = "none";
+        var listdownContent = this.nextElementSibling;
+        if (listdownContent.style.display === "block") {
+        listdownContent.style.display = "none";
         } else {
-        dropdownContent.style.display = "block";
+        listdownContent.style.display = "block";
         }
     });
     } 

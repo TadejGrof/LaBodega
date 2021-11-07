@@ -1,0 +1,45 @@
+<style>
+    div.form_table table{
+        width:80%;
+        margin-left:10%;
+    }
+    div.form_table div{
+        height:10%;
+        text-align:center
+    }
+    div.form_table input[type="submit"]{
+        width:15%;
+        display:inline-block;
+    }
+</style>
+
+<div class="form_table">
+    <table>
+        {% for field in form.visible_fields %}
+            {% if forloop.counter0|divisibleby:columns %}
+                {% if forloop.first %}
+                    <tr>
+                {% elif forloop.last %}
+                    </tr>
+                {% else %}
+                </tr>
+                <tr>
+                {% endif %}
+            {% endif %}
+            <th> {{field.label_tag}} </th>
+            <td> {{field}} </td>
+        {% endfor %}   
+    </table>
+
+    {% if form.values == None %}
+        <input class="create_button btn btn-outline-success" type="submit" value="Dodaj">
+    {% else %}
+        {% if form.toggle_edit %}
+            <button type="button" value="E" class="toggle_edit_button">
+            <input class="save_button" type="submit" value="Shrani">
+        {% elif form.edit %}
+            <input class="save_button" type="submit" value="Shrani">
+        {% endif %}
+    {% endif %}
+
+</div>

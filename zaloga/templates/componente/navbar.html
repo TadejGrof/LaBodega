@@ -1,0 +1,105 @@
+<style class="navbar">
+    .navbar {
+        overflow: hidden;
+        background-color: #333;
+        font-family: Arial;
+        height:12%}
+
+    .navbar a{
+        float: left;
+        font-size: 5vmin;
+        color: white;
+        text-align: center;
+        padding: 18px 16px;
+        text-decoration:none;
+        height:100%;}
+
+    .navbar .dropdown a{
+        width:100%;
+        height:100%;
+    }
+
+    .navbar .dropdown, .nav {
+        float: left;
+        height:100%;
+        width:100%;
+        margin:0;
+        overflow:hidden;}
+
+    .navbar .dropdown .dropbtn, .nav {
+    font-size: 5vmin; 
+    border: none;
+    outline: none;
+    color: white;
+    padding: 12px 16px;
+    width:100%;
+    height:100%;
+    background-color: inherit;
+    font-family: inherit; /* Important for vertical align on mobile phones */
+    margin: 0; /* Important for vertical align on mobile phones */
+    }
+
+    .navbar a:hover, .dropdown:hover .dropbtn {
+    background-color: red;
+    }
+
+    .navbar .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    width:160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    width:300px
+    }
+
+    .navbar .dropdown-content a {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    }
+
+    .navbar .dropdown-content a:hover {
+    background-color: #ddd;
+    }
+
+    .navbar .dropdown:hover .dropdown-content {
+    display: block;
+    } 
+
+    .navbar .racun {
+        float:right;
+        width:300px;
+        overflow:hidden
+    }
+    .navbar .show {
+    display: block;
+    }
+
+</style>
+
+<div id="navbar" class="navbar">
+    {% if sidebar %}
+        <button onclick="odpri()" class="nav" style="width:15%"> ☰ </button>
+    {% endif %}
+    <a style="width:20%" href="/">Home</a>
+    
+    {% block content %}
+    {% endblock}
+    
+    <div class="racun dropdown" id="racun">
+        <button class="dropbtn" >{{ user.get_username }}
+        <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content" id="profil">
+            {% if perms.admin.view_logentry %}
+                <a href="{% url 'admin:index' %}"> Admin </a>
+            {% endif %}
+            <a href="{% url 'profil' %}"> Profil </a>
+            <a href="{% url 'logout' %}"> {{slovar|keyvalue:'Odjava'|keyvalue:jezik}} </a>
+        </div>
+    </div>
+</div>

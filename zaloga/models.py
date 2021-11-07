@@ -18,6 +18,7 @@ from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
 from .model_queries import *
+from .model_queries import StrankaQuerySet
 
 
 TIPI_SESTAVINE = (
@@ -68,6 +69,10 @@ class Tip(BasicModel):
     kratko = models.CharField(max_length=10,default="")
     dolgo = models.CharField(max_length=10,default="")
 
+    plural = "Tipi"
+
+    objects = TipQuerySet.as_manager()
+
     def __str__(self):
         return self.kratko
 
@@ -79,6 +84,10 @@ class Dimenzija(BasicModel):
     visina_special = models.CharField(max_length=10, default="")
     special = models.BooleanField(default=False)
     
+    plural = "Dimenzije"
+    
+    objects = DimenzijaQuerySet.as_manager()
+
     class Meta:
         ordering = ['radij', 'sirina', 'visina' , 'special']
 
@@ -347,7 +356,8 @@ class Stranka(BasicModel):
     status = models.CharField(default='aktivno',max_length=10)
     
     objects = StrankaQuerySet.as_manager()
-
+    plural = "Stranke"
+    
     def __str__(self):
         return self.podjetje.naziv if self.podjetje != None else "/"
         
@@ -392,6 +402,7 @@ class Baza(BasicModel):
     narocilo = models.OneToOneField("self",default=None,null=True,blank=True,on_delete=models.SET_NULL)
 
     objects = BazaQuerySet.as_manager()
+    plural = "Baze"
 
     def all_values(self):
         values = super().all_values()

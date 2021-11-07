@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime
-from .model_queries import ModelQuerySet
+from .model_queries import ModelQuerySet, PodjetjeQuerySet
 
 JEZIKI = (
     ('slo','Slovenscina'),
@@ -156,5 +156,6 @@ class Podjetje(BasicModel):
     direktor = models.ForeignKey(Oseba, default=None,null=True,blank=True, on_delete=models.SET_NULL)
     drzava = models.ForeignKey(Drzava,default=0,on_delete=models.CASCADE)
 
+    objects = PodjetjeQuerySet.as_manager()
     def __str__(self):
         return self.naziv

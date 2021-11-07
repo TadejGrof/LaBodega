@@ -1,47 +1,68 @@
-{% load staticfiles %}
+
+{% load static %}
 
 <html>
     <head>
-        <title> Login </title>
-        <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
-        <link rel="stylesheet" href="{% static 'css/tabele.css' %}">
-    </head>
-
-    <script src="{% static 'js/poskus.js' %}"></script>
-    <script src="{% static 'js/funkcije.js' %}"></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     
+    </head>
     <body>
         <style>
             body{
-                background: black
+                background-image: url("{% static 'fotos/slika.jpg' %}")
             }
-            div.login{
-                background: white;
-                display:block;
-                position:absolute;
-                left:35%;
-                width:30%;
-                height:45%;
-                top:25%;
+            h1 {
                 text-align:center;
-                font-size:4vh
+                margin:5%;
+                margin-top: 10%;
+                color: white;
+            }
+            #login-button{
+                margin-left:40%;
+                width:20%;
             }
             input{
-                width:50%;
-                height:12%;
+                margin-left:30%;
             }
-            button{
-                width:30%;
-                height:16%;
+            div.alert{
+                width:40%;
+                margin-left:30%;
             }
         </style>
-        <div class="login">
-        <h2>Login</h2>
-        <form class="login" method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Login</button>
-        </form>
+    
+        <h1> SEMENIC LLANTAS </h1>
+
+        <div class="form-group">
+            <form class="login" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input style="width:40%" type="text" name="username" class="form-control" placeholder="Username" required/>
+                </div>
+                <div class="form-group">
+                    <input style="width:40%" type="password" name="password" class="form-control" placeholder="Password" required/>
+                </div>
+                {% if form.errors %}
+                    {% for field in form %}
+                        {% for error in field.errors %} 
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+                {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+                <button id="login-button" class="btn btn-light"  type="submit">Login</button>       
+            </form>
         </div>
     </body>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </html>

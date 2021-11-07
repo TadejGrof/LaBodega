@@ -9,8 +9,12 @@ class ModelElement extends MyHTMLElement{
     }
     
     set model(data){
+        this.setModel(data);
+    }
+
+    setModel(data,change=true){
         this.setAttribute("model",JSON.stringify(data));
-        this.modelChange(data);
+        if(change) this.modelChange(data);
     }
 
     updateField(fieldName, value){}
@@ -85,27 +89,11 @@ class ModelElement extends MyHTMLElement{
         }
     }
 
-
-    refresh(model){
-        if(model == null) model = this.model;
-        var filterAttr = this.filterAttr;
-        if(filterAttr != null){
-            $("[filter]",this).each(function(){
-                $(this).hide()
-                if(this.getAttribute("filter") == model[filterAttr]){
-                    $(this).show();
-                }
-            });
-        };
-    }
-
-
     getPOSTData(){
         return {
             'csrfmiddlewaretoken': csrf,
             'class_name': this.className,
             'hasParent': this.hasParent,
-            "parentAttr": this.parentAttr,
         };
     }
 
@@ -129,7 +117,7 @@ class ModelElement extends MyHTMLElement{
     
     preSave(){};
 
-    save(scopeElement=null, includeParent=true){
+    save(scopeElement=null){
         if(scopeElement == null){
             scopeElement = this;
         }
@@ -142,7 +130,7 @@ class ModelElement extends MyHTMLElement{
             dataType: 'json',
             success: function (data) {
                 if(data["success"]){
-                    element.postSave(data, includeParent);
+                    element.postSave(data);
                 } else {
                     alert(data["error"]);
                 }    
@@ -150,9 +138,24 @@ class ModelElement extends MyHTMLElement{
         });
     }
 
-    postSave(data, includeParent){
-        this.model = data["model"];
-        if(this.hasParent && includeParent){
+    connectedFields(inputElements){
+        var fields = []
+        for(var input of inputElements){
+            for(var field of input.connectedFields){
+                if(!fields.contains(field)){
+                    fields.push(field);
+                }
+            }
+        }
+        return fields;
+    }
+
+    postSave(data){
+        var data = data["model"];
+        for(var field of this.connectedFields(updatedFields)){
+            this.updateField(field,data[field.attrName]);
+        }
+        if(this.hasParent){
             element.parent.model = data["parent"];
         }
     };
@@ -225,7 +228,7 @@ class ModelElement extends MyHTMLElement{
     }
 
     postDelete(data, includeParent){
-        $(this).remove();
+        this.model = null;
         if(this.hasParent && includeParent){
             this.parent.model = data["parent"];
         }
@@ -234,125 +237,47 @@ class ModelElement extends MyHTMLElement{
 
 window.customElements.define("model-element",ModelElement);
 
-class EditModelButton extends HTMLButtonElement{
-    set modelElement(data){
-        this.setAttribute("modelElement",data)
-    }
-
-    get modelElement(){
-        return $("#" + this.getAttribute("modelElement")).get(0);
-    }
-
-    get validate(){
-        var validate = this.getAttribute("validate");
-        if(validate == "true"){ return true;}
-        return false;
-    }
-
-    set validate(data){
-        this.setAttribute("validate",data.toString())
-    }
-
-    set scope(data){
-        this.setAttribute("scope",data);
-    }
-
-    get scope(){
-        return this.getAttribute("scope");
-    }
-
-    setClickEvent(){
-
-    }
-
-    connectedCallback(){
-        this.classList.add("editButton");
-        if(this.scope == null){this.scope = ".modelElement";}
-        var modelElement = this.getAttribute("modelElement");
-        if(modelElement == null){
-            this.modelElement = $(this).closest(".modelElement").attr("id");
-        }
-        this.setClickEvent();
-    }
-}
-
-class SaveModelButton extends EditModelButton{
-    constructor(){
-        super();
-    }
-
-    setClickEvent(){
-        var validate = this.validate;
-        $(this).click(function(){
-            if(this.validate && !Confirm()){return}
-            this.modelElement.save($(this).closest(this.scope).get(0));
-            $(".sprememba, .edit",$(this).closest(this.scope).get(0)).toggle();
-        })
-    }
-
-    connectedCallback(){
-        super.connectedCallback();
-        this.classList.add("saveButton");
-    }
-    
-}
-
-window.customElements.define("save-button",SaveModelButton,{extends:"button"});
-
-class CreateModelButton extends EditModelButton{
-    constructor(){
-        super();
-    }
-
-    setClickEvent(){
-        var validate = this.validate;
-        $(this).click(function(){
-            if(this.validate && !Confirm()){return}
-            this.modelElement.create($(this).closest(this.scope).get(0));
-        })
-    }
-
-    connectedCallback(){
-        super.connectedCallback();
-        this.classList.add("createButton");
-    }
-    
-}
-
-window.customElements.define("create-button",CreateModelButton,{extends:"button"});
-
-class DeleteModelButton extends EditModelButton{
-    constructor(){
-        super();
-    }
-
-    setClickEvent(){
-        var validate = this.validate;
-        $(this).click(function(){
-            if(validate && !Confirm()){return}
-            this.modelElement.delete();
-        })
-    }
-
-    connectedCallback(){
-        super.connectedCallback();
-        this.classList.add("deleteButton");
-    }
-    
-}
-
-window.customElements.define("delete-button",DeleteModelButton,{extends:"button"});
-
-
 class RowModelElement extends ModelElement{
     constructor(){
         super();
     }
 
+    get table(){
+        return $("#" + this.getAttribute("table")).get(0);
+    }
+
+    set table(data){
+        this.setAttribute("table",data);
+    }
+
     connectedCallback(){
         super.connectedCallback();
         this.classList.add("rowModelElement");
-        $(this).css("display","table-row");
+        this.table = $(this).closest(".modelTableElement").get(0).id;
+    }
+
+    refreshParent(data){
+        var parent = data["parent"];
+        var table = this.table;
+        for(var field of table.connectedFields()){
+            field.updateField(field,parent[field.attrName]);
+        }
+        this.parent.setModel(parent);
+    }
+
+    postSave(data){
+        this.model = data["model"];
+        this.refreshParent(data);
+    }
+
+    postDelete(data){
+        $(this).remove();
+        this.refreshParent(data);
+    }
+
+    postCreate(data){
+        this.model = data["model"];
+        this.refreshParent(data);
     }
 }
 

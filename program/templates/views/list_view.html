@@ -1,0 +1,84 @@
+{% extends 'program/base.html' %}
+
+{% load static %}
+{% load zaloga_exstras %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/views/list_view.css' %}">
+    <link rel="stylesheet" href="{% static 'css/views/form_table.css' %}">
+    <link rel="stylesheet" href="{% static 'css/views/formset_table.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    {% if title %}
+        <h2> {{title}} </h2>
+    {% endif %}
+
+
+    
+
+    {% if formset.title %}
+        <h2> {{formset.title}} </h2>
+    {% endif %}
+
+    {% if filter %}
+        <div class="filter container">
+            <form id="page_form" method="GET">
+                {{filter.form}}
+                <input type="submit" value="Filtriraj" class="btn btn-primary btn-sm">
+            </form>
+        </div>
+    {% endif %}
+
+    <form id="{{formset.prefix}}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{request.get_full_path}}">
+
+        <div class="formset">
+            <div class="buttons container">
+                <div class="row">
+                    {% if create %}
+                        <button type="button" class="col btn btn-outline-success"> Dodaj </button>
+                    {% endif %}
+                    {% if formset.toggle_edit and formset.select %}
+                        <button type="button" class="edit_selected_button col btn btn-outline-info"> Uredi izbrane </button>
+                    {% elif formset.toggle_edit %}
+                        <button type="button" class="edit_all_button col btn btn-outline-info"> Uredi vse </button>
+                    {% endif %}
+                    {% if formset.edit %}
+                        <button type="button" class="save_button col btn btn-outline-success"> Shrani </button>
+                    {% endif %}
+                    {% if formset.select and formset.delete %}
+                        <button type="submit" formaction="list_delete/" class="delete_selected_button col btn btn-outline-danger"> Izbrisi izbrane </button>
+                    {% endif %}
+                    {% if formset.delete %}
+                        <button type="submit" formaction="list_delete/" class="delete_all_button col btn btn-outline-danger"> Izbrisi vse </button>
+                    {% endif %}
+                    {% if formset.JSON %}
+                        <button type="button" class="col btn btn-outline-info"> JSON </button>
+                    {% endif %}
+                    {% if formset.PDF %}
+                        <button type="button" class="col btn btn-outline-info"> PDF </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="formset_table">
+                    {% include "views/table_formset.html" with formset=formset %}
+            </div>
+        </div>
+    </form>
+
+
+
+    {% if formset.paginate %}
+        {% include "./paginator.html" %}
+    {% endif %}
+
+{% endblock %}
+
+
+{% block endjs %}
+    <script src="{% static 'js/views/form_table.js' %}"></script>
+    <script src="{% static 'js/views/formset_table.js' %}"></script>
+{% endblock %}

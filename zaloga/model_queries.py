@@ -92,6 +92,7 @@ class SestavinaQuerySet(ModelQuerySet):
         .annotate(naziv_dimenzije = F("dimenzija__dimenzija")) \
         .annotate(kratek_tip = F("tip__kratko")) \
         .annotate(radij_dimenzije = F("dimenzija__radij")) \
+        .annotate(__str__ = F("naziv_dimenzije")) \
         .values()
 
     def filtriraj(self,sestavina_filter):
@@ -109,6 +110,30 @@ class VnosZalogeQuerySet(ModelQuerySet):
             .annotate(tip = F("sestavina__tip__kratko")) \
             .annotate(dimenzija_id = F("sestavina__dimenzija__id")) \
             .annotate(tip_id = F("sestavina__tip__id")) \
+            .values()
+
+class StrankaQuerySet(ModelQuerySet):
+    use_for_related_fields = True
+
+    def all_values(self):
+        return self.annotate(naziv = F("podjetje__naziv")) \
+            .annotate(drzava = F("podjetje__drzava__naziv")) \
+            .annotate(direktor = Coalesce(F("podjetje__direktor__ime"),Value("/"))) \
+            .annotate(__str__ = F("naziv")) \
+            .values()
+
+class DimenzijaQuerySet(ModelQuerySet):
+    use_for_related_fields = True
+
+    def all_values(self):
+        return self.annotate(__str__ = F("dimenzija")) \
+            .values()
+
+class TipQuerySet(ModelQuerySet):
+    use_for_related_fields = True
+
+    def all_values(self):
+        return self.annotate(__str__ = F("kratko")) \
             .values()
 
 class VnosQuerySet(ModelQuerySet):
@@ -130,10 +155,3 @@ class VnosQuerySet(ModelQuerySet):
             .annotate(sestavina__tip__kratko = F("sestavina__tip__kratko")) \
             .annotate(skupna_cena=Coalesce(Cast(F("stevilo") * F("cena"), FloatField()),0)) \
             .values()
-
-class StrankaQuerySet(ModelQuerySet):
-
-    def all_values(self):
-        return self.annotate(naziv = F("podjetje__naziv")) \
-            .values()
-        

@@ -1,0 +1,75 @@
+<table class="table table-bordered table-hover">
+    {{formset.management_form}}
+    <thead>
+        <tr class="header">
+            {% if formset.select %}
+                <th scope="col">
+                    <input type="checkbox" selector="td.index" scope="table" class="selector" aria-label="...">
+                </th>
+            {% endif %}
+            {% for field in formset.empty_form.visible_fields %}
+                <th scope="col">
+                    {{field.label_tag}}
+                </th>
+            {% endfor %}
+            {% if formset.edit %}
+                <th scope="col">Edit:</th>
+            {% endif %}
+            {% if formset.delete %}
+                <th scope="col"> Izbrisi: </th>
+            {% endif %}
+            {% if formset.view %}
+                <th scope="col"> Ogled: </th>
+            {% endif %}
+            {% if formset.json %}
+                <th scope="col"> JSON: </th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for form in formset %}
+        <tr class="form_row" id="{{form.prefix}}-row">
+            {{form.id}}
+            {% if formset.select %}
+            <td class="index">
+                <input type="checkbox" name="{{form.prefix}}-select" />
+            </td>
+            {% endif %}
+            {% for field in form.visible_fields %}
+                <td>
+                    {{field}}
+                </td>
+            {% endfor %}
+            {% if formset.toggle_edit %}
+                <td>
+                    <button  type="button" id="{{form.prefix}}-edit_button" class="edit_button btn btn-success"> Save </button> 
+                    <button  type="button" id="{{form.prefix}}-toggle_edit_button" class="toggle_edit_button btn btn-info"> 
+                        E
+                    </button> 
+                </td>
+            {% elif formset.edit %}
+                <td>
+                    <button type="button" id="{{form.prefix}}-edit_button" class="edit_button inline btn btn-success"> 
+                        Save
+                    </button>
+                </td>
+            {% endif %}
+            {% if formset.delete %}
+                <td>
+                    <button type="button" id="{{form.prefix}}-delete_button" class="delete_button btn btn-danger" onclick="delete_ajax(this)"> X </button> 
+                </td>
+            {% endif %}
+            {% if formset.view %}
+                <td> 
+                    <button type="button" id="{{form.prefix}}-view_button" class="btn btn-info view_button"> Ogled </button>
+                </td>
+            {% endif %}
+            {% if formset.json %}
+                <td> 
+                    <button type="button" id="{{form.prefix}}-json_button"> JSON </button>
+                </td>
+            {% endif %}
+        </tr>
+    {% endfor %}   
+    </tbody>
+</table>

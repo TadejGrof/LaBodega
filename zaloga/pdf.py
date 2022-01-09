@@ -115,7 +115,7 @@ def tabela_porocila(p,od,do,promet, top = 800, jezik = "spa"):
             znesek = "+" + str(znesek) + "$"
         else:
             znesek = str(znesek) + "$"
-        
+
         if skupno > 0:
             skupno_str = "+" + str(skupno) + "$"
         else:
@@ -166,9 +166,9 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
 
 def tabela_razlike_inventure(p,baza,top=800,jezik = "spa"):
     header = [slovar['Dimenzija'][jezik],
-            slovar['Tip'][jezik], 
-            slovar['Vnos'][jezik], 
-            slovar['Zaloga'][jezik], 
+            slovar['Tip'][jezik],
+            slovar['Vnos'][jezik],
+            slovar['Zaloga'][jezik],
             slovar['Razlika'][jezik]
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
@@ -180,7 +180,7 @@ def tabela_razlike_inventure(p,baza,top=800,jezik = "spa"):
     top = naslednja_vrstica(p,top)
 
     sestavine = Sestavina.objects.all().filter(zaloga = baza.zaloga)
-    
+
     skupna_razlika = 0
     for vnos in baza.vnos_set.all().order_by("dimenzija"):
         stevilo = vnos.stevilo
@@ -195,7 +195,7 @@ def tabela_razlike_inventure(p,baza,top=800,jezik = "spa"):
                             ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                             ])
             tabela(p,[vrstica],style)
-            top = naslednja_vrstica(p,top,header = header)    
+            top = naslednja_vrstica(p,top,header = header)
     # zadnja vrstica
     vrstica = ["Skupna razlika:", skupna_razlika]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
@@ -203,7 +203,7 @@ def tabela_razlike_inventure(p,baza,top=800,jezik = "spa"):
                         ('BOX', (0,0), (-1,-1), 0.5, colors.black),
                         ])
     tabela(p,[vrstica],style)
-    top = naslednja_vrstica(p,top)   
+    top = naslednja_vrstica(p,top)
 
 def tabela_baz(p,baze,top = 800, jezik = "spa"):
     vnosi = Vnos.objects.filter(baza__in = baze).order_by('dimenzija').values('baza__pk','dimenzija__dimenzija','dimenzija__radius','tip','stevilo','pk','baza__stranka__pk')
@@ -250,7 +250,7 @@ def tabela_baz(p,baze,top = 800, jezik = "spa"):
         skupno = 0
         for baza in podatki:
             skupno += stevilo_baze(podatki,baza)
-        
+
         vrstica = [dimenzija.split('_')[0],"",dimenzija.split('_')[1]] + [stevilo_baze(podatki,baza) if baza.pk in podatki else 0 for baza in baze] + [skupno]
         style = TableStyle([('ALIGN',(2,0),(-1,-1),'CENTER'),
                             ('ALIGN',(0,0),(1,0),'LEFT'),
@@ -472,11 +472,11 @@ def title_vele_prodaje(p,baza,top = 800, jezik = "spa"):
     top = naslednja_vrstica(p,top)
     top = naslednja_vrstica(p,top,visina=30)
     data = [
-        [slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', baza.author.profil.celo_ime],
+        [slovar['Naziv'][jezik] + ':', baza.stranka.ime, slovar['Naziv'][jezik] + ':', "Eurotire America s.a."],
         [slovar['Davcna'][jezik] + ': ' , baza.stranka.davcna, slovar['Telefon'][jezik] + ':',baza.author.profil.telefon],
         [slovar['Kontakt'][jezik] + ':', baza.stranka.telefon,'E-mail:', baza.author.email],
-        [slovar['Naslov'][jezik] + ':', baza.stranka.naslov.mesto, slovar['Banka'][jezik] + ':', baza.author.profil.tip_banke],
-        [slovar['Ulica'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Stevilka racuna'][jezik] + ':', baza.author.profil.stevilka_racuna]
+        [slovar['Naslov'][jezik] + ':', baza.stranka.naslov.mesto, slovar['Banka'][jezik] + ':', "Banco General - corriente"],
+        [slovar['Ulica'][jezik] + ':', baza.stranka.naslov.naslov, slovar['Stevilka racuna'][jezik] + ':', "03-01-01-122185-0"]
         ]
     style = TableStyle([('ALIGN',(0,0),(-1,-1),'LEFT')])
     tabela(p,data,style,[55,220,65,150])

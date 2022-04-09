@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 import datetime
 from django.utils import timezone
 from program.models import Program
-import json 
+import json
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 from django.http import HttpResponse, JsonResponse
 
@@ -23,7 +23,7 @@ def dnevna_prodaja(request,zaloga):
     return pokazi_stran(request, 'prodaja/dnevna_prodaja.html', {'danasnja':True,'prodaja': danasnja_prodaja, 'aktivni_racun': aktivni_racun,'na_voljo':na_voljo})
 
 def nova_dnevna_prodaja(request,zaloga):
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "GET":
         print(zaloga)
         zaloga = Zaloga.objects.get(pk = zaloga)
         program = Program.objects.first()
@@ -93,7 +93,7 @@ def ogled_racuna(request,zaloga, pk_racuna):
 
 ###########################################################################################
 ###########################################################################################
-###########################################################################################    
+###########################################################################################
 
 def cenik(request,baza,zaloga):
     if request.method == "GET":
@@ -148,4 +148,4 @@ def porocilo(request):
     pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
     zacetek = request.GET.get('zacetek', pred_mescem)
     konec = request.GET.get('konec', danes)
-    
+

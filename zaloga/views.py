@@ -157,13 +157,13 @@ def baze(request,zaloga,tip_baze):
         zaloga = Zaloga.objects.get(pk = zaloga)
         baze = Baza.objects.filter(zaloga = zaloga, tip=tip_baze,status='aktivno')
         values = database_functions.baze_values(baze)
+        print(values)
         stranke = Stranka.objects.all().order_by('stevilo_kupljenih').values('pk','naziv')
         zaloge = Zaloga.objects.all()
-        print(values)
-        print("DELAM")
         skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
         skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
         skupen_ladijski_prevoz = values.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
+        ladjarji = ["CMA CGM","MSC"]
         slovar = {
             'zaloge':zaloge,
             'zaloga': zaloga,
@@ -172,9 +172,32 @@ def baze(request,zaloga,tip_baze):
             'stranke':stranke,
             'skupno_stevilo':skupno_stevilo,
             'skupna_cena':skupna_cena,
-            'skupen_ladijski_prevoz': skupen_ladijski_prevoz
+            'skupen_ladijski_prevoz': skupen_ladijski_prevoz,
+            "ladjarji":ladjarji
             }
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
+
+@login_required
+def ladjar(request,zaloga,tip_baze,baza):
+    if request.method == "POST":
+        baza = Baza.objects.get(id=int(baza))
+        ladjar = request.POST.get("ladjar")
+        baza.ladjar = ladjar
+        baza.save()
+    return redirect('baze', zaloga=zaloga, tip_baze=tip_baze)
+
+@login_required
+def datum_prihoda(request,zaloga,tip_baze,baza):
+    print(request.method)
+    if request.method == "POST":
+        baza = Baza.objects.get(id=int(baza))
+        datum = request.POST.get("datum_prihoda")
+        baza.datum_prihoda = datum
+        baza.save()
+        print(baza.datum_prihoda)
+        print(request.POST.get("datum_prihoda"))
+    return redirect('baze', zaloga=zaloga, tip_baze=tip_baze)
+
 
 @login_required
 def nova_baza(request,zaloga,tip_baze):

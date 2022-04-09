@@ -81,6 +81,18 @@
                     </select>
                 </td>
             </tr>
+            <tr>
+                <td> </td>
+                <td> </td>
+                <td> Ladjar: </td>
+                <td> 
+                    <select form="nova_baza" name="ladjar">
+                        {% for ladjar in ladjarji %}
+                            <option value="ladjar"> {{ladjar}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
         </table>
     {% elif tip == "prenos" %}
         <table style="padding:1%;border:1px solid black"class="tabela_podatkov">
@@ -208,12 +220,18 @@
                 {% if tip == "vele_prodaja" %}
                 <th> {{slovar|keyvalue:'Stranka'|keyvalue:jezik}}: </th>
                 {% elif tip == "prevzem" %}
+                <th> Datum odpreme: </th>
                 <th> {{slovar|keyvalue:'Kontejner'|keyvalue:jezik}}: </th>
-                <th> {{slovar|keyvalue:'Drzava'|keyvalue:jezik}}: </th>
+                <th> {{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}: </th>
                 {% elif tip == "prenos" %}
                 <th> {{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}: </th>
                 {% endif %}
-                <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+                {% if tip == "prevzem" %}
+                    <th> Datum prihoda: </th>
+                    <th style="min-width:120px"> Ladjar: </th>
+                {% else %}
+                    <th> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+                {% endif %}
                 <th> {{slovar|keyvalue:'Stevilo'|keyvalue:jezik}}: </th>
                 {% if tip == "vele_prodaja" %}
                 <th> {{slovar|keyvalue:'Cena'|keyvalue:jezik}}: </th>
@@ -230,16 +248,67 @@
                 {% if tip == "vele_prodaja" %}
                 <td> {{baza.naziv_stranke}} </td>
                 {% elif tip == "prevzem" %}
+                <td> {{baza.datum|date:"d.m.Y" }} </td>
                 <td> {{baza.stevilka_kontejnerja}} </td>
                 <td> {{baza.drzava}} </td>
                 {% elif tip == "prenos" %}
                 <td> {{baza.zaloga_prenosa}} </td>
                 {% endif %}
-                <td> {{baza.datum}} </td>
+                {% if baza.tip == "prevzem" %}
+                    <td> 
+                        <div class="{{baza.id}}_datum_prihoda">
+                                {% if baza.datum_prihoda %} {{baza.datum_prihoda|date:"d.m.Y" }} {% else %} / {% endif %} 
+                            <button class="inline" onclick="ToggleClass('.{{baza.id}}_datum_prihoda','skrit')"> E </button>
+                        </div>
+                        <div class="{{baza.id}}_datum_prihoda skrit">
+                            <form action="{% url 'datum_prihoda' zaloga.id baza.tip baza.id %}" method="post">
+                                {% csrf_token %}
+                                <input name="datum_prihoda" type="date" value="{{baza.datum_prihoda|date:'Y-m-d'}}">
+                                <input type="submit" value="Shrani">
+                            </form>
+                            <button class="inline" onclick="ToggleClass('.{{baza.id}}_datum_prihoda','skrit')"> <- </button>
+                        </div> 
+                    </td>
+                    <td class="ladjar">
+                        
+                        <div class="{{baza.id}}_ladjar_edit">
+                                {% if baza.ladjar %} {{baza.ladjar}} {% else %} / {% endif %} 
+                            <button class="inline" onclick="ToggleClass('.{{baza.id}}_ladjar_edit','skrit')"> E </button>
+                        </div>
+                        <div class="{{baza.id}}_ladjar_edit skrit">
+                            <form action="{% url 'ladjar' zaloga.id baza.tip baza.id %}" method="post">
+                                {% csrf_token %}
+                                <select name="ladjar">
+                                    {% for ladjar in ladjarji %}
+                                        {% if ladjar == baza.ladjar %}
+                                            <option value="{{ladjar}}" selected> {{ladjar}} </option>
+                                        {% else %}
+                                            <option value="{{ladjar}}"> {{ladjar}} </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <input type="submit" value="Shrani">
+                            </form>
+                            <button class="inline" onclick="ToggleClass('.{{baza.id}}_ladjar_edit','skrit')"> <- </button>
+                        </div> 
+                        {% if baza.ladjar == "CMA CGM" %}
+                            <form action="https://www.cma-cgm.com/">
+                                <input type="submit" value="ladjar">
+                            </form>
+                        {% elif baza.ladjar == "MSC" %}
+                            <form action="https://www.msc.com/track-a-shipment">
+                                <input type="submit" value="ladjar">
+                            </form>
+                        {% endif %}
+                    </td>
+                {% else %}
+                    <td> {{baza.datum}} </td>
+                {% endif %}
                 <td> {{baza.skupno_stevilo}} </td>
                 {% if tip == "vele_prodaja" %}
                 <td> {{baza.skupna_cena}} $ </td>
                 {% endif %}
+                
                 <td class="ogled"> 
                     <form action="{% url 'baza' zaloga_pk tip baza.id %}" method="GET">
                         <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">

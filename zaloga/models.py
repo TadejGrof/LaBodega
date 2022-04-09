@@ -596,7 +596,9 @@ class Baza(models.Model):
     cena = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     ladijski_prevoz = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     placilo = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
-    
+    datum_prihoda = models.DateField(default=None,null=True,blank=True)
+    ladjar = models.CharField(max_length=20, default=None,null=True,blank=True)
+
     class Meta:
         permissions = [
             ("view_json", "Can view JSON")

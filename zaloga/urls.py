@@ -20,6 +20,8 @@ ogled_patterns = [
 
 baza_patterns = [
     path('', views.baze , name='baze'),
+    path('<int:baza>/ladjar/', views.ladjar , name='ladjar'),
+    path('<int:baza>/datum_prihoda/', views.datum_prihoda , name='datum_prihoda'),
     path('nova_baza/', views.nova_baza, name='nova_baza'),
     path('izbris_baze/<int:pk>/',views.izbris_baze, name='izbris_baze'),
     path('ogled/<int:pk>/', include(ogled_patterns)),

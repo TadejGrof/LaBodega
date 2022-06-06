@@ -24,8 +24,27 @@
         left:40%;
         margin-top:2%;
     }
+    div.model_stranke{
+        padding: 0;
+        height: 8%;
+        text-align: center;
+        border: 1px solid black;
+        vertical-align:middle;
+    }
+
+    div.modeli {
+        width:60%;
+        margin-left:20%;
+        margin-bottom: 3%;
+    }
+     
+     h2{
+         margin:3%;
+     }
 </style>
 
+
+{% if false %}
 
 <h1>
     Naročila:
@@ -55,56 +74,67 @@
     {% endfor %}    
 </div>
 
-    <h2>
-        NAROČILA
-    </h2>
+{% endif %}
+
+<h2>
+    NOVO NAROČILO
+</h2>
 
 <div>
+    <form method="POST" action="{% url 'novo_narocilo' zaloga_pk %}">
+        {% csrf_token %}
+        <select name="stranka">
+            {% for stranka in stranke %}
+                {% with stranka=stranke|keyvalue:stranka %}
+                    {% if not stranka.ima_model %}
+                        <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </select>
+        <input type="submit" value="Novo narocilo"> 
+    </form>
+</div>
+
+<h2>
+    NAROČILA
+</h2>
+
+<div class="modeli">
+    <div class="model_stranke row d-flex align-items-center">
+        <div class="col-sm-3">
+            <label>Stranka:</label>
+        </div>
+        <div class="col-sm-3">
+            <label>Skupno število:</label>
+        </div>
+        <div class="col-sm-6">
+            <label>Ogled: </label>
+        </div>
+    </div>
     {% for model in modeli %}
-        <div>
-            <div class="inline">
-                Model naročila:
-            </div>
-            <div class="inline">
+        <div class="model_stranke row d-flex align-items-center">
+            <div class="col-sm-3">
                 {{model.stranka.naziv}}
             </div>
-            <div class="inline">
+            <div class="col-sm-3">
+                {{model.skupno_stevilo}}
+            </div>
+            <div class="col-sm-3">
                 <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
-                    <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                    <input class="btn btn-info" type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                 </form>
+            </div>
+            <div class="col-sm-3">
+                <button class="btn btn-info"> Info </button>
             </div>
         </div>
     {% endfor %}
-    
-    <h2>
-        NOVO NAROČILO
-    </h2>
-
-    <div>
-        <form method="POST" action="{% url 'novo_narocilo' zaloga_pk %}">
-            {% csrf_token %}
-            <select name="stranka">
-                {% for stranka in stranke %}
-                    {% with stranka=stranke|keyvalue:stranka %}
-                        {% if not stranka.ima_model %}
-                            <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
-                        {% endif %}
-                    {% endwith %}
-                {% endfor %}
-            </select>
-            <input type="submit" value="Novo narocilo"> 
-        </form>
-    </div>
-</div>
-
-
-
-<h1>
-    Pregled po dimenzijah
-</h1>
-
-<div class="dimenzije">
 
 </div>
+
+
+
+
 
 {% endblock %}

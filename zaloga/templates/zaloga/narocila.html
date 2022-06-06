@@ -101,35 +101,33 @@
 </h2>
 
 <div class="modeli">
-    <div class="model_stranke row d-flex align-items-center">
-        <div class="col-sm-3">
-            <label>Stranka:</label>
-        </div>
-        <div class="col-sm-3">
-            <label>Skupno število:</label>
-        </div>
-        <div class="col-sm-6">
-            <label>Ogled: </label>
-        </div>
-    </div>
-    {% for model in modeli %}
-        <div class="model_stranke row d-flex align-items-center">
-            <div class="col-sm-3">
+    <table class="tabela_vnosov">
+        <tr>
+            <th> Stranka: </th>
+            <th> Skupno število: </th>
+            <th colspan="2"> Ogled </th>
+        </tr>
+        {% for model in modeli %}
+        <tr class="model_stranke row d-flex align-items-center">
+            <td class="col-sm-3">
                 {{model.stranka.naziv}}
-            </div>
-            <div class="col-sm-3">
+            </td>
+            <td class="col-sm-3">
                 {{model.skupno_stevilo}}
-            </div>
-            <div class="col-sm-3">
+            </td>
+            <td class="col-sm-3">
                 <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
                     <input class="btn btn-info" type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                 </form>
-            </div>
-            <div class="col-sm-3">
+            </td>
+            <td class="col-sm-3">
                 <button class="btn btn-info"> Info </button>
-            </div>
-        </div>
+            </td>
+        </tr>
     {% endfor %}
+    </table>
+    
+    
 
 </div>
 

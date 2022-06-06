@@ -1,0 +1,98 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+{% block content %}
+
+<style>
+    div.title{
+        font-size:6vh;
+        text-align:center;
+        margin-top:1.5%;
+    }
+    div.okno{
+        margin-top:2%;
+        display:inline-block;
+        width:70%;
+        font-size:5vh;
+        text-align:center;
+    }
+    div.okno form input[type=submit]{
+        display:block;
+        width:20%;
+        height:10%;
+        position:relative;
+        left:40%;
+        margin-top:2%;
+    }
+</style>
+
+
+<h1>
+    Naročila:
+</h1>
+
+<div class="naročila">
+    <div class="stranka">
+        <div>
+            DEJANSKA NAROČILA
+        </div>
+        <div>
+            MODEL NAROČILA
+        </div>
+    </div>
+    {% for stranka in stranke %}
+            <div class="stranka">
+                <div>
+                    {{naročila.stranka.skupno}}
+                </div>
+                <div>
+                    {{modeli.stranka.skupno}}
+                </div>
+                <div>
+                </div>
+            </div>
+    {% endfor %}    
+</div>
+
+<div>
+    {% for model in modeli %}
+        <div>
+            <div>
+                {{model.stranka.naziv}}
+            </div>
+            <div>
+                <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
+                    <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+    
+    <div>
+        <form method="POST" action="{% url 'novo_narocilo' zaloga_pk %}">
+            {% csrf_token %}
+            <select name="stranka">
+                {% for stranka in stranke %}
+                    {% with stranka=stranke|keyvalue:stranka %}
+                        {% if not stranka.ima_model %}
+                            <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </select>
+            <input type="submit" value="Novo narocilo"> 
+        </form>
+    </div>
+</div>
+
+
+
+<h1>
+    Pregled po dimenzijah
+</h1>
+
+<div class="dimenzije">
+
+</div>
+
+{% endblock %}

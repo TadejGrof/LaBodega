@@ -70,7 +70,7 @@
             <button onclick="ToggleClass('.vnosi','skrit')" class="nov_vnos vnosi"> {{slovar|keyvalue:'Vec vnosov'|keyvalue:jezik}} </button>
             <button class="vnosi skrit" onclick="Shrani_vse(this)"> {{slovar|keyvalue:'Shrani vse'|keyvalue:jezik}} </button>
         {% endif %}
-        {% if status == "aktivno" %}
+        {% if status == "aktivno" or status == "model" %}
             <button class="nov_vnos inline vnosi" onclick="Izbrisi_vse()"> Izbrisi_vse </button>
             {% if tip == "inventura" %}
                 <form class="nov_vnos inline vnosi" action="{% url 'nastavi_vnose_inventure' zaloga_pk tip values.id %}" method="POST">
@@ -83,10 +83,12 @@
                 <input style="display:inline-block;width:150px " id="iz_datoteke" name="datoteka" type="file" value="Brskaj" required>
                 <input style="display:inline-block;" type="submit" value="{{slovar|keyvalue:'Dodaj iz datoteke'|keyvalue:jezik}}">
             </form>
+            {% if status == "aktivno" %}
             <form class="nov_vnos inline vnosi" action="{% url 'uveljavi_bazo' zaloga_pk tip values.id %}" method="POST">
                 {% csrf_token %}
                 <input onclick="return Uveljavi_bazo(this)" type="submit" class="vnosi" value="{{slovar|keyvalue:'Uveljavi'|keyvalue:jezik}}">
             </form>
+            {% endif %}
             <button class="vnosi skrit" onclick="ToggleClass('.vnosi','skrit')"> {{slovar|keyvalue:'Preklici veckratni vnos'|keyvalue:jezik}}</button>
             {% if tip == "inventura" %}
                 <form class="nov_vnos inline vnosi" action="{% url 'pdf_razlike' zaloga_pk tip values.id %}" method="GET">

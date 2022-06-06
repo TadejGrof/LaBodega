@@ -247,6 +247,7 @@
         <div class="dropdown-container">
             {% if perms.prodaja.add_vele_prodaja %}
                 <a href="{% url 'baze' zaloga_pk 'vele_prodaja' %}">{{slovar|keyvalue:'Nova vele prodaja'|keyvalue:jezik}}</a>
+                <a href="{% url 'narocila' zaloga_pk %}"> Naročila </a>
             {% endif %}
             {% if perms.prodaja.view_stranka %}
                 <a href="{% url 'pregled_strank' %}">{{slovar|keyvalue:'Pregled strank'|keyvalue:jezik}}</a>

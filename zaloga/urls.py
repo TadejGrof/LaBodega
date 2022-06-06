@@ -91,6 +91,11 @@ dolgovi_patterns = [
     path("poravnava_dolga/<int:baza>/", views.poravnava_dolga, name="poravnava_dolga")
 ]
 
+narocila_patterns = [
+    path("", views.narocila, name="narocila"),
+    path("novo_narocilo/", views.novo_narocilo, name="novo_narocilo")
+]
+
 urlpatterns = [
     path('poskus/',views.poskus,name="poskus"),
     path('<int:zaloga>/pregled_zaloge/', zaloga_views.pregled_zaloge, name='pregled_zaloge'),
@@ -106,6 +111,7 @@ urlpatterns = [
     path('<int:zaloga>/cenik/', include(cenik_patterns)),
     path('<int:zaloga>/json_baz/<str:tip>/', views.json_baz, name="json_baz"),
     path('<int:zaloga>/json_baze/<int:baza>/', views.json_baze, name="json_baze"),
+    path('<int:zaloga>/narocilo/', include(narocila_patterns)),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
     

@@ -17,7 +17,7 @@ from django.urls import reverse
 from .test import testiraj_stanja_zaklepov
 from django.http import HttpResponse, JsonResponse
 from . import database_functions
-
+from django.db.models import F,Value
 #zaloga = Zaloga.objects.first()
 
 ##################################################################################################
@@ -178,6 +178,44 @@ def baze(request,zaloga,tip_baze):
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
 
 @login_required
+def narocila(request,zaloga):
+    if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk = zaloga)
+        narocila = Baza.objects.filter(zaloga=zaloga, tip = "narocilo", status="aktivno")
+        modeli = Baza.objects.filter(zaloga=zaloga, tip="narocilo", status="model")
+        stranke = Stranka.objects.all().annotate(ima_model=Value(False)).values()
+        stranke = {
+            stranka["id"]: stranka for stranka in stranke
+        }
+        for model in modeli.values("stranka__pk"):
+            stranke[model["stranka__pk"]]["ima_model"] = True
+        slovar = {
+            "stranke":stranke,
+            "zaloga": zaloga,
+            "tip": "narocilo",
+            "narocila": narocila,
+            "modeli": modeli,
+        }
+        return pokazi_stran(request, 'zaloga/narocila.html', slovar)
+
+@login_required
+def novo_narocilo(request, zaloga):
+    if request.method == "POST":
+        stranka = Stranka.objects.get(pk = int(request.POST.get('stranka')))
+        Baza.objects.create(
+            zaloga_id = zaloga,
+            stranka = stranka,
+            title = "model-" + stranka.naziv,
+            popust = 0,
+            prevoz = 0,
+            placilo = 0,
+            status = "model",
+            author = request.user,
+            tip = "narocilo")
+        return redirect("narocila",zaloga=zaloga)
+
+
+@login_required
 def ladjar(request,zaloga,tip_baze,baza):
     if request.method == "POST":
         baza = Baza.objects.get(id=int(baza))
@@ -288,7 +326,7 @@ def baza(request,zaloga, tip_baze, pk):
         if tip_baze == "prevzem":
             skupna_prodajna_cena = baza.skupna_prodajna_cena_vnosov
             baza_values["razlika"] = baza_values["razlika"] + skupna_prodajna_cena
-        if baza.status == "aktivno":
+        if baza.status == "aktivno" or baza.status == "model":
             dosedanje_kupljene = None
             if baza.tip == "vele_prodaja":
                 dosedanje_kupljene = baza.dosedanje_kupljene_stranke
@@ -298,7 +336,7 @@ def baza(request,zaloga, tip_baze, pk):
                 'vnosi':baza.inventurni_vnosi,
                 'tip':tip_baze,
                 "skupna_prodajna_cena":skupna_prodajna_cena,
-                'status':"aktivno",
+                'status':baza.status,
                 'uveljavljeni_vnosi': baza.uveljavljeni_vnosi,
                 'na_voljo':zaloga.na_voljo,
                 'razlicni_radiusi':zaloga.vrni_razlicne_radiuse,

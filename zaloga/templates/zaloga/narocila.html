@@ -40,6 +40,7 @@
             MODEL NAROČILA
         </div>
     </div>
+
     {% for stranka in stranke %}
             <div class="stranka">
                 <div>
@@ -54,13 +55,20 @@
     {% endfor %}    
 </div>
 
+    <h2>
+        NAROČILA
+    </h2>
+
 <div>
     {% for model in modeli %}
         <div>
-            <div>
+            <div class="inline">
+                Model naročila:
+            </div>
+            <div class="inline">
                 {{model.stranka.naziv}}
             </div>
-            <div>
+            <div class="inline">
                 <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
                     <input type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
                 </form>
@@ -68,6 +76,10 @@
         </div>
     {% endfor %}
     
+    <h2>
+        NOVO NAROČILO
+    </h2>
+
     <div>
         <form method="POST" action="{% url 'novo_narocilo' zaloga_pk %}">
             {% csrf_token %}

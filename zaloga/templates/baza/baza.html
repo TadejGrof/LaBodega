@@ -101,11 +101,11 @@
 </div>
 
 
-{% if status == "aktivno" %}
+{% if status == "aktivno" or status == "model" %}
     {% include 'baza/filter.html' with tip=tip tipi=tipi radiusi=razlicni_radiusi slovar=slovar dosedanje_kupljene=dosedanje_kupljene %}
 {% endif %}
 
-{% if status == "aktivno" %}
+{% if status == "aktivno" or status == "model" %}
     {% include 'baza/inventurna_tabela.html' with tip=tip sestavine=vnosi vnosi=uveljavljeni_vnosi slovar=slovar %}
 {% endif %}
 

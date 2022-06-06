@@ -10,7 +10,7 @@
         <th width="18%">{{slovar|keyvalue:'Datum'|keyvalue:jezik}}:</th>
         <th width="18%">{{slovar|keyvalue:'Skupno stevilo'|keyvalue:jezik}}: </th>
         <th width="18%">{{slovar|keyvalue:'Skupna cena'|keyvalue:jezik}}:</th>
-        <th width="18%"> Placano: </th>
+        <th width="18%"> Dolg: </th>
         <th width="10%">{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}:</th>
         <th width="10%"> PDF: </th>
     {% elif tip == "dnevna_prodaja" %}
@@ -21,27 +21,27 @@
     {% elif tip == "prenos" %}
         <th width="20%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
         <th width="20%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
-        <th width="15%">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}:</th>  
-        <th width="15%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>   
-        <th width="15%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th> 
+        <th width="15%">{{slovar|keyvalue:'Zaloga'|keyvalue:jezik}}:</th>
+        <th width="15%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>
+        <th width="15%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
     {% elif tip == "prevzem" %}
         <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
         <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
-        <th width="12%">{{slovar|keyvalue:'Tip'|keyvalue:jezik}}:</th> 
-        <th width="12%">{{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}</th>  
+        <th width="12%">{{slovar|keyvalue:'Tip'|keyvalue:jezik}}:</th>
+        <th width="12%">{{slovar|keyvalue:'Posiljatelj'|keyvalue:jezik}}</th>
         <th width="12%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>
-        <th width="15%">Cena nakupa:</th> 
+        <th width="15%">Cena nakupa:</th>
         <th width="15%">Cena prodaje:</th>
-        <th width="15%"> Stroški: </th>     
-        <th width="15%">Zasluzek:</th>     
+        <th width="15%"> Stroški: </th>
+        <th width="15%">Zasluzek:</th>
         <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
-        <th width="10%"> PDF: </th> 
+        <th width="10%"> PDF: </th>
     {% elif tip == "inventura" %}
         <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
-        <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th> 
+        <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
         <th width="12%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>
-        <th width="15%"> Vrednost: </th>     
-        <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th> 
+        <th width="15%"> Vrednost: </th>
+        <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
         <th width="10%"> PDF: </th>
     {% endif %}
     {% if perms.admin.view_logentry %}

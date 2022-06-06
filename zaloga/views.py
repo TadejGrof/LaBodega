@@ -163,7 +163,7 @@ def baze(request,zaloga,tip_baze):
         skupno_stevilo = values.aggregate(skupno = Sum("skupno_stevilo"))["skupno"]
         skupna_cena = values.aggregate(cena = Sum("koncna_cena"))["cena"]
         skupen_ladijski_prevoz = values.aggregate(skupno = Sum("ladijski_prevoz_value"))["skupno"]
-        ladjarji = ["CMA CGM","MSC"]
+        ladjarji = ["CMA CGM","MSC","MAERSK"]
         slovar = {
             'zaloge':zaloge,
             'zaloga': zaloga,
@@ -256,7 +256,7 @@ def izbris_baze(request,zaloga, tip_baze, pk):
     if request.method == "POST":
         baza = Baza.objects.get(pk=pk)
         baza.delete()
-        return redirect('baze', zaloga = zaloga, tip_baze=tip_baze) 
+        return redirect('baze', zaloga = zaloga, tip_baze=tip_baze)
 
 #######################################################################################################
 
@@ -266,7 +266,7 @@ def dolgovi(request, zaloga):
         vele_prodaje = Baza.objects.filter(tip="vele_prodaja", status__in = ["veljavno", "zaklenjeno"])
         dolgovi = database_functions.baze_values(vele_prodaje).filter(placano=False)
         return pokazi_stran(request, 'dolgovi/dolgovi.html',{'dolgovi':dolgovi})
-        
+
 def poravnava_dolga(request, zaloga, baza):
     baza = Baza.objects.filter(pk=baza)
     baza_values = database_functions.baze_values(baza)[0]
@@ -432,6 +432,7 @@ def arhiv(request,zaloga, tip_baze):
             values["skupna_cena_nakupa"] = baze.aggregate(cena=Coalesce(Sum("skupna_cena_nakupa"),0))["cena"]
             values["skupen_zasluzek"] = baze.aggregate(cena=Coalesce(Sum("razlika"),0))["cena"]
             values["skupen_ladijski_prevoz"] = baze.aggregate(skupno=Sum("ladijski_prevoz_value"))["skupno"]
+            values["skupen_dolg"] = baze.aggregate(skupno = Sum("dolg"))["skupno"]
         except:
             print("NAPAKA")
             pass

@@ -90,7 +90,7 @@ class Zaloga(models.Model):
     @property
     def tipi_sestavin(self):
         return json.loads(self.tipi_sestavine)
-           
+
     @property
     def danes(self):
         return datetime.today().strftime('%Y-%m-%d')
@@ -115,7 +115,7 @@ class Zaloga(models.Model):
                 zaloga[dimenzija].update({tip:sestavina[tip]})
         return zaloga
 
-    @property            
+    @property
     def rezervirane(self):
         rezervirane = {}
         for baza in self.baza_set.all().filter(status="aktivno", tip__in =  ["vele_prodaja","prenos"]):
@@ -176,7 +176,7 @@ class Zaloga(models.Model):
         if obratno:
             for dimenzija in dimenzije:
                 slovar.update({dimenzija['dimenzija_id']:dimenzija['dimenzija__dimenzija']})
-        else: 
+        else:
             for dimenzija in dimenzije:
                 slovar.update({dimenzija['dimenzija__dimenzija']:dimenzija['dimenzija_id']})
         return slovar
@@ -200,7 +200,7 @@ class Zaloga(models.Model):
             sestavine.sort()
             sestavine = sestavine[::-1][:10]
         return [{'dimenzija__dimenzija':sestavina[2],sestavina[1]:sestavina[0],'tip':sestavina[1]} for sestavina in sestavine]
-    
+
     @property
     def vrni_tipe(self):
         return [[tip,""] for tip in self.tipi_sestavin]
@@ -212,7 +212,7 @@ class Zaloga(models.Model):
     @property
     def drzave(self):
         return DRZAVE
-    
+
     @property
     def posiljatelji(self):
         return POSILJATELJI
@@ -223,7 +223,7 @@ class Zaloga(models.Model):
             special = True
             width = width[:-1]
         return Dimenzija.objects.get(radius = radius,height=height,width=width,special=special)
- 
+
     @property
     def vrni_zalogo(self):
         return self.sestavina_set.all().order_by("dimenzija")\
@@ -311,7 +311,7 @@ class Dimenzija(models.Model):
     height = models.CharField(max_length=10)
     width = models.CharField(max_length=10)
     special = models.BooleanField(default=False)
-    
+
     class Meta:
         ordering = ['radius', 'height', 'width' , 'special']
 
@@ -323,7 +323,7 @@ class Sestavina(models.Model):
     zaloga = models.ForeignKey(Zaloga,default=1, on_delete=models.CASCADE)
     dimenzija = models.ForeignKey(Dimenzija, on_delete=models.CASCADE)
     Y = models.IntegerField(default = 0)
-    W = models.IntegerField(default = 0)  
+    W = models.IntegerField(default = 0)
     JP = models.IntegerField(default = 0)
     JP50 = models.IntegerField(default = 0)
     JP70 = models.IntegerField(default = 0)
@@ -341,7 +341,7 @@ class Sestavina(models.Model):
         cena = self.cena_set.all().get(tip=tip,prodaja=prodaja)
         cena.cena = nova_cena
         cena.save()
-        
+
     def spremeni_stevilo(self,stevilo,tip,save=True):
         try:
             stevilo = getattr(self,tip) + stevilo
@@ -462,11 +462,14 @@ class Cena(models.Model):
     tip = models.CharField(max_length=4, choices=TIPI_SESTAVINE, default="Y")
     prodaja = models.CharField(max_length=15, choices=TIPI_PRODAJE, null=True, blank=True, default=None)
     drzava = models.CharField(max_length=15, choices=DRZAVE, null=True,blank=True,default=None)
-    
+
 class Kontejner(models.Model):
     stevilka = models.CharField(default="", max_length=20)
     posiljatelj = models.CharField(default="", max_length=20, choices=POSILJATELJI)
     drzava = models.CharField(default="", max_length=20, choices=DRZAVE)
+
+    def __str__(self):
+        return self.stevilka
 
     @property
     def json(self):
@@ -489,7 +492,7 @@ class Dnevna_prodaja(models.Model):
         permissions = [
             ("view_json", "Can view JSON")
         ]
-        
+
     @property
     def json(self):
         return {
@@ -532,25 +535,25 @@ class Dnevna_prodaja(models.Model):
 
     def stevilo_veljavnih_racunov(self):
         return self.baza_set.filter(tip="racun",status="veljavno").count()
-    
+
     @property
     def urejeni_vnosi(self):
         return Vnos.objects.filter(baza__dnevna_prodaja = self, baza__status="veljavno").order_by('dimenzija')
 
-    @property 
+    @property
     def skupna_cena(self):
         cena = 0
         for vnos in Vnos.objects.filter(baza__dnevna_prodaja=self,baza__status="veljavno"):
             cena += vnos.cena * vnos.stevilo
         return cena
 
-    @property 
+    @property
     def skupno_stevilo(self):
         stevilo = 0
         for vnos in Vnos.objects.filter(baza__dnevna_prodaja=self,baza__status="veljavno"):
             stevilo += vnos.stevilo
         return stevilo
-        
+
     @property
     def prodane(self):
         prodane = {}
@@ -626,13 +629,13 @@ class Baza(models.Model):
             'vnosi':[vnos.json for vnos in self.vnos_set.all()]
         }
 
-    @property 
+    @property
     def getZalogaPrenosa(self):
         return Zaloga.objects.get(id=self.zalogaPrenosa)
 
     def __str__(self):
         return self.title
-    
+
     @property
     def skupna_prodajna_cena_vnosov(self):
         cenik = self.zaloga.cenik()
@@ -640,7 +643,7 @@ class Baza(models.Model):
         for vnos in self.vnos_set.all().values("stevilo","dimenzija__dimenzija","tip"):
             cena += vnos["stevilo"] * cenik[vnos["dimenzija__dimenzija"]][vnos["tip"]]
         return cena
-        
+
 
     #def save(self, *args, **kwargs):
     #    baza = Baza.objects.get(pk = self.pk)
@@ -692,7 +695,7 @@ class Baza(models.Model):
                     )
                     seznam_vnosov.append(vnos)
             Vnos.objects.bulk_create(seznam_vnosov)
-        
+
         spremembe = []
         seznam_sestavin = []
         for vnos in self.vnos_set.all().values():
@@ -718,7 +721,7 @@ class Baza(models.Model):
         for vnos in vnosi:
             sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
             vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
-        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"]) 
+        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])
 
     def uveljavi_prenos(self,cas = None):
         self.uveljavi_bazo()
@@ -761,7 +764,7 @@ class Baza(models.Model):
         elif self.zalogaPrenosa != None:
             return Zaloga.objects.get(pk = self.zalogaPrenosa).title
         return None
-        
+
     @property
     def tipPrevzema(self):
         if self.kontejner != None:
@@ -817,7 +820,7 @@ class Baza(models.Model):
             sprememba = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
             vnos.sprememba_id = slovar_sprememb[str(vnos.dimenzija_id) + vnos.tip]
         Sestavina.objects.bulk_update(seznam_sestavin, self.zaloga.tipi_sestavin)
-        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])       
+        Vnos.objects.bulk_update(vnosi,["sprememba","sprememba_id"])
 
     def razveljavi(self):
         if self.status == "veljavno":
@@ -894,7 +897,7 @@ class Baza(models.Model):
 
     @property
     def vnosi_values(self):
-        return database_functions.vnosi_values(self.vrni_vnose) 
+        return database_functions.vnosi_values(self.vrni_vnose)
 
     @property
     def cena_nakupa(self):
@@ -945,7 +948,7 @@ class Baza(models.Model):
                 vnosi.update({dimenzija_tip: slovar})
         return vnosi
 
-    @property 
+    @property
     def dimenzija_tip_vnosi(self):
         vnosi = {}
         for vnos in self.vnosi_values:
@@ -977,7 +980,7 @@ class Baza(models.Model):
                 try:
                     slovar["kupljena"] = slovar_kupljenih[sestavina["dim"] + "_" + tip[0]]
                 except:
-                    slovar["kupljena"] = False 
+                    slovar["kupljena"] = False
                 vnosi.update({sestavina['dim'] + '_' + tip[0]: slovar})
         for vnos in self.vnos_set.all().values('dimenzija__dimenzija','pk','stevilo','tip'):
             slovar['vneseno'] = True
@@ -1013,7 +1016,7 @@ class Baza(models.Model):
     def cena_prevoza(self):
         if self.prevoz != None:
             return round(float(self.skupno_stevilo * self.prevoz))
-    
+
     @property
     def koncna_cena(self):
         try:
@@ -1050,7 +1053,7 @@ class Sprememba(models.Model):
 
     def __str__(self):
         return self.baza.tip  + '/' + str(self.stevilo) + '/' + self.tip
-    
+
     def doloci_datum(self):
         self.datum_spremembe = self.baza.datum
         self.save()
@@ -1072,7 +1075,7 @@ class Sprememba(models.Model):
     @property
     def datum_baze(self):
         return self.baza.datum
-    
+
     @property
     def str_stevilo(self):
         if self.baza.tip == "inventura":
@@ -1084,7 +1087,7 @@ class Sprememba(models.Model):
             return '+' + str(self.stevilo)
         elif self.baza.sprememba_zaloge == -1:
             return str(-self.stevilo)
-    
+
     @property
     def ime_baze(self):
         return self.baza.title
@@ -1114,7 +1117,7 @@ class Vnos(models.Model):
             return self.stevilo * self.cena
         except:
             return 0
-            
+
     @property
     def skupna_cena_nakupa(self):
         try:
@@ -1144,7 +1147,7 @@ class Vnos(models.Model):
                 baza = self.baza,
                 stanje = self.stevilo,
                 tip = self.tip,
-                sestavina = sestavina 
+                sestavina = sestavina
             )
         else:
             self.sprememba = Sprememba.objects.create(
@@ -1152,9 +1155,9 @@ class Vnos(models.Model):
                 zaloga = self.baza.zaloga,
                 stevilo = self.stevilo,
                 tip = self.tip,
-                sestavina = sestavina 
+                sestavina = sestavina
             )
-            
+
         self.save()
 
 @receiver(post_save, sender=Vnos)
@@ -1181,8 +1184,8 @@ def change_vnos(sender,instance,created,**kwargs):
                 sprememba.stanje = instance.stevilo
                 sprememba.save()
             else:
-                instance.sprememba.nastavi_iz_vnosov() 
-    
+                instance.sprememba.nastavi_iz_vnosov()
+
 @receiver(post_delete, sender=Vnos)
 def delete_vnos(sender,instance,**kwargs):
     baza = instance.baza
@@ -1224,7 +1227,7 @@ class Stroski_Group(models.Model):
         for strosek in self.strosek_set.all():
             znesek += strosek.znesek
         return znesek
-        
+
 class Strosek(models.Model):
     title = models.CharField(default="",max_length=20)
     group = models.ForeignKey(Stroski_Group,default=0,on_delete=models.CASCADE)

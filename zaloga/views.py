@@ -18,6 +18,7 @@ from .test import testiraj_stanja_zaklepov
 from django.http import HttpResponse, JsonResponse
 from . import database_functions
 from django.db.models import F,Value
+from django.db.models.fields import BooleanField
 #zaloga = Zaloga.objects.first()
 
 ##################################################################################################
@@ -183,7 +184,7 @@ def narocila(request,zaloga):
         zaloga = Zaloga.objects.get(pk = zaloga)
         narocila = Baza.objects.filter(zaloga=zaloga, tip = "narocilo", status="aktivno")
         modeli = Baza.objects.filter(zaloga=zaloga, tip="narocilo", status="model")
-        stranke = Stranka.objects.all().annotate(ima_model=Value(False)).values()
+        stranke = Stranka.objects.all().annotate(ima_model=Value(False, output_field=BooleanField())).values()
         stranke = {
             stranka["id"]: stranka for stranka in stranke
         }

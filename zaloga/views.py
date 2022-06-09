@@ -20,7 +20,6 @@ from . import database_functions
 from django.db.models import F,Value
 from django.db.models.fields import BooleanField
 #zaloga = Zaloga.objects.first()
-
 ##################################################################################################
 
 @login_required
@@ -214,7 +213,27 @@ def novo_narocilo(request, zaloga):
             author = request.user,
             tip = "narocilo")
         return redirect("narocila",zaloga=zaloga)
+    
+@login_required
+def pregled_narocil(request,zaloga):
+    if request.method == "GET":
+        zaloga = Zaloga.objects.get(pk = zaloga)
+        dimenzija_filter = request.GET.get("dimenzija_filter","")
+        stranke = request.GET.get("stranke","")
+        kontejnerji = request.GET.get("kontejnerji","")
 
+        dimenzija_filters = dimenzija_filter.split(" ")
+        dimenzije = Dimenzija.objects.all()
+
+        try:
+            stranke = [int(stranka) for stranka in stranke.split(",")]
+        except:
+            stranke = []
+        try:
+            kontejnerji = [int(kontejner) for kontejner in kontejnerji.split(",")]
+        except:
+            kontejnerji = []
+        sestavine = Sestavina.objects.all().filter(dimenzija__in = dimenzije)
 
 @login_required
 def ladjar(request,zaloga,tip_baze,baza):

@@ -4,8 +4,35 @@ import json
 import os
 import shutil
 from program.models import Program
-from zaloga.models import Zaloga
+from zaloga.models import Zaloga, Dimenzija
 import json
+from django.db.models import F
+
+def filtriraj_dimenzije(filter):
+    split = filter.split(" ")
+    dimenzije = Dimenzija.objects.all().values()
+    valid_dimenzije = []
+    for dimenzija in dimenzije:
+        valid = True
+        filter_dimenzija = dimenzija["dimenzija"]
+        for filter in split:
+            if filter not in filter_dimenzija:
+                valid = False
+                break
+            else:
+                if filter + "/" in filter_dimenzija:
+                    filter_dimenzija = filter_dimenzija.replace(filter + "/", "",1)
+                else:
+                    filter_dimenzija = filter_dimenzija.replace(filter,"",1)
+        if valid:
+            valid_dimenzije.append(dimenzija)
+    return valid_dimenzije
+
+    
+
+
+    
+    
 
 def nastavi_cene():
     cene = []

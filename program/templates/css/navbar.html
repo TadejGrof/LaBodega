@@ -268,6 +268,7 @@
             <a href="{% url 'cenik_prodaje' zaloga_pk 'dnevna_prodaja' %}">{{slovar|keyvalue:'Cenik dnevne prodaje'|keyvalue:jezik}}</a>
             {% if perms.prodaja.view_dnevna_prodaja %}
                 <a href="{% url 'arhiv_baz' zaloga_pk 'dnevna_prodaja' %}">{{slovar|keyvalue:'Arhiv dnevnih prodaj'|keyvalue:jezik}}</a>
+                <a href="{% url 'pregled_prodanih' zaloga_pk %}"> Pregled prodanih </a>
             {% endif %}
         </div>
     {% endif %}

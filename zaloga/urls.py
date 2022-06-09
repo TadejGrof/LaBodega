@@ -96,6 +96,11 @@ narocila_patterns = [
     path("novo_narocilo/", views.novo_narocilo, name="novo_narocilo")
 ]
 
+pregled_prodaje_patterns = [
+    path("", pviews.pregled_prometa, name="pregled_prodanih"),
+    path("izracun/", pviews.pregled_prodaje, name="izracun_pregleda_prometa")
+]
+
 urlpatterns = [
     path('poskus/',views.poskus,name="poskus"),
     path('<int:zaloga>/pregled_zaloge/', zaloga_views.pregled_zaloge, name='pregled_zaloge'),
@@ -112,6 +117,7 @@ urlpatterns = [
     path('<int:zaloga>/json_baz/<str:tip>/', views.json_baz, name="json_baz"),
     path('<int:zaloga>/json_baze/<int:baza>/', views.json_baze, name="json_baze"),
     path('<int:zaloga>/narocilo/', include(narocila_patterns)),
+    path('<int:zaloga>/pregled_prodaje/', include(pregled_prodaje_patterns)),
     path('<int:zaloga>/<str:tip_baze>/', include(baza_patterns)),
     path('ajax/', include(ajax_patterns))
     

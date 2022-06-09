@@ -1,3 +1,4 @@
+from pickle import FALSE
 from django.shortcuts import render
 from prodaja.models import Stranka, Prodaja, Naslov
 from zaloga.models import Vnos, Zaloga, Dimenzija, Sestavina, Baza, Cena, Dnevna_prodaja
@@ -8,6 +9,8 @@ from program.models import Program
 import json
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 from django.http import HttpResponse, JsonResponse
+from zaloga.funkcije import filtriraj_dimenzije
+from django.template.loader import render_to_string
 
 def json_dnevne_prodaje(request, zaloga, dnevna_prodaja):
     return JsonResponse(Dnevna_prodaja.objects.get(pk=dnevna_prodaja).json,safe=False)
@@ -91,7 +94,60 @@ def ogled_racuna(request,zaloga, pk_racuna):
     racun = Racun.objects.get(pk = pk)
     return pokazi_stran(request, 'prodaja/ogled_racuna.html', {'racun':racun})
 
+
 ###########################################################################################
+
+def pregled_prometa(request,zaloga):
+    do_datum = datetime.date.today().strftime('%Y-%m-%d')
+    od_datum =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+    return pokazi_stran(request, 'prodaja/pregled_prodaje.html', {'od': od_datum, "do": do_datum})
+
+def pregled_prodaje(request,zaloga):
+    od_datum = request.GET.get("od",datetime.date.today())
+    do_datum = request.GET.get("do",datetime.date.today() - datetime.timedelta(days=30))
+    dimenzija_filter = request.GET.get("dimenzija")
+    print(dimenzija_filter)
+    print(od_datum)
+    print(do_datum)
+    dimenzije = filtriraj_dimenzije(dimenzija_filter)
+    vnosi = Vnos.objects.filter(dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga, baza__tip="racun", baza__status="veljavno", baza__dnevna_prodaja__datum__gte = od_datum, baza__dnevna_prodaja__datum__lte = do_datum).values(
+        "dimenzija__dimenzija", "stevilo", "tip","cena"
+    )
+    sestevek = sestevek_vnosov(vnosi)
+    vnosi = []
+    zaloga = Zaloga.objects.get(id=zaloga)
+    for dimenzija in dimenzije:
+        for tip in ["Y","W","JP70"]:
+            dimenzija_tip = dimenzija["dimenzija"] + "_" + tip
+            if dimenzija_tip in sestevek:
+                vnosi.append(
+                    {
+                        "dimenzija": dimenzija["dimenzija"],
+                        "tip": tip,
+                        "stevilo": sestevek[dimenzija_tip]["stevilo"],
+                        "cena": float(sestevek[dimenzija_tip]["cena"])
+                    }
+                )
+    data = {"html": render_to_string("prodaja/tabela_prodanih.html",{"vnosi":vnosi})}
+    print(vnosi)
+    print(data)
+    return JsonResponse(data,safe=False)
+
+def sestevek_vnosov(vnosi):
+    slovar = {}
+    for vnos in vnosi:
+        dimenzija_tip = vnos["dimenzija__dimenzija"] + "_" + vnos["tip"]
+        if dimenzija_tip in slovar:
+            slovar[dimenzija_tip]["stevilo"] += vnos["stevilo"]
+            slovar[dimenzija_tip]["cena"] += vnos["stevilo"] * vnos["cena"] if vnos["cena"] else 0
+        else:
+            slovar[dimenzija_tip] = {
+                "stevilo": vnos["stevilo"],
+                "cena": vnos["cena"] * vnos["stevilo"] if vnos["cena"] else 0
+            }
+    return slovar
+
+ ###########################################################################################
 ###########################################################################################
 ###########################################################################################
 

@@ -1,0 +1,27 @@
+<table class="tabela_vnosov">
+    <tr>
+        <th> Dimenzija: </th>
+        <th> Tip: </th>
+        <th> Stevilo: </th>
+        <th> Cena: </th>
+    </tr>
+    {% for vnos in vnosi %}
+        <tr>
+            <td> {{vnos.dimenzija}} </td>
+            <td> {{vnos.tip}} </td>
+            <td> {{vnos.stevilo}} </td>
+            <td> {{vnos.cena}} $ </td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="2">
+            Skupno:
+        </td>
+        <td>
+            {{skupno_stevilo}}
+        </td>
+        <td>
+            {{skupna_cena}}
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,66 @@
+{% extends 'program/base.html' %}
+
+{% load zaloga_exstras %}
+
+{% block content %}
+    <style>
+        .filters {
+            margin:4%;
+            
+        }
+        .tabela{
+            width:70%;
+            margin-left:15%;
+        }
+    </style>
+    <h2> Pregled prometa dnevne prodaje <h2>
+
+    <div class="filters">
+    <div class="date">
+        <label> Od: </label>
+        <input name="od" id="od_datum" type="date" value="{{od}}" />
+        <label> Do: </label>
+        <input name="do" id="do_datum" type="date" value="{{do}}" />
+    </div>
+    <div>
+        <label> Dimenzija: </label>
+        <input type="text" name="dimenzija" id="dimenzija_filter" value="{{dimenzija_filter}}">
+        <button class="poskus" onclick="filtriraj2()"> Filtriraj </button>
+    </div>
+</div>
+<div>
+
+</div>
+
+<div class="tabela" id="tabela">
+    {% include "./tabela_prodanih.html" %}
+</div>
+
+<script>
+    function filtriraj2(){
+        alert("FILTRIRAM");
+        var od_datum = $("#od_datum").val();
+        var do_datum = $("#do_datum").val();
+        var dimenzija = $("#dimenzija_filter").val();
+        console.log(od_datum);
+        console.log(do_datum);
+        console.log(dimenzija);
+        $.ajax({
+            url: '{% url "izracun_pregleda_prometa" zaloga_pk %}',
+            method: 'GET',
+            data: {
+            'od': od_datum,
+            'do': do_datum,
+            'dimenzija': dimenzija,
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                $("#tabela").html(data["html"]);
+            }
+        }); 
+        
+    }
+</script>
+
+{% endblock %}

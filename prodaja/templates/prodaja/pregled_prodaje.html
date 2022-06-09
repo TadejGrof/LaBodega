@@ -38,13 +38,9 @@
 
 <script>
     function filtriraj2(){
-        alert("FILTRIRAM");
         var od_datum = $("#od_datum").val();
         var do_datum = $("#do_datum").val();
         var dimenzija = $("#dimenzija_filter").val();
-        console.log(od_datum);
-        console.log(do_datum);
-        console.log(dimenzija);
         $.ajax({
             url: '{% url "izracun_pregleda_prometa" zaloga_pk %}',
             method: 'GET',
@@ -55,7 +51,6 @@
             },
             dataType: 'json',
             success: function (data) {
-                console.log(data);
                 $("#tabela").html(data["html"]);
             }
         }); 

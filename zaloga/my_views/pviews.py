@@ -11,6 +11,7 @@ from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 from django.http import HttpResponse, JsonResponse
 from zaloga.funkcije import filtriraj_dimenzije
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 
 def json_dnevne_prodaje(request, zaloga, dnevna_prodaja):
     return JsonResponse(Dnevna_prodaja.objects.get(pk=dnevna_prodaja).json,safe=False)
@@ -97,18 +98,17 @@ def ogled_racuna(request,zaloga, pk_racuna):
 
 ###########################################################################################
 
+@login_required
 def pregled_prometa(request,zaloga):
     do_datum = datetime.date.today().strftime('%Y-%m-%d')
     od_datum =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
     return pokazi_stran(request, 'prodaja/pregled_prodaje.html', {'od': od_datum, "do": do_datum})
 
+@login_required
 def pregled_prodaje(request,zaloga):
     od_datum = request.GET.get("od",datetime.date.today())
     do_datum = request.GET.get("do",datetime.date.today() - datetime.timedelta(days=30))
     dimenzija_filter = request.GET.get("dimenzija")
-    print(dimenzija_filter)
-    print(od_datum)
-    print(do_datum)
     dimenzije = filtriraj_dimenzije(dimenzija_filter)
     vnosi = Vnos.objects.filter(dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga, baza__tip="racun", baza__status="veljavno", baza__dnevna_prodaja__datum__gte = od_datum, baza__dnevna_prodaja__datum__lte = do_datum).values(
         "dimenzija__dimenzija", "stevilo", "tip","cena"
@@ -116,6 +116,8 @@ def pregled_prodaje(request,zaloga):
     sestevek = sestevek_vnosov(vnosi)
     vnosi = []
     zaloga = Zaloga.objects.get(id=zaloga)
+    skupno_stevilo = 0
+    skupna_cena = 0
     for dimenzija in dimenzije:
         for tip in ["Y","W","JP70"]:
             dimenzija_tip = dimenzija["dimenzija"] + "_" + tip
@@ -128,9 +130,14 @@ def pregled_prodaje(request,zaloga):
                         "cena": float(sestevek[dimenzija_tip]["cena"])
                     }
                 )
-    data = {"html": render_to_string("prodaja/tabela_prodanih.html",{"vnosi":vnosi})}
+                skupno_stevilo += sestevek[dimenzija_tip]["stevilo"]
+                skupna_cena += sestevek[dimenzija_tip]["cena"]
+
+    data = {"html": render_to_string("prodaja/tabela_prodanih.html",{"vnosi":vnosi,"skupno_stevilo":skupno_stevilo,"skupna_cena":skupna_cena})}
     print(vnosi)
     print(data)
+    print(skupno_stevilo)
+    print(skupna_cena)
     return JsonResponse(data,safe=False)
 
 def sestevek_vnosov(vnosi):

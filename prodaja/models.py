@@ -42,6 +42,9 @@ class Naslov(models.Model):
     mesto = models.CharField(default="", max_length=20)
     naslov = models.CharField(default="", max_length=40)
 
+class Skupina(models.Model):
+    naziv = models.CharField(default="", max_length=30)
+
 class Stranka(models.Model):
     prodaja = models.ForeignKey(Prodaja, default=1, on_delete=models.CASCADE)
     naziv = models.CharField(default="", max_length=30)

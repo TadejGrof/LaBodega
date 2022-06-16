@@ -45,6 +45,9 @@ class Naslov(models.Model):
 class Skupina(models.Model):
     naziv = models.CharField(default="", max_length=30)
 
+    def __str__(self):
+        return self.naziv
+        
 class Stranka(models.Model):
     prodaja = models.ForeignKey(Prodaja, default=1, on_delete=models.CASCADE)
     naziv = models.CharField(default="", max_length=30)

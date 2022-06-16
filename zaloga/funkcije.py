@@ -1,7 +1,6 @@
 import io
 from datetime import datetime
 import json
-from msilib.schema import Error 
 import os
 import shutil
 from program.models import Program
@@ -23,7 +22,7 @@ def filtriraj_dimenzije(filter):
     elif isinstance(filter, list):
         split = filter
     else:
-        raise Error("NEPRAVILNA OBLIKA FILTRA")
+        print("ERROR")
     dimenzije = Dimenzija.objects.all().values()
     valid_dimenzije = []
     for dimenzija in dimenzije:

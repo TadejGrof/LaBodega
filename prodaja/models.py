@@ -47,7 +47,7 @@ class Skupina(models.Model):
 
     def __str__(self):
         return self.naziv
-        
+
 class Stranka(models.Model):
     prodaja = models.ForeignKey(Prodaja, default=1, on_delete=models.CASCADE)
     naziv = models.CharField(default="", max_length=30)
@@ -59,6 +59,7 @@ class Stranka(models.Model):
     status = models.CharField(default='aktivno',max_length=10)
     stevilo_kupljenih = models.IntegerField(default=0)
     skupna_cena_kupljenih = models.DecimalField(decimal_places=1,max_digits=5,default=0)
+    skupina = models.ForeignKey(Skupina,default=None,null=True,blank=True,on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.ime

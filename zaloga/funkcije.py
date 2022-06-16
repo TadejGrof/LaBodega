@@ -1,6 +1,7 @@
 import io
 from datetime import datetime
-import json 
+import json
+from msilib.schema import Error 
 import os
 import shutil
 from program.models import Program
@@ -8,8 +9,21 @@ from zaloga.models import Zaloga, Dimenzija
 import json
 from django.db.models import F
 
+import random
+
+def random_color():
+    r = random.randint(0,255)
+    g = random.randint(0,255)
+    b = random.randint(0,255)
+    return [r,g,b]
+
 def filtriraj_dimenzije(filter):
-    split = filter.split(" ")
+    if isinstance(filter, str):
+        split = filter.split(" ")
+    elif isinstance(filter, list):
+        split = filter
+    else:
+        raise Error("NEPRAVILNA OBLIKA FILTRA")
     dimenzije = Dimenzija.objects.all().values()
     valid_dimenzije = []
     for dimenzija in dimenzije:
@@ -28,7 +42,20 @@ def filtriraj_dimenzije(filter):
             valid_dimenzije.append(dimenzija)
     return valid_dimenzije
 
-    
+def seperate_filter(filter):
+    split = filter.split(" ")
+    tipi = ["Y","W","JP70"]
+    tipi_filter = []
+    dimenzija_filter = []
+    for filter in split:
+        filter = filter.upper()
+        if filter in tipi:
+            tipi_filter.append(filter)
+        else:
+            dimenzija_filter.append(filter)
+    if len(tipi_filter) == 0:
+        tipi_filter = tipi
+    return tipi_filter,dimenzija_filter
 
 
     

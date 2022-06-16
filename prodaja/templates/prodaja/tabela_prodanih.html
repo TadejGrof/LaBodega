@@ -1,10 +1,17 @@
-<table class="tabela_vnosov">
+
+<div class="header">
+<table class="tabela_vnosov" style="border-top:0">
     <tr>
         <th> Dimenzija: </th>
         <th> Tip: </th>
         <th> Stevilo: </th>
         <th> Cena: </th>
     </tr>
+</table>
+</div>
+<div class="vnosi">
+<table class="tabela_vnosov" style="border-bottom:0">
+
     {% for vnos in vnosi %}
         <tr>
             <td> {{vnos.dimenzija}} </td>
@@ -13,6 +20,10 @@
             <td> {{vnos.cena}} $ </td>
         </tr>
     {% endfor %}
+</table>
+</div>
+<div class="skupno">
+<table class="tabela_vnosov" style="border-top:0">
     <tr>
         <td colspan="2">
             Skupno:
@@ -25,3 +36,4 @@
         </td>
     </tr>
 </table>
+</div>

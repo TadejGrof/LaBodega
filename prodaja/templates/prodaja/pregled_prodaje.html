@@ -2,6 +2,10 @@
 
 {% load zaloga_exstras %}
 
+{% block js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
     <style>
         .filters {
@@ -11,9 +15,40 @@
         .tabela{
             width:70%;
             margin-left:15%;
+            max-height: 60vh;
+        }
+        .tabela .vnosi{
+            position:relative;
+            overflow-y:scroll;
+            max-height:48vh;
+        }
+        .tabela .skupno{
+            height:10%;
+        }
+        .statistika{
+            height:40%;
         }
     </style>
-    <h2> Pregled prometa dnevne prodaje <h2>
+
+
+<div>
+    <div class="inline">
+        <button onclick="page('pregled')"> Pregled </button>
+    </div>
+    <div class="inline">
+        <button onclick="page('statistika')"> Statistika </button>
+    </div>
+</div>
+
+<script>
+    function page(page_name){
+        $(".page").addClass("skrit");
+        $("." + page_name).removeClass("skrit");
+    }
+</script>
+
+<div class="page pregled">
+    <h2> Pregled prometa dnevne prodaje </h2>
 
     <div class="filters">
     <div class="date">
@@ -25,7 +60,7 @@
     <div>
         <label> Dimenzija: </label>
         <input type="text" name="dimenzija" id="dimenzija_filter" value="{{dimenzija_filter}}">
-        <button class="poskus" onclick="filtriraj2()"> Filtriraj </button>
+        <button class="poskus" onclick="filtriraj()"> Filtriraj </button>
     </div>
 </div>
 <div>
@@ -36,8 +71,10 @@
     {% include "./tabela_prodanih.html" %}
 </div>
 
+</div>
+
 <script>
-    function filtriraj2(){
+    function filtriraj(){
         var od_datum = $("#od_datum").val();
         var do_datum = $("#do_datum").val();
         var dimenzija = $("#dimenzija_filter").val();
@@ -57,5 +94,194 @@
         
     }
 </script>
+
+<style>
+    .statistika_element{
+        width:90vw;
+        margin-left: 5%;
+        height: 60vh;
+        border: 1px solid black;
+        padding: 3px;
+        vertical-align: top;
+    }
+
+    .left{
+        vertical-align: top;
+        margin:0%;
+        padding:0%;
+        width:25vw;
+        border: 1px solid black;
+        height:100%;
+    }
+    .right{
+        vertical-align: top;
+        width:62vw;
+        border: 1px solid black;
+        height:100%;
+        margin:0%;
+        padding:0%;
+    }
+    .query{
+        margin:0.5%;
+    }
+    .queries_div{
+        height:78%;
+    }
+    .buttons{
+        height:12%;
+    }
+    .buttons button{
+        height:100%;
+        width:33%;
+    }
+    .filter{
+        height: 9%
+    }
+    .filter *{
+        height:90%;
+    }
+    .graph{
+        height:50vh;
+        width:90%;
+        margin-left:5%;
+    }
+</style>
+
+<div class="page statistika skrit">
+    <h2> Statistika dnevne prodaje </h2>
+
+    <div class="statistika_element">
+        <div class="inline left">
+            <div class="queries_div">
+                <h3> Queries </h3>
+                <div class="queries">
+                    <div class="query">
+                        <label> 1. </label>
+                        <input class="statistika_query" name="query" type="text"> 
+                        <button onclick="removeQuery(this)"> - </button>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="addQuery()"> + </button>
+                </div>
+            </div>
+            <div class="buttons">
+                <button onclick="statistika(this)"> Filtriraj </button>
+                <button> PDF </button>
+            </div>
+        </div>
+
+        <div class="inline right">
+            <div class="filter">
+                <label> Interval: </label>
+                <select name="interval" class="statistika_interval" onchange="toggleExtraFilters(this)">
+                    <option value="day"> Dnevno </option>
+                    <option value="year" selected> Mesečno </option>
+                </select>
+
+                <div class="inline extra_filters" >
+                    <div class="extra date_extra skrit" >
+                        <label> Od: </label>
+                        <input name="od" class="statistika_od_datum" type="date" value="{{od}}" />
+                        <label> Do: </label>
+                        <input name="do" class="statistika_do_datum" type="date" value="{{do}}" />
+                    </div>
+                    <div class="extra year_extra">
+                        <select class="statistika_year" name="year">
+                            <option value="2021"> 2021 </option>
+                            <option value="2022"> 2022 </option>
+                        </select>
+                    </div>
+                </div>
+
+                
+            </div>
+
+            <div class="graph">
+                <canvas id="chart"> </canvas>
+            </div>            
+        </div>
+    </div>
+</div>
+<script>
+    const config = {
+            type: 'line',
+            data: [],
+            options: {
+                responsive:true,
+                maintainAspectRatio: false
+            }
+        };
+
+    var myChart = new Chart(
+            document.getElementById("chart"),
+            config
+    );
+
+    function removeQuery(button){
+        $(button).closest(".query").remove();
+    }
+
+    function addQuery(){
+        var queries = $(".queries .query").length + 1;
+        if(queries <= 5){
+            var query = '<div class="query"><label>' +  queries + '. </label><input class="statistika_query" name="query" type="text"> <button onclick="removeQuery(this)"> - </button></div>'
+            $(".queries").append(query)
+        };
+    }
+
+    function toggleExtraFilters(select){
+        var selected = $(select).val();
+        var filter = $(select).closest(".filter");
+        $(".extra", filter).addClass("skrit");
+        if(selected == "day"){
+            $(".date_extra",filter).removeClass("skrit")
+        } else if( selected == "year"){
+            $(".year_extra",filter).removeClass("skrit")
+        }
+    }
+    function statistika(button){
+        var statistika_el = $(button).closest(".statistika_element");
+        var od_datum = $(".statistika_od_datum",statistika_el).val();
+        var do_datum = $(".statistika_do_datum",statistika_el).val();
+        var year = $(".statistika_year",statistika_el).val();
+        var queries = "";
+        $(".statistika_query",statistika_el).each(function(e){
+            var query = $(this).val();
+            if(query != ""){
+                if(queries != ""){
+                    queries = queries + ";" + query
+                } else {
+                    queries = query;
+                }
+            }
+        });
+        console.log(queries);
+        var interval = $(".statistika_interval",statistika_el).val();
+        console.log(interval);
+        console.log(year)
+        $.ajax({
+            url: '{% url "dnevna_prodaja_chart" zaloga_pk %}',
+            method: 'GET',
+            data: {
+            'od': od_datum,
+            'do': do_datum,
+            'query': queries,
+            'interval': interval,
+            'year': year
+            },
+            dataType: 'json',
+            success: function (data) {
+                drawChart("chart",data);
+            }
+        }); 
+    }
+
+    function drawChart(id,data){
+        myChart.data = data;
+        myChart.update();
+    }
+</script>
+
 
 {% endblock %}

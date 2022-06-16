@@ -36,6 +36,15 @@
             <td> <input form="spremeni" value="{{stranka.davcna}}" name="davcna" type="text" autocomplete="off"> </td>
             <td> {{slovar|keyvalue:'Ulica'|keyvalue:jezik}}: </td>
             <td> <input form="spremeni" value="{{stranka.naslov.naslov}}" name="naslov" type="text" required autocomplete="off"> </td>
+            <td> Skupina: </td>
+            <td>
+                <select style="width:100%;text-align:center" value="{{stranka.skupina.id}}" name="skupina">
+                    {% for skupina in skupine %}
+                        <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
+                    {% endfor %}
+                </select>
+            </td>
+        
         </tr>
     </table>
     <form id="spremeni" action="{% url 'sprememba_stranke' stranka.pk %}" method="POST">

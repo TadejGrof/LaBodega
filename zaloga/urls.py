@@ -98,7 +98,8 @@ narocila_patterns = [
 
 pregled_prodaje_patterns = [
     path("", pviews.pregled_prometa, name="pregled_prodanih"),
-    path("izracun/", pviews.pregled_prodaje, name="izracun_pregleda_prometa")
+    path("izracun/", pviews.pregled_prodaje, name="izracun_pregleda_prometa"),
+    path("statistika/", pviews.statistika, name="dnevna_prodaja_chart")
 ]
 
 urlpatterns = [

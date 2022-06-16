@@ -35,6 +35,14 @@
                 <td> <input form="nova_stranka" name="davcna" type="text" autocomplete="off"> </td>
                 <td> {{slovar|keyvalue:'Ulica'|keyvalue:jezik}}: </td>
                 <td> <input form="nova_stranka" name="naslov" type="text" required autocomplete="off"> </td>
+                <td> Skupina: </td>
+                <td>
+                    <select style="width:100%;text-align:center" name="skupina">
+                        {% for skupina in skupine %}
+                            <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
+                        {% endfor %}
+                    </select>
+                </td>
             </tr>
         </table>
         <form id="nova_stranka" action="{% url 'nova_stranka' %}" method="POST">
@@ -51,6 +59,7 @@
             <tr>
                 <th width="15%"> {{slovar|keyvalue:'Naziv'|keyvalue:jezik}}: </th>
                 <th width="23%"> {{slovar|keyvalue:'Ime'|keyvalue:jezik}}: </th>
+                <th width="15%"> Skupina </th>
                 <th width="20%"> {{slovar|keyvalue:'Telefon'|keyvalue:jezik}}: </th>
                 <th width="30%"> {{slovar|keyvalue:'E-mail'|keyvalue:jezik}}: </th>
                 <th width="12%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
@@ -59,6 +68,13 @@
                 <tr>
                     <td> {{stranka.naziv}} </td>
                     <td> {{stranka.ime}} </td>
+                    <td> 
+                        {% if stranka.skupina %}
+                            {{stranka.skupina}}
+                        {% else %}
+                            /
+                        {% endif %}
+                    </td>
                     <td> {{stranka.telefon}} </td>
                     <td style="overflow:hidden"> {{stranka.mail}} </td>
                     <td>
@@ -70,7 +86,5 @@
             {% endfor %}
         </table>
     </div>
-  
-
 
 {% endblock %}

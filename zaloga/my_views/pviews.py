@@ -1,3 +1,4 @@
+from ast import Pass
 from pickle import FALSE
 from django.shortcuts import render
 from prodaja.models import Stranka, Prodaja, Naslov
@@ -9,7 +10,7 @@ from program.models import Program
 import json
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 from django.http import HttpResponse, JsonResponse
-from zaloga.funkcije import filtriraj_dimenzije
+from zaloga.funkcije import filtriraj_dimenzije, seperate_filter, random_color
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 
@@ -108,9 +109,10 @@ def pregled_prometa(request,zaloga):
 def pregled_prodaje(request,zaloga):
     od_datum = request.GET.get("od",datetime.date.today())
     do_datum = request.GET.get("do",datetime.date.today() - datetime.timedelta(days=30))
-    dimenzija_filter = request.GET.get("dimenzija")
+    filter = request.GET.get("dimenzija")
+    tipi, dimenzija_filter = seperate_filter(filter)
     dimenzije = filtriraj_dimenzije(dimenzija_filter)
-    vnosi = Vnos.objects.filter(dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga, baza__tip="racun", baza__status="veljavno", baza__dnevna_prodaja__datum__gte = od_datum, baza__dnevna_prodaja__datum__lte = do_datum).values(
+    vnosi = Vnos.objects.filter(tip__in = tipi, dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga, baza__tip="racun", baza__status="veljavno", baza__dnevna_prodaja__datum__gte = od_datum, baza__dnevna_prodaja__datum__lte = do_datum).values(
         "dimenzija__dimenzija", "stevilo", "tip","cena"
     )
     sestevek = sestevek_vnosov(vnosi)
@@ -140,6 +142,84 @@ def pregled_prodaje(request,zaloga):
     print(skupna_cena)
     return JsonResponse(data,safe=False)
 
+@login_required
+def statistika(request,zaloga):
+    query = request.GET.get("query")
+    queries = query.split(";")
+    interval = request.GET.get("interval","day")
+    if interval == "year":
+        year = int(request.GET.get("year",datetime.date.today().year))
+        intervals = [datetime.date(year,1 + month,1) for month in range(1,12)]
+        od_datum = datetime.date(year,1,1)
+        do_datum = datetime.date(year,12,31)
+        print(od_datum)
+        print(do_datum)
+        labels = ["Jan","Feb","Mar", "Apr", "Maj", "Jun", "Jul", "Avg","Sep", "Okt", "Nov", "Dec"]
+        datasets = []
+        for query in queries:
+            print(query)
+            vnosi = vnosi_iz_filtra(query,zaloga,od_datum,do_datum)
+            print(len(vnosi))
+            sestevek = sestevek_vnosov_na_intervale(vnosi,intervals)
+            print(sestevek)
+            color = random_color()
+            color = "rgb(" + str(color[0]) + "," + str(color[1]) + "," + str(color[2]) + ")"
+            datasets.append({
+                "label": query,
+                "data":sestevek,
+                "backgroundColor": color,
+                "borderColor": color,
+            })
+    elif interval == "day":
+        od_datum = request.GET.get("od",datetime.date.today())
+        do_datum = request.GET.get("do",datetime.date.today() - datetime.timedelta(days=30))
+        pass
+    data = {
+        "datasets": datasets,
+        "labels": labels
+    }
+    return JsonResponse(data,safe=False)
+
+def vnosi_iz_filtra(filter,zaloga,od_datum,do_datum):
+    tipi, dimenzija_filter = seperate_filter(filter)
+    dimenzije = filtriraj_dimenzije(dimenzija_filter)
+    vnosi = Vnos.objects.filter(tip__in = tipi, dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga, baza__tip="racun", baza__status="veljavno", baza__dnevna_prodaja__datum__gte = od_datum, baza__dnevna_prodaja__datum__lte = do_datum).values(
+        "dimenzija__dimenzija", "stevilo", "tip","cena","baza__dnevna_prodaja__datum"
+    ).order_by("baza__dnevna_prodaja__datum")
+    return vnosi
+
+# sestevek po datomu urejenih vnosov ločenih na naraščajoče intervale
+def sestevek_vnosov_na_intervale(vnosi, intervali):
+    return [sum([vnos["stevilo"] for vnos in vnosi]) for vnosi in razčleni_vnose(vnosi,intervali)]
+
+def razčleni_vnose(vnosi, intervali):
+    seznam_vnosov = []
+
+    datum_index = 0
+    if datum_index < len(intervali):
+        datum = intervali[0]
+    else:
+        return [vnosi]
+    seznam = []
+    for vnos in vnosi:
+        if vnos["baza__dnevna_prodaja__datum"] < datum:
+            seznam.append(vnos)
+        else:
+            seznam_vnosov.append(seznam)
+            seznam = []
+            seznam.append(vnos)
+            datum_index += 1
+            if datum_index < len(intervali):
+                datum = intervali[datum_index]
+            else:
+                datum = datetime.date.max
+    seznam_vnosov.append(seznam)
+    if len(seznam_vnosov) < len(intervali) + 1:
+        for i in range(len(intervali) - len(seznam_vnosov) + 1):
+            seznam_vnosov.append([])
+    return seznam_vnosov
+        
+
 def sestevek_vnosov(vnosi):
     slovar = {}
     for vnos in vnosi:
@@ -153,6 +233,8 @@ def sestevek_vnosov(vnosi):
                 "cena": vnos["cena"] * vnos["stevilo"] if vnos["cena"] else 0
             }
     return slovar
+
+
 
  ###########################################################################################
 ###########################################################################################

@@ -36,7 +36,7 @@ class Prodaja(models.Model):
     def stranke(self):
         return self.stranka_set.all().values('pk','ime','telefon','mail')
 
-
+#poskus
 class Naslov(models.Model):
     drzava = models.CharField(default="", max_length=20)
     mesto = models.CharField(default="", max_length=20)

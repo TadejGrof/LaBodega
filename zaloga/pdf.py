@@ -18,7 +18,7 @@ with open('slovar.json') as dat:
         slovar = json.load(dat)
 
 ZGORNJA_MEJA = 830
-SPODANJA_MEJA = 100
+SPODANJA_MEJA = 60
 LEVA_MEJA = 40
 VISINA_VRSTICE = 20
 
@@ -341,6 +341,11 @@ def zadnja_vrstica_vele_prodaje(p,baza,tip,top,brezplacne, jezik = "spa"):
         skupno = baza.skupno_stevilo
     else:
         skupno = baza.skupnoStevilo(tip)
+    visina = VISINA_VRSTICE * (4 + len(brezplacne))
+    if top - visina < SPODANJA_MEJA:
+        for i in range(4 + len(brezplacne)):
+            top = naslednja_vrstica(p,top)
+
     data=  [[slovar['Skupno stevilo'][jezik] + ':', skupno , slovar['Cena'][jezik] + ':',str(baza.skupna_cena) + "$"]]
     style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
                         ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),

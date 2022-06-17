@@ -4,6 +4,7 @@
 {% block content %}
 
 <style>
+
     div.title{
         font-size:6vh;
         text-align:center;
@@ -44,93 +45,124 @@
 </style>
 
 
-{% if false %}
+<div>
+    <div class="inline">
+        <button onclick="page('pregled_narocil')"> Pregled vseh narocil</button>
+    </div>
+    <div class="inline">
+        <button onclick="page('analiza')"> Analiza narocil </button>
+    </div>
+</div>
 
-<h1>
-    Naročila:
-</h1>
+<script>
+    function page(page_name){
+        $(".page").addClass("skrit");
+        $("." + page_name).removeClass("skrit");
+    }
+</script>
 
-<div class="naročila">
-    <div class="stranka">
-        <div>
-            DEJANSKA NAROČILA
-        </div>
-        <div>
-            MODEL NAROČILA
-        </div>
+<div class="page pregled_narocil">
+    <h2>
+        NOVO NAROČILO
+    </h2>
+
+    <div>
+        <form method="POST" action="{% url 'novo_narocilo' zaloga_pk %}">
+            {% csrf_token %}
+            <select name="stranka">
+                {% for stranka in stranke %}
+                    {% with stranka=stranke|keyvalue:stranka %}
+                        {% if not stranka.ima_model %}
+                            <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </select>
+            <input type="submit" value="Novo narocilo"> 
+        </form>
     </div>
 
-    {% for stranka in stranke %}
-            <div class="stranka">
-                <div>
-                    {{naročila.stranka.skupno}}
-                </div>
-                <div>
-                    {{modeli.stranka.skupno}}
-                </div>
-                <div>
-                </div>
-            </div>
-    {% endfor %}    
+    <h2>
+        NAROČILA
+    </h2>
+
+    <div class="modeli">
+        <table class="tabela_vnosov">
+            <tr>
+                <th> Stranka: </th>
+                <th> Skupno število: </th>
+                <th colspan="2"> Ogled </th>
+            </tr>
+            {% for model in modeli %}
+            <tr class="model_stranke row d-flex align-items-center">
+                <td class="col-sm-3">
+                    {{model.stranka.naziv}}
+                </td>
+                <td class="col-sm-3">
+                    {{model.skupno_stevilo}}
+                </td>
+                <td class="col-sm-3">
+                    <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
+                        <input class="btn btn-info" type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                    </form>
+                </td>
+                <td class="col-sm-3">
+                    <button class="btn btn-info"> Info </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+        
+        
+
+    </div>
 </div>
 
-{% endif %}
+<style>
+    .analiza_div{
+        width:90%;
+        margin-left:5%;
+    }
+    .vnosi{
+        position:relative;
+        overflow-y:scroll;
+        max-height:48vh;
+        min-height:30vh;
+    }
+    .vnosi.empty{
+        border-left: 2px solid black;
+        border-right: 2px solid black;
+        text-align:center;
+    }
+    .tabela .skupno{
+        height:10%;
+    }
+</style>
+<div class="page analiza skrit">
+    <h2>
+        Analiza narocil
+    </h2>
 
-<h2>
-    NOVO NAROČILO
-</h2>
+    <div class="analiza_div">
 
-<div>
-    <form method="POST" action="{% url 'novo_narocilo' zaloga_pk %}">
-        {% csrf_token %}
-        <select name="stranka">
-            {% for stranka in stranke %}
-                {% with stranka=stranke|keyvalue:stranka %}
-                    {% if not stranka.ima_model %}
-                        <option value="{{stranka.id}}"> {{stranka.naziv}} </option>
-                    {% endif %}
-                {% endwith %}
-            {% endfor %}
-        </select>
-        <input type="submit" value="Novo narocilo"> 
-    </form>
+        <div class="filter">
+            <label> Dimenzija-Tip: </label>
+            <input name="query" value="" type="text" />
+            <label> Skupina </label>
+            <select>
+                <option value="all"> All </option>
+                {% for skupina in skupine %}
+                    <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
+                {% endfor %}
+            </select>   
+            <button> Filtriraj </button>
+        </div>
+
+        <div class="analiza_tabela">
+            {% include './tabela_analize_narocil.html' %}
+        </div>
+    </div>
 </div>
-
-<h2>
-    NAROČILA
-</h2>
-
-<div class="modeli">
-    <table class="tabela_vnosov">
-        <tr>
-            <th> Stranka: </th>
-            <th> Skupno število: </th>
-            <th colspan="2"> Ogled </th>
-        </tr>
-        {% for model in modeli %}
-        <tr class="model_stranke row d-flex align-items-center">
-            <td class="col-sm-3">
-                {{model.stranka.naziv}}
-            </td>
-            <td class="col-sm-3">
-                {{model.skupno_stevilo}}
-            </td>
-            <td class="col-sm-3">
-                <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
-                    <input class="btn btn-info" type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
-                </form>
-            </td>
-            <td class="col-sm-3">
-                <button class="btn btn-info"> Info </button>
-            </td>
-        </tr>
-    {% endfor %}
-    </table>
-    
-    
-
-</div>
-
 
 
 

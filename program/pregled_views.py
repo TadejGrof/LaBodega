@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from zaloga.models import Zaloga, Dnevna_prodaja, Zaposleni
-from prodaja.models import Stranka,Naslov
+from prodaja.models import Stranka,Naslov, Skupina
 from django.contrib.auth.decorators import login_required
 from prodaja.models import Prodaja
 from django.shortcuts import redirect
@@ -95,7 +95,8 @@ def spremembna_zaposlenega(request, pk):
 
 def pregled_strank(request):
     stranke = Stranka.objects.all().filter(status = 'aktivno').order_by('skupna_cena_kupljenih')
-    return pokazi_stran(request, 'pregled/pregled_strank.html', {'stranke': stranke})
+    skupine = Skupina.objects.all().values()
+    return pokazi_stran(request, 'pregled/pregled_strank.html', {'stranke': stranke,"skupine":skupine})
 
 def izbris_stranke(request, pk):
     stranka = Stranka.objects.get(pk = pk)
@@ -104,7 +105,8 @@ def izbris_stranke(request, pk):
 
 def ogled_stranke(request, pk):
     stranka = Stranka.objects.get(pk=pk)
-    return pokazi_stran(request,'pregled/stranka.html',{'stranka':stranka})
+    skupine = Skupina.objects.all().values()
+    return pokazi_stran(request,'pregled/stranka.html',{'stranka':stranka,"skupine":skupine})
 
 def spremembna_stranke(request, pk):
     if request.method=="POST":
@@ -114,6 +116,7 @@ def spremembna_stranke(request, pk):
         stranka.telefon = request.POST.get('telefon')
         stranka.mail = request.POST.get('mail')
         stranka.davcna = request.POST.get('davcna')
+        stranka.skupina = None if request.POST.get("skupina") == "null" else Skupina.objects.get(pk = int(request.POST.get("skupina")))
         stranka.naslov.drzava = request.POST.get('drzava')
         stranka.naslov.mesto = request.POST.get('mesto')
         stranka.naslov.naslov = request.POST.get('naslov')
@@ -131,6 +134,7 @@ def nova_stranka(request):
     naslov = Naslov.objects.create(drzava = drzava, mesto = mesto, naslov = naslov)
     telefon = request.POST.get('telefon')
     mail = request.POST.get('mail')
+    skupina = int(request.POST.get("skupina"))
     if mail == "":
         mail = "/"
     if davcna == "":
@@ -143,7 +147,8 @@ def nova_stranka(request):
         davcna = davcna,
         telefon = telefon,
         mail = mail,
-        naslov = naslov)
+        naslov = naslov,
+        skupina = skupina)
     return redirect('pregled_strank')
 
 ###############################################################################################

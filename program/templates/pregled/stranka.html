@@ -39,10 +39,10 @@
             <td> Skupina: </td>
             <td>
                 <select form="spremeni" style="width:100%;text-align:center" name="skupina">
-                    {% for skupina in skupine %}
-                        {% if stranka.skupina == null %}
+                    {% if stranka.skupina == null %}
                         <option value="null"> / </option>
-                        {% endif %}
+                    {% endif %}
+                    {% for skupina in skupine %}  
                         {% if stranka.skupina.id == skupina.id %}
                         <option value="{{skupina.id}}" selected> {{skupina.naziv}} </option>
                         {% else %}

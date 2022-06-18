@@ -211,6 +211,35 @@
 
 <script>
 
+    var reversals = {
+        0: false,
+        3: false,
+        4: true,
+        5: true,
+    }
+
+    function sortTable(index){
+        var table = $("#tabela_vnosov").eq(0);
+        var rows = table.find('tr').toArray().sort(comparer(index))
+        var asc = reversals[index]
+
+        if (!asc){rows = rows.reverse()}
+        for (var i = 0; i < rows.length; i++){table.append(rows[i])}
+        reversals[index] = !asc;
+    }
+
+    function comparer(index) {
+        return function(a, b) {
+            var valA = getCellValue(a, index), valB = getCellValue(b, index)
+            if(index == 5){
+                return parseInt(valA.toString().replace("+","")) - parseInt(valB.toString().replace("+",""));
+            } else {
+                return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+            }
+        }
+    }
+    function getCellValue(row, index){ return $(row).children('td').eq(index).text() }
+
     function analiza(){
         var query = $("#query").val();
         var skupina = $("#skupina").val();

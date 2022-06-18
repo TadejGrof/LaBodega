@@ -2,11 +2,11 @@
 <div class="header">
     <table class="tabela_vnosov" style="border-top:0">
         <tr>
-            <th width="15%"> Dimenzija: </th>
+            <th width="15%" onclick="sortTable(0)"> Dimenzija: </th>
             <th width="15%"> Tip: </th>
-            <th width="15%"> Narocilo: </th>
-            <th width="15%"> Zaloga: </th>
-            <th width="15%"> Razlika: </th>
+            <th onclick="sortTable(3)" width="15%"> Narocilo: </th>
+            <th onclick="sortTable(4)" width="15%"> Zaloga: </th>
+            <th onclick="sortTable(5)" width="15%"> Razlika: </th>
             <th width="15%"> Info: </th>
         </tr>
     </table>
@@ -17,9 +17,10 @@
 </div>
 {% else %}
 <div class="vnosi">
-    <table class="tabela_vnosov" style="border-bottom:0">
+    <table id="tabela_vnosov" class="tabela_vnosov" style="border-bottom:0">
         {% for vnos in vnosi %}
             <tr>
+                <td class="skrit"> {{forloop.counter}} </td>
                 <td width="15%"> {{vnos.dimenzija}} </td>
                 <td width="15%"> {{vnos.tip}} </td>
                 <td width="15%"> {{vnos.stevilo}} </td>

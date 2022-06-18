@@ -120,8 +120,10 @@
 
 <style>
     .analiza_div{
-        width:90%;
-        margin-left:5%;
+        width:94%;
+        margin-left:3%;
+        height: 50vh;
+        vertical-align:top;
     }
     .vnosi{
         position:relative;
@@ -137,6 +139,19 @@
     .tabela .skupno{
         height:10%;
     }
+    .left{
+        display: inline-block;
+        width:25%;
+        margin:0%;
+        padding: 0%;
+        height: 100%;
+    }
+    .right{
+        display: inline-block;
+        width:70%;
+        margin:0%;
+        padding:0%;
+    }
 </style>
 <div class="page analiza skrit">
     <h2>
@@ -144,27 +159,79 @@
     </h2>
 
     <div class="analiza_div">
+        {% if false %}
+        <div class="left">
+            
+            <div class="header">
+                <table class="tabela_vnosov" style="border-top:0">
+                    <tr>
+                        <th> Stranke: </th>
+                        <th> Delete: </th>
+                    </tr>
+                </table>
+            </div>
+            <div class="vnosi">
 
-        <div class="filter">
-            <label> Dimenzija-Tip: </label>
-            <input name="query" value="" type="text" />
-            <label> Skupina </label>
-            <select>
-                <option value="all"> All </option>
-                {% for skupina in skupine %}
-                    <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
-                {% endfor %}
-            </select>   
-            <button> Filtriraj </button>
+            </div>
         </div>
+        {% endif %}
+        <div class="right">
+            <div class="filter">
+                <div class="left-filter">
+                    <div>
+                        <label> Dimenzija-Tip: </label>
+                        <input id="query" name="query" value="" type="text" />
+                    </div>
+                    <div>
+                        <label> Skupina </label>
+                        <select id="skupina">
+                            <option value="all"> All </option>
+                            {% for skupina in skupine %}
+                                <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
+                            {% endfor %}
+                        </select>   
+                    </div>
+                    <div>
+                        <button onclick="analiza()"> Filtriraj </button>
+                    </div>
+                </div>
+                <div class="kontejnerji-filter inline"> 
+                    <div class="tabela-kontejnerjev">
 
-        <div class="analiza_tabela">
-            {% include './tabela_analize_narocil.html' %}
+                    </div>
+                </div>
+            
+            </div>
+            <div class="analiza_tabela" id="analiza_tabela">
+                {% include './tabela_analize_narocil.html' %}
+            </div>
         </div>
     </div>
 </div>
 
+<script>
 
+    function analiza(){
+        var query = $("#query").val();
+        var skupina = $("#skupina").val();
+        $.ajax({
+            url: '{% url "analiza_narocil" zaloga_pk %}',
+            method: 'GET',
+            data: {
+            'query': query,
+            'skupina': skupina,
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log("SUCCES");
+                console.log(data);
+                $("#analiza_tabela").html(data["html"]);
+            }
+        }); 
+        
+    }
+
+</script>
 
 
 {% endblock %}

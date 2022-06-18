@@ -7,6 +7,7 @@ from program.models import Program
 from zaloga.models import Zaloga, Dimenzija
 import json
 from django.db.models import F
+from zaloga.models import Vnos
 
 import random
 
@@ -15,6 +16,19 @@ def random_color():
     g = random.randint(0,255)
     b = random.randint(0,255)
     return [r,g,b]
+
+def vnosi_iz_filtra(filter,zaloga,od_datum,do_datum):
+    tipi, dimenzija_filter = seperate_filter(filter)
+    dimenzije = filtriraj_dimenzije(dimenzija_filter)
+    vnosi = Vnos.objects.filter(tip__in = tipi, dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga, baza__tip="racun", baza__status="veljavno", baza__dnevna_prodaja__datum__gte = od_datum, baza__dnevna_prodaja__datum__lte = do_datum).values(
+        "dimenzija__dimenzija", "stevilo", "tip","cena","baza__dnevna_prodaja__datum"
+    ).order_by("baza__dnevna_prodaja__datum")
+    return vnosi
+
+def vnosi_iz_filtra(filter,zaloga):
+    tipi, dimenzija_filter = seperate_filter(filter)
+    dimenzije = filtriraj_dimenzije(dimenzija_filter)
+    return Vnos.objects.filter(tip__in = tipi, dimenzija__in = [d["id"] for d in dimenzije],baza__zaloga=zaloga)
 
 def filtriraj_dimenzije(filter):
     if isinstance(filter, str):
@@ -59,7 +73,20 @@ def seperate_filter(filter):
 
     
     
-
+def sestevek_vnosov(vnosi):
+    slovar = {}
+    for vnos in vnosi:
+        dimenzija_tip = vnos["dimenzija__dimenzija"] + "_" + vnos["tip"]
+        if dimenzija_tip in slovar:
+            slovar[dimenzija_tip]["stevilo"] += vnos["stevilo"]
+            slovar[dimenzija_tip]["cena"] += vnos["stevilo"] * vnos["cena"] if vnos["cena"] else 0
+        else:
+            slovar[dimenzija_tip] = {
+                "stevilo": vnos["stevilo"],
+                "cena": vnos["cena"] * vnos["stevilo"] if vnos["cena"] else 0
+            }
+    return slovar
+    
 def nastavi_cene():
     cene = []
     with open('cene.txt') as dat:

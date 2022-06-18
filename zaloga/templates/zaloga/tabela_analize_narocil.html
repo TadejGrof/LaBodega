@@ -2,12 +2,12 @@
 <div class="header">
     <table class="tabela_vnosov" style="border-top:0">
         <tr>
-            <th> Dimenzija: </th>
-            <th> Tip: </th>
-            <th> Narocilo: </th>
-            <th> Zaloga: </th>
-            <th> Razlika: </th>
-            <th> Info: </th>
+            <th width="15%"> Dimenzija: </th>
+            <th width="15%"> Tip: </th>
+            <th width="15%"> Narocilo: </th>
+            <th width="15%"> Zaloga: </th>
+            <th width="15%"> Razlika: </th>
+            <th width="15%"> Info: </th>
         </tr>
     </table>
 </div>
@@ -20,12 +20,20 @@
     <table class="tabela_vnosov" style="border-bottom:0">
         {% for vnos in vnosi %}
             <tr>
-                <td> {{vnos.dimenzija}} </td>
-                <td> {{vnos.tip}} </td>
-                <td> {{vnos.stevilo}} </td>
-                <td> {{vnos.zaloga}} </td>
-                <td> {{vnos.razlika}} </td>
-                <td> <button> i </button> </td>
+                <td width="15%"> {{vnos.dimenzija}} </td>
+                <td width="15%"> {{vnos.tip}} </td>
+                <td width="15%"> {{vnos.stevilo}} </td>
+                <td width="15%"> {{vnos.zaloga}} </td>
+                {% if vnos.razlika < 0 %}
+                    <td style="background-color:red " width="15%"> {{vnos.razlika}} </td>
+                {% else %}
+                    {% if vnos.razlika == 0 %}
+                         <td style="background-color:green" width="15%"> {{vnos.razlika}} </td>
+                    {% else %}
+                        <td style="background-color:green" width="15%"> + {{vnos.razlika}} </td>
+                    {% endif %}
+                {% endif %}
+                <td width="15%"> <button> i </button> </td>
             </tr>
         {% endfor %}
     </table>
@@ -34,21 +42,22 @@
 <div class="skupno">
     <table class="tabela_vnosov" style="border-top:0">
         <tr>
-            <td>
+            <td width="25%">
                 Skupno:
             </td>
-            <td>
+            <td width="25%">
                 {{skupno_stevilo}}
             </td>
-            <td>
-                Zaloga:
-            </td>
-            <td>
-                {{skupna_zaloga}}
-            </td>
-            <td> Razlika: </td>
-            <td>
-                {{skupno_razlika}} 
+            <td width="25%"> Manjkajoče: </td>
+            {% if skupna_razlika == none %}
+                
+                <td width="25%">
+            {% elif skupna_razlika < 0 %}
+                <td style="background-color:red" width="25%">
+            {% else %}
+                <td style="background-color:green" width="25%">
+            {% endif %}
+                {{skupna_razlika}} 
             </td>
         </tr>
     </table>

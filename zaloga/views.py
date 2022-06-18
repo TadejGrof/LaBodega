@@ -3,7 +3,7 @@ from django.db.models import Sum
 from .models import Dimenzija, Sestavina, Vnos, Kontejner, Sprememba, Dnevna_prodaja
 from .models import Baza, Zaloga, Cena
 from django.shortcuts import redirect
-from prodaja.models import Stranka
+from prodaja.models import Stranka, Skupina
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 import io
@@ -19,6 +19,9 @@ from django.http import HttpResponse, JsonResponse
 from . import database_functions
 from django.db.models import F,Value
 from django.db.models.fields import BooleanField
+from zaloga.funkcije import filtriraj_dimenzije, seperate_filter, random_color, vnosi_iz_filtra, sestevek_vnosov
+from django.template.loader import render_to_string
+
 #zaloga = Zaloga.objects.first()
 ##################################################################################################
 
@@ -183,6 +186,7 @@ def narocila(request,zaloga):
         zaloga = Zaloga.objects.get(pk = zaloga)
         narocila = Baza.objects.filter(zaloga=zaloga, tip = "narocilo", status="aktivno")
         modeli = Baza.objects.filter(zaloga=zaloga, tip="narocilo", status="model")
+        skupine = Skupina.objects.all().values()
         stranke = Stranka.objects.all().annotate(ima_model=Value(False, output_field=BooleanField())).values()
         stranke = {
             stranka["id"]: stranka for stranka in stranke
@@ -190,6 +194,7 @@ def narocila(request,zaloga):
         for model in modeli.values("stranka__pk"):
             stranke[model["stranka__pk"]]["ima_model"] = True
         slovar = {
+            "skupine":skupine,
             "stranke":stranke,
             "zaloga": zaloga,
             "tip": "narocilo",
@@ -197,6 +202,40 @@ def narocila(request,zaloga):
             "modeli": modeli,
         }
         return pokazi_stran(request, 'zaloga/narocila.html', slovar)
+
+@login_required
+def analiza(request,zaloga):
+    zaloga = Zaloga.objects.get(pk = zaloga)
+    query = request.GET.get("query")
+    skupina = request.GET.get("skupina")
+    print(query)
+    if skupina == "all":
+        print("VSE STRANKE")
+        stranke = Stranka.objects.all()
+    else:
+        stranke = Stranka.objects.filter(skupina = int(skupina))
+    vnosi = vnosi_iz_filtra(query,zaloga)
+    print(vnosi)
+    vnosi = vnosi.filter(baza__tip="narocilo", baza__status="model", baza__stranka__in = stranke).order_by("dimenzija").values("stevilo","dimenzija__dimenzija","tip","cena")
+    print(vnosi)
+    sestevek = sestevek_vnosov(vnosi)
+    print(sestevek)
+    stanje_zaloge = zaloga.dimenzija_tip_zaloga
+    print(stanje_zaloge)
+    vnosi = [{
+        "dimenzija": key.split("_")[0],
+        "tip": key.split("_")[1],
+        "stevilo": sestevek[key]["stevilo"],
+        "zaloga": stanje_zaloge[key],
+        "razlika": stanje_zaloge[key] - sestevek[key]["stevilo"]
+    } for key in sestevek]
+    skupno_stevilo = 0
+    skupna_razlika = 0
+    for vnos in vnosi:
+        skupno_stevilo += vnos["stevilo"]
+        skupna_razlika += vnos["razlika"] if vnos["razlika"] < 0 else 0
+    data = {"html": render_to_string("zaloga/tabela_analize_narocil.html",{"vnosi":vnosi,"skupno_stevilo":skupno_stevilo,"skupna_razlika":skupna_razlika})}
+    return JsonResponse(data,safe=False)
 
 @login_required
 def novo_narocilo(request, zaloga):

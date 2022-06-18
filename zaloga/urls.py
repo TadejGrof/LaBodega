@@ -93,7 +93,8 @@ dolgovi_patterns = [
 
 narocila_patterns = [
     path("", views.narocila, name="narocila"),
-    path("novo_narocilo/", views.novo_narocilo, name="novo_narocilo")
+    path("novo_narocilo/", views.novo_narocilo, name="novo_narocilo"),
+    path("analiza/", views.analiza, name="analiza_narocil")
 ]
 
 pregled_prodaje_patterns = [

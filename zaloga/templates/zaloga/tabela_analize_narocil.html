@@ -1,65 +1,73 @@
 
-<div class="header">
-    <table class="tabela_vnosov" style="border-top:0">
-        <tr>
-            <th width="15%" onclick="sortTable(0)"> Dimenzija: </th>
-            <th width="15%"> Tip: </th>
-            <th onclick="sortTable(3)" width="15%"> Narocilo: </th>
-            <th onclick="sortTable(4)" width="15%"> Zaloga: </th>
-            <th onclick="sortTable(5)" width="15%"> Razlika: </th>
-            <th width="15%"> Info: </th>
-        </tr>
-    </table>
-</div>
-{% if vnosi == none or vnosi.length == 0 %}
-<div class="vnosi empty" >
-    <h2> Filtriraj </h2>
-</div>
-{% else %}
-<div class="vnosi">
-    <table id="tabela_vnosov" class="tabela_vnosov" style="border-bottom:0">
-        {% for vnos in vnosi %}
-            <tr>
-                <td class="skrit"> {{forloop.counter}} </td>
-                <td width="15%"> {{vnos.dimenzija}} </td>
-                <td width="15%"> {{vnos.tip}} </td>
-                <td width="15%"> {{vnos.stevilo}} </td>
-                <td width="15%"> {{vnos.zaloga}} </td>
-                {% if vnos.razlika < 0 %}
-                    <td style="background-color:red " width="15%"> {{vnos.razlika}} </td>
-                {% else %}
-                    {% if vnos.razlika == 0 %}
-                         <td style="background-color:green" width="15%"> {{vnos.razlika}} </td>
+<div class="col h-100 overflow-auto">
+    <div style="height:18%" class="row">
+        <div class="h-100 col">
+            <table  class="table table-striped" style="border-bottom:0">
+                <thead>
+                    <tr>
+                        <th width="15%" onclick="sortTable(0)"> Dimenzija: </th>
+                        <th width="15%"> Tip: </th>
+                        <th onclick="sortTable(3)" width="15%"> Narocilo: </th>
+                        <th onclick="sortTable(4)" width="15%"> Zaloga: </th>
+                        <th onclick="sortTable(5)" width="15%"> Razlika: </th>
+                        <th width="15%"> Info: </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div style="height:64%" class="row overflow-auto">
+        <div class="col h-100 overflow-auto">
+            <table id="tabela_vnosov" class="table table-striped" style="border-bottom:0">
+                <tbody>
+                {% for vnos in vnosi %}
+                    <tr>
+                        <td class="skrit"> {{forloop.counter}} </td>
+                        <td width="15%"> {{vnos.dimenzija}} </td>
+                        <td width="15%"> {{vnos.tip}} </td>
+                        <td width="15%"> {{vnos.stevilo}} </td>
+                        <td width="15%"> {{vnos.zaloga}} </td>
+                        {% if vnos.razlika < 0 %}
+                            <td style="color:red " width="15%"> {{vnos.razlika}} </td>
+                        {% else %}
+                            {% if vnos.razlika == 0 %}
+                                <td width="15%"> {{vnos.razlika}} </td>
+                            {% else %}
+                                <td style="color:green" width="15%"> +{{vnos.razlika}} </td>
+                            {% endif %}
+                        {% endif %}
+                        <td width="15%"> <button class="btn btn-info"> i </button> </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div style="height:18%" class="row">
+        <div class="h-100 col">
+            <table  class="table" style="border-bottom:0">
+                <tbody>
+                    <tr>
+                    <td colspan="2" width="30%">
+                        Skupno:
+                    </td>
+                    <td width="20%">
+                        {{skupno_stevilo}}
+                    </td>
+                    <td width="20%"> Manjkajoče: </td>
+                    {% if skupna_razlika == none %}
+                        
+                        <td colspan="2" width="30%">
+                    {% elif skupna_razlika < 0 %}
+                        <td colspan="2" style="color:red" width="25%">
                     {% else %}
-                        <td style="background-color:green" width="15%"> + {{vnos.razlika}} </td>
+                        <td colspan="2" style="color:green" width="25%">
                     {% endif %}
-                {% endif %}
-                <td width="15%"> <button> i </button> </td>
-            </tr>
-        {% endfor %}
-    </table>
-</div>
-{% endif %}
-<div class="skupno">
-    <table class="tabela_vnosov" style="border-top:0">
-        <tr>
-            <td width="25%">
-                Skupno:
-            </td>
-            <td width="25%">
-                {{skupno_stevilo}}
-            </td>
-            <td width="25%"> Manjkajoče: </td>
-            {% if skupna_razlika == none %}
-                
-                <td width="25%">
-            {% elif skupna_razlika < 0 %}
-                <td style="background-color:red" width="25%">
-            {% else %}
-                <td style="background-color:green" width="25%">
-            {% endif %}
-                {{skupna_razlika}} 
-            </td>
-        </tr>
-    </table>
+                        {{skupna_razlika}} 
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

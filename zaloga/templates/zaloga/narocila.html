@@ -1,56 +1,24 @@
 {% extends 'program/base.html' %}
 
 {% load zaloga_exstras %}
+
+{% block css %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+{% endblock %}
+
 {% block content %}
 
 <style>
 
-    div.title{
-        font-size:6vh;
-        text-align:center;
-        margin-top:1.5%;
-    }
-    div.okno{
-        margin-top:2%;
-        display:inline-block;
-        width:70%;
-        font-size:5vh;
-        text-align:center;
-    }
-    div.okno form input[type=submit]{
-        display:block;
-        width:20%;
-        height:10%;
-        position:relative;
-        left:40%;
-        margin-top:2%;
-    }
-    div.model_stranke{
-        padding: 0;
-        height: 8%;
-        text-align: center;
-        border: 1px solid black;
-        vertical-align:middle;
-    }
-
-    div.modeli {
-        width:60%;
-        margin-left:20%;
-        margin-bottom: 3%;
-    }
-     
-     h2{
-         margin:3%;
-     }
 </style>
 
 
 <div>
     <div class="inline">
-        <button onclick="page('pregled_narocil')"> Pregled vseh narocil</button>
+        <button class="btn btn-outline-info" onclick="page('pregled_narocil')"> Pregled vseh narocil</button>
     </div>
     <div class="inline">
-        <button onclick="page('analiza')"> Analiza narocil </button>
+        <button class="btn btn-outline-info" onclick="page('analiza')"> Analiza narocil </button>
     </div>
 </div>
 
@@ -62,7 +30,7 @@
 </script>
 
 <div class="page pregled_narocil">
-    <h2>
+    <h2 style="margin:2%">
         NOVO NAROČILO
     </h2>
 
@@ -82,128 +50,100 @@
         </form>
     </div>
 
-    <h2>
+    <h2 style="margin:2%">
         NAROČILA
     </h2>
 
-    <div class="modeli">
-        <table class="tabela_vnosov">
-            <tr>
-                <th> Stranka: </th>
-                <th> Skupno število: </th>
-                <th colspan="2"> Ogled </th>
-            </tr>
-            {% for model in modeli %}
-            <tr class="model_stranke row d-flex align-items-center">
-                <td class="col-sm-3">
-                    {{model.stranka.naziv}}
-                </td>
-                <td class="col-sm-3">
-                    {{model.skupno_stevilo}}
-                </td>
-                <td class="col-sm-3">
-                    <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
-                        <input class="btn btn-info" type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
-                    </form>
-                </td>
-                <td class="col-sm-3">
-                    <button class="btn btn-info"> Info </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </table>
-        
-        
+    <div class="w-100 d-flex justify-content-center">
+        <div class="w-75 modeli">
+            <table class="table table-striped">
+                <tr>
+                    <th> Stranka: </th>
+                    <th> Skupno število: </th>
+                    <th colspan="2"> Ogled </th>
+                </tr>
+                {% for model in modeli %}
+                <tr>
+                    <td class="col-sm-3">
+                        {{model.stranka.naziv}}
+                    </td>
+                    <td class="col-sm-3">
+                        {{model.skupno_stevilo}}
+                    </td>
+                    <td class="col-sm-3">
+                        <form action="{% url 'baza' zaloga_pk 'narocilo' model.id %}" method="GET">
+                            <input class="btn btn-info" type="submit" value="{{slovar|keyvalue:'Ogled'|keyvalue:jezik}}">
+                        </form>
+                    </td>
+                    <td class="col-sm-3">
+                        <button class="btn btn-info"> Info </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+            
+            
 
+        </div>
     </div>
 </div>
 
 <style>
-    .analiza_div{
-        width:94%;
-        margin-left:3%;
-        height: 50vh;
-        vertical-align:top;
-    }
-    .vnosi{
-        position:relative;
-        overflow-y:scroll;
-        max-height:48vh;
-        min-height:30vh;
-    }
-    .vnosi.empty{
-        border-left: 2px solid black;
-        border-right: 2px solid black;
-        text-align:center;
-    }
-    .tabela .skupno{
-        height:10%;
-    }
-    .left{
-        display: inline-block;
-        width:25%;
-        margin:0%;
-        padding: 0%;
-        height: 100%;
-    }
-    .right{
-        display: inline-block;
-        width:70%;
-        margin:0%;
-        padding:0%;
-    }
+    
 </style>
+
 <div class="page analiza skrit">
-    <h2>
+    <h2 style="margin:2%">
         Analiza narocil
     </h2>
 
-    <div class="analiza_div">
-        {% if false %}
-        <div class="left">
-            
-            <div class="header">
-                <table class="tabela_vnosov" style="border-top:0">
-                    <tr>
-                        <th> Stranke: </th>
-                        <th> Delete: </th>
-                    </tr>
-                </table>
-            </div>
-            <div class="vnosi">
-
-            </div>
-        </div>
-        {% endif %}
-        <div class="right">
-            <div class="filter">
-                <div class="left-filter">
-                    <div>
-                        <label> Dimenzija-Tip: </label>
-                        <input id="query" name="query" value="" type="text" />
+    <div class="container h-75 analiza_div">
+        <div class="h-100 row">
+            <div class="col-9">
+                <div class="h-25 row filter">
+                    <div class="col col-7">
+                        <div class="row">
+                            <label class="col-sm-6"> Dimenzija-Tip: </label>
+                            <input class="col-sm-6" id="query" name="query" value="" type="text" />
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-6"> Skupina: </label>
+                            <select class="col-sm-6" id="skupina">
+                                <option value="all"> All </option>
+                                {% for skupina in skupine %}
+                                    <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
+                                {% endfor %}
+                            </select>   
+                        </div>
                     </div>
-                    <div>
-                        <label> Skupina </label>
-                        <select id="skupina">
-                            <option value="all"> All </option>
-                            {% for skupina in skupine %}
-                                <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
-                            {% endfor %}
-                        </select>   
-                    </div>
-                    <div>
-                        <button onclick="analiza()"> Filtriraj </button>
-                    </div>
+                    <div class="col col-5">
+                        <button class="btn btn-success" onclick="analiza()"> Filtriraj </button>
+                    </div> 
                 </div>
-                <div class="kontejnerji-filter inline"> 
-                    <div class="tabela-kontejnerjev">
-
-                    </div>
+                <div id="analiza_tabela" class="h-75 row">
+                    {% include './tabela_analize_narocil.html' %}
                 </div>
-            
             </div>
-            <div class="analiza_tabela" id="analiza_tabela">
-                {% include './tabela_analize_narocil.html' %}
+            
+            <div class="col-3">
+                <div class="overflow-auto row h-100 tabela_strank">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th> Stranka: </th>
+                                <th> Odstrani: </th>
+                            </tr>
+                        </thead>
+                        {% for stranka in stranke.values %}
+                            {% if stranka.ima_model %}
+                                <tr>
+                                    <td> {{stranka.naziv}} </td>
+                                    <td> <button class="btn btn-outline-danger"> - </button> </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
             </div>
         </div>
     </div>

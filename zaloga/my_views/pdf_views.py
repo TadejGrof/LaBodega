@@ -118,6 +118,7 @@ def pdf_narocil(request,zaloga):
     top = pdf.tabela_vnosov(p, stranke,headers,keys,)
     headers = ["Dimenzija:", "Tip:", "Narocila:", "Zaloga:","Razlika:"]
     keys = ["dimenzija","tip","stevilo","zaloga","razlika"]
+    top = pdf.naslednja_vrstica(p,top)
     top = pdf.tabela_vnosov(p,vnosi, headers, keys, top)
     p.showPage()
     p.save()

@@ -16,6 +16,7 @@ from django.db.models import F, CharField, Value
 from django.dispatch import receiver
 from django.utils.timezone import now
 from . import database_functions
+from .managers import BazaQuerySet
 
 TIPI_SESTAVINE = (
         ('Y','Yellow'),
@@ -601,6 +602,8 @@ class Baza(models.Model):
     placilo = models.DecimalField(default=None,decimal_places = 2,max_digits=10,null=True,blank=True)
     datum_prihoda = models.DateField(default=None,null=True,blank=True)
     ladjar = models.CharField(max_length=20, default=None,null=True,blank=True)
+
+    objects = BazaQuerySet.as_manager()
 
     class Meta:
         permissions = [

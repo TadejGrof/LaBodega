@@ -5,6 +5,7 @@ import os
 import shutil
 from program.models import Program
 from zaloga.models import Zaloga, Dimenzija
+from prodaja.models import Stranka
 import json
 from django.db.models import F
 from zaloga.models import Vnos
@@ -54,6 +55,32 @@ def filtriraj_dimenzije(filter):
         if valid:
             valid_dimenzije.append(dimenzija)
     return valid_dimenzije
+
+def analiza_narocil(request,zaloga):
+    zaloga = Zaloga.objects.get(pk = zaloga)
+    query = request.GET.get("query")
+    skupina = request.GET.get("skupina")
+    if skupina == "all":
+        stranke = Stranka.objects.all()
+    else:
+        stranke = Stranka.objects.filter(skupina = int(skupina))
+    vnosi = vnosi_iz_filtra(query,zaloga)
+    vnosi = vnosi.filter(baza__tip="narocilo", baza__status="model", baza__stranka__in = stranke).order_by("dimenzija").values("stevilo","dimenzija__dimenzija","tip","cena")
+    sestevek = sestevek_vnosov(vnosi)
+    stanje_zaloge = zaloga.dimenzija_tip_zaloga
+    vnosi = [{
+        "dimenzija": key.split("_")[0],
+        "tip": key.split("_")[1],
+        "stevilo": sestevek[key]["stevilo"],
+        "zaloga": stanje_zaloge[key],
+        "razlika": stanje_zaloge[key] - sestevek[key]["stevilo"]
+    } for key in sestevek]
+    stranke = stranke.values()
+    return vnosi, stranke
+
+def baza_analize_narocil(request, zaloga):
+    pass
+
 
 def seperate_filter(filter):
     split = filter.split(" ")

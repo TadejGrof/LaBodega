@@ -92,42 +92,53 @@
     
 </style>
 
-<div class="page analiza skrit">
-    <h2 style="margin:2%">
-        Analiza narocil
-    </h2>
+<form id="pdf_form"  action="{% url 'pdf_analize' zaloga_pk %}" method="GET">
+    <input type="text" name="query" id="pdf_query" />
+    <input type="text" name="skupina" id="pdf_skupina" />
+</form>
 
-    <div class="container h-75 analiza_div">
+<div style="margin-top:2%" class="page analiza skrit">
+    <div style="height:85%" class="container analiza_div">
         <div class="h-100 row">
             <div class="col-9">
                 <div class="h-25 row filter">
-                    <div class="col col-7">
+                    <div class="col">
                         <div class="row">
-                            <label class="col-sm-6"> Dimenzija-Tip: </label>
-                            <input class="col-sm-6" id="query" name="query" value="" type="text" />
-                        </div>
-                        <div class="row">
-                            <label class="col-sm-6"> Skupina: </label>
-                            <select class="col-sm-6" id="skupina">
+                            <label class="col-sm-3"> Dimenzija-Tip: </label>
+                            <input class="col-sm-3" id="query" name="query" value="" type="text" />
+                            <label class="col-sm-3"> Skupina: </label>
+                            <select onchange="filtrirajStranke()" class="col-sm-3" id="skupina">
                                 <option value="all"> All </option>
                                 {% for skupina in skupine %}
                                     <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
                                 {% endfor %}
                             </select>   
                         </div>
+                        <div class="row">
+                            <label for="kontejnerji" class="form-check-label col-5"> Vključi prihajajoče kontejnerje: </label>
+                            <input style="width:100%;margin:8px" class="col-1" type="checkbox" id="kontejnerji"/>
+                            
+                            <div class="col col-3"> <label class="skrit"> Do: </label></div>
+                            <div class="col col-3"> <input class="skrit" type="date" id="datum" /></div> 
+                             
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-success" onclick="analiza()"> Filtriraj </button>
+                                <button class="btn btn-primary" onclick="pdf()"> PDF </button>
+                            </div> 
+                        </div>
                     </div>
-                    <div class="col col-5">
-                        <button class="btn btn-success" onclick="analiza()"> Filtriraj </button>
-                    </div> 
+                    
                 </div>
                 <div id="analiza_tabela" class="h-75 row">
                     {% include './tabela_analize_narocil.html' %}
                 </div>
             </div>
             
-            <div class="col-3">
-                <div class="overflow-auto row h-100 tabela_strank">
-                    <table class="table table-striped">
+            <div class="h-100 overflow-auto col-3">
+                <div class=" row tabela_strank">
+                    <table id="tabela_strank" class="table table-striped">
                         <thead>
                             <tr>
                                 <th> Stranka: </th>
@@ -136,9 +147,10 @@
                         </thead>
                         {% for stranka in stranke.values %}
                             {% if stranka.ima_model %}
-                                <tr>
+                                <tr class="stranka">
+                                    <td class="skrit skupina"> {{stranka.skupina_id}} </td>
                                     <td> {{stranka.naziv}} </td>
-                                    <td> <button class="btn btn-outline-danger"> - </button> </td>
+                                    <td> <button onclick="removeStranka(this)" class="btn btn-outline-danger"> - </button> </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -156,6 +168,32 @@
         3: false,
         4: true,
         5: true,
+    }
+
+    function filtrirajStranke(){
+        console.log("FILTRIRAM");
+        var skupina = $("#skupina").val();
+        var vrstice = $("#tabela_strank tr.stranka");
+        vrstice.addClass("skrit");
+        console.log(skupina);
+        
+        if(skupina == "all"){
+            vrstice.removeClass("skrit");
+        } else {
+            vrstice.each(function(){
+                console.log(parseInt($("td.skupina",$(this)).html()));
+                console.log(parseInt(skupina));
+                console.log(parseInt($("td.skupina",$(this)).html()) == parseInt(skupina));
+                if(parseInt($("td.skupina",$(this)).html()) == parseInt(skupina)){
+                    $(this).removeClass("skrit");
+                }
+            });
+        }
+
+    }
+
+    function removeStranka(button){
+        $(button).closest("tr").addClass("skrit");
     }
 
     function sortTable(index){
@@ -198,6 +236,17 @@
             }
         }); 
         
+    }
+
+    function pdf(){
+        var query = $("#query").val();
+        var skupina = $("#skupina").val();
+        console.log(query);
+        console.log(skupina);
+        $("#pdf_query").val(query);
+        $("#pdf_skupina").val(skupina);
+        $("#pdf_form").submit();
+        console.log("FOMR SUBMITED");
     }
 
 </script>

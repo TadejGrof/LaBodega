@@ -1,4 +1,6 @@
 from django.urls import include,path
+
+from zaloga.funkcije import analiza_narocil
 from .my_views import zaloga_views
 from . import views
 from .my_views import pdf_views
@@ -94,7 +96,8 @@ dolgovi_patterns = [
 narocila_patterns = [
     path("", views.narocila, name="narocila"),
     path("novo_narocilo/", views.novo_narocilo, name="novo_narocilo"),
-    path("analiza/", views.analiza, name="analiza_narocil")
+    path("analiza/", views.analiza, name="analiza_narocil"),
+    path("pdf/", pdf_views.pdf_narocil, name="pdf_analize")
 ]
 
 pregled_prodaje_patterns = [

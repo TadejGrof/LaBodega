@@ -19,7 +19,7 @@ from django.http import HttpResponse, JsonResponse
 from . import database_functions
 from django.db.models import F,Value
 from django.db.models.fields import BooleanField
-from zaloga.funkcije import filtriraj_dimenzije, seperate_filter, random_color, vnosi_iz_filtra, sestevek_vnosov
+from zaloga.funkcije import filtriraj_dimenzije, seperate_filter, random_color, vnosi_iz_filtra, sestevek_vnosov, analiza_narocil
 from django.template.loader import render_to_string
 
 #zaloga = Zaloga.objects.first()
@@ -193,6 +193,7 @@ def narocila(request,zaloga):
         }
         for model in modeli.values("stranka__pk"):
             stranke[model["stranka__pk"]]["ima_model"] = True
+        print(stranke)
         slovar = {
             "skupine":skupine,
             "stranke":stranke,
@@ -205,30 +206,7 @@ def narocila(request,zaloga):
 
 @login_required
 def analiza(request,zaloga):
-    zaloga = Zaloga.objects.get(pk = zaloga)
-    query = request.GET.get("query")
-    skupina = request.GET.get("skupina")
-    print(query)
-    if skupina == "all":
-        print("VSE STRANKE")
-        stranke = Stranka.objects.all()
-    else:
-        stranke = Stranka.objects.filter(skupina = int(skupina))
-    vnosi = vnosi_iz_filtra(query,zaloga)
-    print(vnosi)
-    vnosi = vnosi.filter(baza__tip="narocilo", baza__status="model", baza__stranka__in = stranke).order_by("dimenzija").values("stevilo","dimenzija__dimenzija","tip","cena")
-    print(vnosi)
-    sestevek = sestevek_vnosov(vnosi)
-    print(sestevek)
-    stanje_zaloge = zaloga.dimenzija_tip_zaloga
-    print(stanje_zaloge)
-    vnosi = [{
-        "dimenzija": key.split("_")[0],
-        "tip": key.split("_")[1],
-        "stevilo": sestevek[key]["stevilo"],
-        "zaloga": stanje_zaloge[key],
-        "razlika": stanje_zaloge[key] - sestevek[key]["stevilo"]
-    } for key in sestevek]
+    vnosi, stranke = analiza_narocil(request, zaloga)
     skupno_stevilo = 0
     skupna_razlika = 0
     for vnos in vnosi:

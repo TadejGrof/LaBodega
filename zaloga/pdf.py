@@ -43,6 +43,15 @@ def naslednja_vrstica(p,top,spodnja = SPODANJA_MEJA, zgornja = ZGORNJA_MEJA, lev
             top = naslednja_vrstica(p,top)
     return top
 
+def tabela_vnosov(p, vnosi, headers, keys, top=800, jezik="spa"):
+    tabela(p,[headers],style)
+    top = naslednja_vrstica(p,top)
+    for vnos in vnosi:
+        data = [[vnos.get(key,"") for key in keys]]
+        tabela(p,data,style)
+        top = naslednja_vrstica(p,top)
+    return top
+
 def tabela_zaloge(p, zaloga, sestavine, tipi, top=800, jezik = "spa"):
     kratki_tipi = [tip[0] for tip in tipi]
     dolgi_tipi = [tip[1] for tip in tipi]

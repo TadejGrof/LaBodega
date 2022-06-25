@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from zaloga.funkcije import analiza_narocil
 from ..models import Dimenzija, Sestavina, Vnos, Dnevna_prodaja
 from ..models import Baza, Zaloga
 from ..models import Kontejner, Stroski_Group, Strosek, Zaposleni
@@ -13,7 +15,9 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from django.http import HttpResponse
- 
+from zaloga.funkcije import analiza_narocil
+
+
 #zaloga = Zaloga.objects.first()
 
 def pdf_zaloge(request,zaloga):
@@ -102,6 +106,22 @@ def pdf_baze(request,zaloga,tip_baze, pk):
     p.showPage()
     p.save()
     return response 
+
+def pdf_narocil(request,zaloga):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="baza.pdf"'
+    p = canvas.Canvas(response)
+    p.translate(40,850)
+    vnosi, stranke = analiza_narocil(request,zaloga)
+    headers = ["Naziv:", "Skupno število:"]
+    keys = ["naziv", "skupno_stevilo"]
+    top = pdf.tabela_vnosov(p, stranke,headers,keys,)
+    headers = ["Dimenzija:", "Tip:", "Narocila:", "Zaloga:","Razlika:"]
+    keys = ["dimenzija","tip","stevilo","zaloga","razlika"]
+    top = pdf.tabela_vnosov(p,vnosi, headers, keys, top)
+    p.showPage()
+    p.save()
+    return response
 
 def pdf_razlike(request,zaloga,tip_baze,pk):
     zaloga = Zaloga.objects.get(pk = zaloga)

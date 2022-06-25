@@ -92,7 +92,7 @@
     
 </style>
 
-<form id="pdf_form"  action="{% url 'pdf_analize' zaloga_pk %}" method="GET">
+<form hidden="hidden" id="pdf_form"  action="{% url 'pdf_analize' zaloga_pk %}" method="GET">
     <input type="text" name="query" id="pdf_query" />
     <input type="text" name="skupina" id="pdf_skupina" />
 </form>

@@ -15,7 +15,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from django.http import HttpResponse
-from zaloga.funkcije import analiza_narocil
+from zaloga.funkcije import analiza_narocil, merge_tipe_vnosov
 
 
 #zaloga = Zaloga.objects.first()
@@ -113,11 +113,12 @@ def pdf_narocil(request,zaloga):
     p = canvas.Canvas(response)
     p.translate(40,850)
     vnosi, stranke = analiza_narocil(request,zaloga)
+    vnosi = merge_tipe_vnosov(vnosi)
     headers = ["Naziv:", "Skupno število:"]
     keys = ["naziv", "skupno_stevilo"]
     top = pdf.tabela_vnosov(p, stranke,headers,keys,)
-    headers = ["Dimenzija:", "Tip:", "Narocila:", "Zaloga:","Razlika:"]
-    keys = ["dimenzija","tip","stevilo","zaloga","razlika"]
+    headers = ["Dimension:", "Yellow:", "White:", "JP70:","SUM:"]
+    keys = ["dimenzija","Y","W","JP70","skupno"]
     top = pdf.naslednja_vrstica(p,top)
     top = pdf.tabela_vnosov(p,vnosi, headers, keys, top)
     p.showPage()

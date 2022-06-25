@@ -56,6 +56,22 @@ def filtriraj_dimenzije(filter):
             valid_dimenzije.append(dimenzija)
     return valid_dimenzije
 
+def merge_tipe_vnosov(vnosi):
+    tipi = ["Y","W","JP70"]
+    data = {dimenzija: {tip : 0 for tip in tipi} for dimenzija in razlicne_dimenzije(vnosi)}
+    for vnos in vnosi:
+        data[vnos["dimenzija"]][vnos["tip"]] += vnos["stevilo"]
+    for key,value in data.items():
+        data[key]["skupno"] = value["Y"] + value["W"] + value["JP70"]
+        data[key]["dimenzija"] = key
+    return data.values()
+
+def razlicne_dimenzije(vnosi):
+    slovar = {}
+    for vnos in vnosi:
+        slovar[vnos["dimenzija"]] = True
+    return slovar.keys()
+
 def analiza_narocil(request,zaloga):
     zaloga = Zaloga.objects.get(pk = zaloga)
     query = request.GET.get("query")
@@ -79,7 +95,7 @@ def analiza_narocil(request,zaloga):
     slovar_strank = {
         stranka["id"]: dict(stranka, **{"skupno_stevilo": 0}) for stranka in stranke.values("id","naziv")
     }
-    
+
     for vnos in vnosi:
         slovar_strank[vnos["baza__stranka"]]["skupno_stevilo"] += vnos["stevilo"] 
     

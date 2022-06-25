@@ -38,6 +38,7 @@ TIPI_CEN = (
 
 POSILJATELJI = (
     ('bozo', 'Bozo'),
+    ('dob', 'Dobova - Brežice'),
     ('japan', 'Japan'),
     ('poland',"Poland"),
     ('sweden',"Sweden"),

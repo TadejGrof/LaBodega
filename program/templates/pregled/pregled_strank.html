@@ -37,7 +37,7 @@
                 <td> <input form="nova_stranka" name="naslov" type="text" required autocomplete="off"> </td>
                 <td> Skupina: </td>
                 <td>
-                    <select style="width:100%;text-align:center" name="skupina">
+                    <select form="nova_stranka" style="width:100%;text-align:center" name="skupina">
                         {% for skupina in skupine %}
                             <option value="{{skupina.id}}"> {{skupina.naziv}} </option>
                         {% endfor %}

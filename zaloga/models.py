@@ -1168,7 +1168,7 @@ class Vnos(models.Model):
 @receiver(post_save, sender=Vnos)
 def create_vnos(sender, instance, created, **kwargs):
     if created:
-        if instance.baza.status == "veljavno":
+        if instance.baza.status == "veljavno" and instance.baza.tip != "ribce":
             sestavina = Sestavina.objects.get(zaloga = instance.baza.zaloga,dimenzija = instance.dimenzija)
             instance.ustvari_spremembo(sestavina)
             print('nov_veljaven_vnos')
@@ -1176,7 +1176,7 @@ def create_vnos(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Vnos)
 def change_vnos(sender,instance,created,**kwargs):
     if not created:
-        if instance.baza.status=="veljavno":
+        if instance.baza.status=="veljavno" and instance.baza.tip != "ribce":
             if instance.baza.tip == "inventura":
                 sestavina = Sestavina.objects.get(
                     zaloga = instance.baza.zaloga,

@@ -1194,7 +1194,7 @@ def change_vnos(sender,instance,created,**kwargs):
 @receiver(post_delete, sender=Vnos)
 def delete_vnos(sender,instance,**kwargs):
     baza = instance.baza
-    if baza.status == "veljavno":
+    if baza.status == "veljavno" and baza.tip != "ribce":
         sestavina = Sestavina.objects.get(zaloga=baza.zaloga,dimenzija = instance.dimenzija)
         if baza.tip == "racun":
             sprememba = sestavina.sprememba_set.all().filter(baza__dnevna_prodaja=baza.dnevna_prodaja, tip=instance.tip).first()

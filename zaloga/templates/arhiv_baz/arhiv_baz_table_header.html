@@ -43,6 +43,11 @@
         <th width="15%"> Vrednost: </th>
         <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
         <th width="10%"> PDF: </th>
+    {% else %}
+        <th width="17%"> {{slovar|keyvalue:'Title'|keyvalue:jezik}}: </th>
+        <th width="17%"> {{slovar|keyvalue:'Datum'|keyvalue:jezik}}: </th>
+        <th width="12%">{{slovar|keyvalue:"Stevilo"|keyvalue:jezik}}:</th>
+        <th width="13%"> {{slovar|keyvalue:'Ogled'|keyvalue:jezik}}: </th>
     {% endif %}
     {% if perms.admin.view_logentry %}
         <th width="10%"> JSON </th>

@@ -324,6 +324,12 @@ def nova_baza(request,zaloga,tip_baze):
                 title=title,
                 author=request.user,
                 tip=tip_baze)
+        else:
+            Baza.objects.create(
+                zaloga_id = zaloga,
+                title="Inventura",
+                author=request.user,
+                tip=tip_baze)
         return redirect('baze', zaloga=zaloga, tip_baze=tip_baze)
 
 @login_required
@@ -436,7 +442,7 @@ def spremeni_ceno_nakupa(request,zaloga,tip_baze,pk):
         baza = Baza.objects.get(pk = pk)
         try:
             cena = float(request.POST.get("cena_nakupa"))
-            if not cena > 0:
+            if not cena > 0:    
                 cena = 0
         except:
             cena = 0

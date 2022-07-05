@@ -16,6 +16,9 @@ def ponastavi_zalogo(request):
 
 @login_required
 def home_page(request):
+    je_ribce = request.user.groups.filter(name="Ribce").exists()
+    if je_ribce:
+        return redirect('baze', Zaloga.objects.first().pk, "ribce")
     zaloga = request.user.profil.aktivna_zaloga
     prodaja = Prodaja.objects.first()
     stranke = prodaja.stranka_set.all().filter(status="aktivno").prefetch_related('baza_set').values(

@@ -172,6 +172,8 @@
                     {{slovar|keyvalue:'Odpis'|keyvalue:jezik}}
                 {% elif tip == "inventura" %}
                     {{slovar|keyvalue:'Inventura'|keyvalue:jezik}}
+                {% else %}
+                    Inventura
                 {% endif %}
                 </td>
                 <td> User: </td>
@@ -184,7 +186,10 @@
                     {{program.naslednji_odpis}}
                 {% elif tip == "inventura" %}
                     {{program.naslednja_inventura}}
+                {% else %}
+                    Inventura
                 {% endif %}
+
                 </td>
             </tr>
             <tr>

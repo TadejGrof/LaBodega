@@ -99,7 +99,10 @@ def skupno(baza,tip):
 
 @register.filter
 def keyvalue(dict, key):   
-    return dict[key]
+    try:
+        return dict[key]
+    except:
+        return key
 
 @register.filter
 def stringvalue(obj, string):   

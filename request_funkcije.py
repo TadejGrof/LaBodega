@@ -33,9 +33,10 @@ def pokazi_stran(request, html, baze={}):
     je_stranka = False
     program = Program.objects.first()
     zaloga = request.user.profil.aktivna_zaloga
+    je_ribce = request.user.groups.filter(name="Ribce").exists()
     if request.user.profil.stranka != None:
         je_stranka = True
-    slovar = {'je_stranka':je_stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
+    slovar = {'je_ribce':je_ribce,'je_stranka':je_stranka,'program':program,'slovar':vrni_slovar(request),'jezik':request.user.profil.jezik}
     slovar.update(baze)
     if not 'zaloga' in baze:
         slovar.update({'zaloga':zaloga})

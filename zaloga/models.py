@@ -65,7 +65,7 @@ TIPI_BAZE = (
     ('racun','Racun'),
     ('narocilo','Narocilo'),
     ('prenos', 'Prenos med skladišči'),
-
+    ('ribce','Ribce')
 )
 
 TIPI_STROSKOV = (
@@ -75,7 +75,6 @@ TIPI_STROSKOV = (
     ('placa','Placa'),
     ('drugo','Drugo')
 )
-
 
 class Zaloga(models.Model):
     title = models.CharField(default="skladisce", max_length=20)
@@ -788,6 +787,8 @@ class Baza(models.Model):
             self.uveljavi_prenos()
         elif self.tip == "racun":
             self.uveljavi_racun()
+        elif self.tip == "ribce":
+            pass
         else:
             self.uveljavi_bazo()
 

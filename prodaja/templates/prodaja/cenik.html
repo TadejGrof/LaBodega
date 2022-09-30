@@ -43,7 +43,7 @@
 
 <div class="filter">
     <div style="margin-bottom:1%;font-size:3.5vh;display:block">
-        {% include "program/dinamic_select.html" %} 
+        {% include "program/dinamic_select.html" %}
         <button onclick="Filtriraj()"> Filtriraj </button>
     </div>
     {% for tip in zaloga.tipi_sestavin %}
@@ -79,29 +79,31 @@
             </th>
             <th width="20%">
                 {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}}:
-            </th>  
+            </th>
         </tr>
         {% for sestavina in sestavine %}
-            {% if sestavina.dimenzija__special %}
-            <tr class="vrstica {{sestavina.cena__tip}} {{sestavina.dimenzija__radius}} {{sestavina.dimenzija__height}} {{sestavina.dimenzija__width}}C all">
-            {% else %}
-            <tr class="vrstica {{sestavina.cena__tip}} {{sestavina.dimenzija__radius}} {{sestavina.dimenzija__height}} {{sestavina.dimenzija__width}} all">
-            {% endif %}
-                <td> {{sestavina.dimenzija__dimenzija}}</td>
-                <td> {{sestavina.cena__tip}}</td>
-                {% with pk=sestavina.cena__pk %}
-                    <td> 
-                        <div id="cena_{{pk}}" class="{{pk}}">{{sestavina.cena__cena}}$ </div>
-                        <div class="{{pk}} skrit">
-                            <input id="cena_value_{{pk}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $ 
-                        </div>
-                    </td>
-                    <td>
-                        <button onclick="ToggleClass('.{{pk}}', 'skrit')" class="{{pk}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
-                        <button onclick="Spremeni_ceno('{{pk}}')" class="{{pk}} skrit"> Ok </button>
-                        <button onclick="ToggleClass('.{{pk}}', 'skrit')" class="{{pk}} skrit"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
-                    </td>
-                {% endwith %}
+            {% if sestavina.cena__tip == "Y" or sestavina.cena__tip == "W" or sestavina.cena__tip == "JP70" %}
+                {% if sestavina.dimenzija__special %}
+                <tr class="vrstica {{sestavina.cena__tip}} {{sestavina.dimenzija__radius}} {{sestavina.dimenzija__height}} {{sestavina.dimenzija__width}}C all">
+                {% else %}
+                <tr class="vrstica {{sestavina.cena__tip}} {{sestavina.dimenzija__radius}} {{sestavina.dimenzija__height}} {{sestavina.dimenzija__width}} all">
+                {% endif %}
+                    <td> {{sestavina.dimenzija__dimenzija}}</td>
+                    <td> {{sestavina.cena__tip}}</td>
+                    {% with pk=sestavina.cena__pk %}
+                        <td>
+                            <div id="cena_{{pk}}" class="{{pk}}">{{sestavina.cena__cena}}$ </div>
+                            <div class="{{pk}} skrit">
+                                <input id="cena_value_{{pk}}" placeholder="({{sestavina.cena__cena}} $)" style="text-align:center;width:50%" type="text" value=""> $
+                            </div>
+                        </td>
+                        <td>
+                            <button onclick="ToggleClass('.{{pk}}', 'skrit')" class="{{pk}}"> {{slovar|keyvalue:'Spremeni'|keyvalue:jezik}} </button>
+                            <button onclick="Spremeni_ceno('{{pk}}')" class="{{pk}} skrit"> Ok </button>
+                            <button onclick="ToggleClass('.{{pk}}', 'skrit')" class="{{pk}} skrit"> {{slovar|keyvalue:'Preklici'|keyvalue:jezik}} </button>
+                        </td>
+                    {% endwith %}
+                {% endif %}
             </tr>
         {% endfor %}
     </table>
@@ -131,7 +133,7 @@
         for(var i=0; i< tipi.length; i++){
             $('.' + tipi[i]).addClass('skrit')
         }
-        
+
     }
     function Spremeni_ceno(pk){
         var cena = get_value('cena_value_' + pk)

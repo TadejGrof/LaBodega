@@ -45,6 +45,7 @@
 {% endif %}
 
 <div class="delovno_okno">
+    {% include 'forms/pdf_baze_form.html' with tip=tip baza=values.id zaloga=zaloga_pk select=True razlicni_tipi=baza.razlicni_tipi %}
     {% if status != "zaklenjeno" %}
         {% if tip == "inventura" %}
             <button onclick="Izracunaj_razliko()"> Razlika </button>
@@ -97,7 +98,6 @@
             {% endif %}
         {% endif %}
     {% endif %}
-    {% include 'forms/pdf_baze_form.html' with tip=tip baza=values.id zaloga=zaloga_pk select=True razlicni_tipi=baza.razlicni_tipi %}
 </div>
 
 

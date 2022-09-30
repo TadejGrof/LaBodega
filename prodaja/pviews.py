@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 import datetime
 from django.utils import timezone
 from program.models import Program
-import json 
+import json
 from request_funkcije import vrni_dimenzijo, vrni_slovar, pokazi_stran
 
 def cenik(request,baza,zaloga):
@@ -62,4 +62,4 @@ def porocilo(request):
     pred_mescem =  (datetime.date.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
     zacetek = request.GET.get('zacetek', pred_mescem)
     konec = request.GET.get('konec', danes)
-    
+

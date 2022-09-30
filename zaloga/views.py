@@ -178,6 +178,11 @@ def baze(request,zaloga,tip_baze):
             'skupen_ladijski_prevoz': skupen_ladijski_prevoz,
             "ladjarji":ladjarji
             }
+        if tip_baze == "vele_prodaja":
+            od_datum = datetime.date.today() - datetime.timedelta(days=60)
+            prevzemi = Baza.objects.filter(zaloga=zaloga,tip="prevzem",status="veljavno",datum__gte=od_datum).order_by("-datum")
+            values = database_functions.baze_values(prevzemi)
+            slovar["prevzemi"] = values
         return pokazi_stran(request, 'zaloga/aktivne_baze.html', slovar)
 
 @login_required

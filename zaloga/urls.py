@@ -112,6 +112,7 @@ urlpatterns = [
     path('pregled_prometa/<str:tip>/<int:pk>/', include(pregled_patterns)),
     path('<int:zaloga>/pdf/', pdf_views.pdf_zaloge, name='pdf_zaloge'),
     path('<int:zaloga>/dolgovi', include(dolgovi_patterns)),
+    path('<int:zaloga>/primerjalna_tabela', pdf_views.pdf_primerjalne_tabele, name="primerjalna_tabela"),
     path('dodaj_dimenzijo/', views.dodaj_dimenzijo, name='nova_dimenzija'),
     path('pregled_stroskov/', include(stroski_patterns)),
     path('strosek/', include(strosek_patterns)),

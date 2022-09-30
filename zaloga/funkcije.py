@@ -128,8 +128,22 @@ def seperate_filter(filter):
     return tipi_filter,dimenzija_filter
 
 
+def sestevek_vnosov_skupno(vnosi):
+    slovar = {}
+    for dimenzija in Dimenzija.objects.values("dimenzija"):
+        for tip in ["Y","W","JP70"]:
+            slovar[dimenzija["dimenzija"] + "_" + tip] = 0
+    for vnos in vnosi:
+        dimenzija_tip = vnos["dimenzija__dimenzija"] + "_" + vnos["tip"]
+        slovar[dimenzija_tip] = slovar[dimenzija_tip] + vnos["stevilo"]
+    return slovar
     
-    
+def join_sestevka(s1, s2, i = 1):
+    slovar = s1.copy()
+    for vnos in s2:
+        slovar[vnos] = slovar[vnos] + s2[vnos] * i
+    return slovar
+
 def sestevek_vnosov(vnosi):
     slovar = {}
     for vnos in vnosi:

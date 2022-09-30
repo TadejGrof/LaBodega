@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from zaloga.funkcije import analiza_narocil
+from zaloga.funkcije import analiza_narocil, join_sestevka, sestevek_vnosov
 from ..models import Dimenzija, Sestavina, Vnos, Dnevna_prodaja
 from ..models import Baza, Zaloga
 from ..models import Kontejner, Stroski_Group, Strosek, Zaposleni
@@ -15,7 +15,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from django.http import HttpResponse
-from zaloga.funkcije import analiza_narocil, merge_tipe_vnosov
+from zaloga.funkcije import analiza_narocil, merge_tipe_vnosov, sestevek_vnosov_skupno
 
 
 #zaloga = Zaloga.objects.first()
@@ -202,3 +202,26 @@ def pdf_porocila_prometa(request):
     p.showPage()
     p.save()
     return response
+
+def pdf_primerjalne_tabele(request,zaloga):
+    zaloga = Zaloga.objects.get(pk = zaloga)
+    vele_prodaje = [int(pk) for pk in request.GET.get("vele_prodaje").split(",")]
+    prevzemi = [int(pk) for pk in request.GET.get("prevzemi").split(",")]
+
+
+    sestevek_vele_prodaj = sestevek_vnosov_skupno(Vnos.objects.filter(baza__pk__in=vele_prodaje).values(
+        "dimenzija__dimenzija", "stevilo", "tip","cena"
+    ))
+    sestevek_prevzemov = sestevek_vnosov_skupno(Vnos.objects.filter(baza__pk__in = prevzemi).values(
+        "dimenzija__dimenzija", "stevilo", "tip","cena"
+    ))
+    sestevek = join_sestevka(sestevek_prevzemov,sestevek_vele_prodaj,-1)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="tabela.pdf"'
+    p = canvas.Canvas(response)
+    p.translate(40,850)
+    pdf.primerjalna_tabela(p, sestevek,sestevek_vele_prodaj,sestevek_prevzemov)
+    p.showPage()
+    p.save()
+    return response 

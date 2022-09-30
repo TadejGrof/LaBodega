@@ -429,6 +429,33 @@ def zaloga_skupno(p,zaloga,sestavine,tipi,top,jezik="spa"):
     tabela(p,data,style)
     return naslednja_vrstica(p,top)
 
+def primerjalna_tabela(p,skupno,vele_prodaje,prevzemi,top=800,jezik = "spa"):
+    header = [slovar['Dimenzija'][jezik],
+            slovar['Tip'][jezik],
+            "Facturas",
+            "Contenedores",
+            "Differencia"
+        ]
+    style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+    header = [[header],style]
+    tabela(p,header[0],header[1])
+    top = naslednja_vrstica(p,top)
+
+    for key in skupno:
+        if(vele_prodaje[key] != 0 or prevzemi[key] != 0):
+            dimenzija = key.split("_")[0]
+            tip = key.split("_")[1]
+            vrstica = [dimenzija,tip,vele_prodaje[key], prevzemi[key], skupno[key]]
+            style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                            ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                            ])
+            tabela(p,[vrstica],style)
+            top = naslednja_vrstica(p,top,header = header)
+
 ##################################TITLI##################################################
 def title_baze(p,baza,top = 800, jezik = "spa"):
     p.translate(10,0)

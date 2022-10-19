@@ -1,0 +1,17 @@
+{% extends "bases/podjetje_base.html" %}
+
+{% block content %}
+
+    <div class="row">
+
+    {% for poslovna_enota in poslovne_enote %}
+        <div class="col">
+            {{poslovna_enota.naziv}}
+            <form action="{% url 'poslovna_enota' poslovna_enota.id %}" method="GET">
+                <input type="submit" value="Ogled">
+            </form>
+        </div>
+    {% endfor %}
+    
+    </div>
+{% endblock %}

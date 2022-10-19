@@ -1,0 +1,77 @@
+<table class="table table-bordered table-hover">
+    <tr class="header">
+        <th>
+            Sestavina:
+        </th>
+        <th>
+            Stevilo:
+        </th>
+        {% if cena %}
+        <th>
+            Cena:
+        </th>
+        {% endif %}
+        {% if edit %}
+        <th>
+            Edit:
+        </th>
+        {% endif %}
+        {% if delete %}
+        <th>
+            Delete:
+        </th>
+        {% endif %}
+    </tr>
+    {% for vnos in vnosi_baze %}
+        <tr>
+            <td>
+                <div class="value">
+                    {{vnos.sestavina}} 
+                </div>
+                {% if edit %}
+                <div class="edit hidden">
+                    <input type="number" name="sestavina" value="{{vnos.sestavina.id}}">
+                </div>
+                {% endif %}
+            </td>
+            <td>
+                <div class="value">
+                    {{vnos.stevilo}} 
+                </div>
+                {% if edit %}
+                <div class="edit hidden">
+                    <input type="number" name="stevilo" value="{{vnos.stevilo}}">
+                </div>
+                {% endif %}
+            </td>
+            {% if cena %}
+            <td>
+                <div class="value">
+                    {{vnos.cena}} 
+                </div>
+                {% if edit %}
+                <div class="edit hidden">
+                    <input type="text" name="cena" value="{{vnos.cena}}">
+                </div>
+                {% endif %}
+            </td>
+            {% endif %}
+            {% if edit %}
+            <td>
+                <div class="value">
+                    <button class="btn btn-secundary"> E </button> 
+                </div>
+                <div class="edit hidden">
+                    <button class="btn btn-success"> Save </button>
+                    <button clas="btn btn-secundary"> <- </button>
+                </div>
+            </td>
+            {% endif %}
+            {% if delete %}
+            <td>
+                <button class="btn btn-danger"> X </button> 
+            </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>

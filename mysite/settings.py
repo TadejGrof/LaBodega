@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'zaloga.apps.ZalogaConfig',
     'program.apps.ProgramConfig',
     'prodaja.apps.ProdajaConfig',
+    'proizvodnja.apps.ProizvodnjaConfig',
+    'rest_framework'
 ]
 
 

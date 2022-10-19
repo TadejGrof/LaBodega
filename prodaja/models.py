@@ -11,7 +11,6 @@ class Prodaja(models.Model):
     stevilo_faktur = models.IntegerField(default=0)
     stevilo_racunov = models.IntegerField(default=0)
     
-
     def naslednja_faktura(self):
         self.stevilo_faktur += 1
         self.save()

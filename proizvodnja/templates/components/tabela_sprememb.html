@@ -1,0 +1,36 @@
+<table class="table table-bordered table-hover">
+    <tr class="header">
+        <th colspan="6">
+            Baza:
+        </th>
+        <th>
+            Tip:
+        </th>
+        <th>
+            Čas:
+        </th>
+        {% if ogled %}
+        <th>
+            Ogled:
+        </th>
+        {% endif %}
+    </tr>
+    {% for vnos in spremembe %}
+        <tr>
+            <td>
+                {{vnos.baza}}
+            </td>
+            <td>
+                {{vnos.tip}}
+            </td>
+            <td>
+                {{vnos.cas}}
+            </td>
+            {% if ogled %}
+            <td>
+                <button class="btn btn-seccondary"> Ogled </button>
+            </td>       
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>

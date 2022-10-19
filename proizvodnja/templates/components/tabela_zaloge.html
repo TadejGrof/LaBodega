@@ -1,0 +1,49 @@
+<table class="table table-bordered table-hover">
+    <tr class="header">
+        <th colspan="6">
+            Sestavina:
+        </th>
+        <th>
+            Stevilo:
+        </th>
+        {% if ogled %}
+        <th>
+            Ogled:
+        </th>
+        {% endif %}
+    </tr>
+    {% for vnos in vnosi_zaloge %}
+        <tr>
+            {% if vnos.is_guma and vnos.lastnostSestavine %}
+                <td colspan="2"> 
+                    {{vnos.dimenzija}}
+                </td>
+                <td colspan="2">
+                    {{vnos.tip}}
+                </td>
+                <td colspan="2">
+                    {{vnos.lastnostSestavine}}
+                </td>
+            {% elif vnos.is_guma %}
+                <td colspan="3">
+                    {{vnos.dimeznija}}
+                </td>
+                <td colspan="3">
+                    {{vnos.tip}}
+                </td>
+            {% else %}
+                <td colspan="6">
+                    {{vnos.sestavina}}
+                </td>
+            {% endif %}
+            <td>
+                {{vnos.kolicina}}
+            </td>
+            {% if ogled %}
+            <td>
+                <button class="btn btn-seccondary"> Ogled </button>
+            </td>       
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>

@@ -3,7 +3,7 @@ from .models import Zaklep,Dimenzija, Sestavina, Zaloga, Vnos,Baza, Stroski_Grou
 from .models import TIPI_BAZE
 
 admin.site.register(Zaloga)
-admin.site.register(Dimenzija)
+
 admin.site.register(Sestavina)
 
 class TipListFilter(admin.SimpleListFilter):

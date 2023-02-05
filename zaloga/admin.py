@@ -24,6 +24,11 @@ class BazaAdmin(admin.ModelAdmin):
     list_display = ('title','status','zaloga', 'tip', 'datum','stranka','kontejner','dnevna_prodaja','zalogaPrenosa')
     list_filter = (TipListFilter,"zaloga","stranka",)
 
+@admin.register(Dimenzija)
+class BazaAdmin(admin.ModelAdmin):
+    list_display = ('dimenzija', 'radius', 'height', 'width', 'special', 'diameter')
+
+
 admin.site.register(Zaklep)
 admin.site.register(Vnos)
 admin.site.register(Stroski_Group)

@@ -312,7 +312,8 @@ class Dimenzija(models.Model):
     height = models.CharField(max_length=10)
     width = models.CharField(max_length=10)
     special = models.BooleanField(default=False)
-
+    diameter = models.IntegerField(default = 0)
+    
     class Meta:
         ordering = ['radius', 'height', 'width' , 'special']
 

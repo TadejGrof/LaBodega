@@ -10,4 +10,10 @@
             {% endfor %}
         </select>
     {% endif %}
+    {% if tip == "vele_prodaja" %}
+        <select name="type">
+            <option value="standard"> Standard list </option>
+            <option value="loading"> Loading list</option>
+        </select>
+    {% endif %}
 </form>

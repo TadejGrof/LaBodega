@@ -173,6 +173,39 @@ def tabela_baze(p, baza, tip, top = 800, jezik = "spa"):
         top = zadnja_vrstica_baze(p,baza,tip,top)
     podpis(p,top)
 
+def tabela_loading_vele_prodaje(p, baza, tip, top = 800, jezik = "spa"):
+    p.translate(-15,0)
+    data = [[
+            slovar['Title'][jezik] + ':', baza.title,
+            slovar['Datum'][jezik] + ':', baza.datum,
+            'Cliente:', baza.stranka.naziv]]
+    tabela(p,data,centerStyle)
+    top = naslednja_vrstica(p,top)
+    top = naslednja_vrstica(p,top)
+    data=  [[slovar['Dimenzija'][jezik], slovar['Tip'][jezik], slovar['Stevilo'][jezik]]]
+    style = TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+    tabela(p,data,style)
+    top = naslednja_vrstica(p,top)
+    vnosi = baza.vnos_set.all().order_by("dimenzija__diameter")
+    if tip != "all":
+        vnosi = vnosi.filter(tip=tip)
+    for vnos in vnosi:
+        data = [[
+            vnos.dimenzija,
+            vnos.tip,
+            vnos.stevilo]]
+        style= TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
+                        ])
+        tabela(p,data,style)
+        top = naslednja_vrstica(p,top)
+    top = zadnja_vrstica_baze(p,baza,tip,top)
+    podpis(p,top)
+
 def tabela_razlike_inventure(p,baza,top=800,jezik = "spa"):
     header = [slovar['Dimenzija'][jezik],
             slovar['Tip'][jezik],

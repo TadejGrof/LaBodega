@@ -303,4 +303,28 @@ def nova_zaloga(ime,tipi,prodaje):
     tipi = json.dumps(tipi)
     prodaje = json.dumps(prodaje)
     Zaloga.objects.create(title=ime,tipi_sestavine=tipi,tipi_prodaje=prodaje)
-    
+
+
+def set_diameters():
+    dimenzije = Dimenzija.objects.all()
+    for dimenzija in dimenzije:
+        try:
+            print(dimenzija.dimenzija)
+            radij = float(dimenzija.radius.replace("R",''))
+            radijMM = radij * 25.4
+            visina = float(dimenzija.height)
+            if dimenzija.width == "R":
+                razmerje = 80. / 100
+            else:
+                razmerje = float(dimenzija.width) / 100
+            if razmerje > 0.2 and visina > 50:
+                notranji_del = visina * razmerje
+                dimenzija.diameter = round(notranji_del * 2 + radijMM)
+            else:
+                visina = visina * 25.4
+                sirina = (7 + (29 - float(dimenzija.width)) * 0.5) * 25.4
+                dimenzija.diameter = round(sirina * 2 + radijMM) 
+        except: 
+            print("NAPAKA:" + dimenzija.dimenzija)
+            dimenzija.diameter = 0
+    Dimenzija.objects.bulk_update(dimenzije,["diameter"])
